@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resources — Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .res-section { margin-bottom: 3rem; }
+    .res-section h2 { border-bottom: 2px solid var(--border); padding-bottom: .5rem; margin-bottom: 1.25rem; }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1.5rem;
+    }
+    .filter-btn {
+      padding: .35rem .9rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--text-muted);
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--brand-cyan);
+      border-color: var(--brand-cyan);
+      color: #fff;
+    }
+    .resource-item { display: none; }
+    .resource-item.visible { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="theory.html">Theory</a></li>
+    <li><a href="calculators.html">Calculators</a></li>
+    <li><a href="resources.html" class="active">Resources</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>&#128218; Resources</h1>
+  <p>Textbooks, landmark papers, software, standards, and online tools for ultrasonic NDE</p>
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" id="res-search" placeholder="Search resources…" oninput="filterResources()" />
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('textbook', this)">&#128218; Textbooks</button>
+      <button class="filter-btn" onclick="setFilter('paper', this)">&#128196; Papers</button>
+      <button class="filter-btn" onclick="setFilter('software', this)">&#128187; Software</button>
+      <button class="filter-btn" onclick="setFilter('standard', this)">&#128220; Standards</button>
+      <button class="filter-btn" onclick="setFilter('online', this)">&#127760; Online</button>
+    </div>
+
+    <div id="resource-list" class="resource-list">
+
+      <!-- ── TEXTBOOKS ─────────────────────────────────── -->
+      <div class="resource-item visible" data-type="textbook" data-text="ultrasonic testing nondestructive rose">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h4>Ultrasonic Testing of Materials — Krautkrämer &amp; Krautkrämer</h4>
+          <p>The definitive reference for conventional UT. Covers wave physics, transducers, testing techniques, and defect evaluation. Often called "the bible of UT."</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-orange tag">Textbook</span>
+            <span class="tag">Foundation</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="textbook" data-text="rose ultrasonic waves solid media">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h4>Ultrasonic Waves in Solid Media — Joseph L. Rose</h4>
+          <p>Comprehensive treatment of guided wave theory and applications. Essential for Lamb waves, pipe inspection, and phased-array analysis. Rose is at Penn State.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-orange tag">Textbook</span>
+            <span class="tag">Guided Waves</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="textbook" data-text="schmerr fundamentals ultrasonic phased arrays">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h4>Fundamentals of Ultrasonic Phased Arrays — Lester Schmerr</h4>
+          <p>Systematic treatment of phased-array beam modeling, focal laws, and imaging. Includes MATLAB code. Schmerr is at Iowa State (CNDE).</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-orange tag">Textbook</span>
+            <span class="tag">Phased Arrays</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="textbook" data-text="achenbach wave propagation elastic solids">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h4>Wave Propagation in Elastic Solids — J. D. Achenbach</h4>
+          <p>Rigorous mathematical treatment of elastodynamics. Required reading for anyone working with wave scattering, diffraction, and anisotropic media.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-orange tag">Textbook</span>
+            <span class="tag">Theory</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="textbook" data-text="olympus ndt practical phased array">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h4>Phased Array Testing — Basic Theory for Industrial Applications (Olympus NDT)</h4>
+          <p>Free PDF from Olympus. Very practical — covers probe selection, wedge angles, S-scan setup, and weld inspection. Good starting point before the Schmerr book.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-orange tag">Textbook</span>
+            <span class="tag-green tag">Free PDF</span>
+            <span class="tag">Practical</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="textbook" data-text="nondestructive testing handbook ASNT">
+        <div class="resource-icon">&#128218;</div>
+        <div class="resource-body">
+          <h4>Nondestructive Testing Handbook, Vol. 7: Ultrasonic Testing — ASNT</h4>
+          <p>The ASNT handbook series. Vol. 7 covers the full spectrum of UT methods, from pulse-echo basics to TOFD and advanced imaging. Standard reference for Level III certification.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-orange tag">Textbook</span>
+            <span class="tag-purple tag">ASNT</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAPERS ─────────────────────────────────────── -->
+      <div class="resource-item visible" data-type="paper" data-text="Holmes Drinkwater Wilcox total focusing method TFM 2005">
+        <div class="resource-icon">&#128196;</div>
+        <div class="resource-body">
+          <h4>Post-processing of the Full Matrix of Ultrasonic Transmit–Receive Array Data for Non-destructive Evaluation — Holmes, Drinkwater, Wilcox (2005)</h4>
+          <p><em>NDT&amp;E International.</em> The landmark paper introducing FMC/TFM. Essential reading for anyone working with array imaging.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Paper</span>
+            <span class="tag">FMC/TFM</span>
+            <span class="tag-green tag">Landmark</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="paper" data-text="Reverdy Audoin acoustic nonlinearity parameter fatigue 2001">
+        <div class="resource-icon">&#128196;</div>
+        <div class="resource-body">
+          <h4>Acoustic Nonlinearity Parameter &beta; Measurement — Review of Methods</h4>
+          <p>Reviews techniques for measuring &beta; using harmonic generation and resonance methods. Key reference for nonlinear UT / early damage detection.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Paper</span>
+            <span class="tag">Nonlinear UT</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="paper" data-text="Drinkwater Wilcox ultrasonic arrays NDE review 2006">
+        <div class="resource-icon">&#128196;</div>
+        <div class="resource-body">
+          <h4>Ultrasonic Arrays for Non-destructive Evaluation: A Review — Drinkwater &amp; Wilcox (2006)</h4>
+          <p><em>NDT&amp;E International.</em> Broad survey of array imaging methods, beam forming, signal processing, and applications. Excellent overview paper.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Paper</span>
+            <span class="tag">Review</span>
+            <span class="tag">Arrays</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="paper" data-text="Michaels grain noise scattering SNR 2008">
+        <div class="resource-icon">&#128196;</div>
+        <div class="resource-body">
+          <h4>Frequency-Dependent Ultrasonic Grain Noise in Metals — Margetan, Thompson, Yalda-Mooshabad</h4>
+          <p>Foundational paper on coherent grain noise statistics, frequency scaling laws, and SNR prediction. Invaluable for inspection planning in coarse-grained materials.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Paper</span>
+            <span class="tag">Grain Noise</span>
+            <span class="tag">SNR</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="paper" data-text="Wilcox SAFT synthetic aperture focusing 2003">
+        <div class="resource-icon">&#128196;</div>
+        <div class="resource-body">
+          <h4>A Rapid Signal Processing Technique to Remove the Effect of Dispersion from Guided Wave Signals — Wilcox (2003)</h4>
+          <p><em>IEEE T-UFFC.</em> Introduces the Warped Frequency Transform for dispersion compensation in guided wave inspection. Widely cited in the GW community.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Paper</span>
+            <span class="tag">Guided Waves</span>
+            <span class="tag">Dispersion</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SOFTWARE ───────────────────────────────────── -->
+      <div class="resource-item visible" data-type="software" data-text="CIVA simulation phased array UT">
+        <div class="resource-icon">&#128187;</div>
+        <div class="resource-body">
+          <h4>CIVA — CEA (France)</h4>
+          <p>Industry-standard simulation platform for UT, ET, and RT. Models beam propagation, defect response, and phased-array imaging. Free academic licenses available.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Software</span>
+            <span class="tag">Simulation</span>
+            <span class="tag-green tag">Academic License</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="software" data-text="COMSOL multiphysics acoustics piezoelectric FEM">
+        <div class="resource-icon">&#128187;</div>
+        <div class="resource-body">
+          <h4>COMSOL Multiphysics — Acoustics &amp; Structural Mechanics Modules</h4>
+          <p>FEM/FEA for modeling wave propagation, transducer resonance, and piezoelectric coupling. Very flexible; steep learning curve. Purdue has a campus license.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Software</span>
+            <span class="tag">FEM</span>
+            <span class="tag-purple tag">Purdue License</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="software" data-text="OpenPDC python ultrasound signal processing open source">
+        <div class="resource-icon">&#128187;</div>
+        <div class="resource-body">
+          <h4>ARIM / PyUS — Python UT Signal Processing Libraries</h4>
+          <p>Open-source Python libraries for UT data processing: A-scan filtering, TFM reconstruction, dispersion curve calculation (scikit-signal, arim). Community-maintained.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Software</span>
+            <span class="tag-green tag">Open Source</span>
+            <span class="tag">Python</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="software" data-text="DISPERSE guided wave dispersion curves Imperial College">
+        <div class="resource-icon">&#128187;</div>
+        <div class="resource-body">
+          <h4>DISPERSE — Imperial College London</h4>
+          <p>Software for computing dispersion curves of guided waves in layered media (plates, pipes, coatings). The standard tool for guided wave mode selection. Free for research.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Software</span>
+            <span class="tag">Guided Waves</span>
+            <span class="tag-green tag">Free Research</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="software" data-text="UT Tools MATLAB toolbox phased array FMC TFM">
+        <div class="resource-icon">&#128187;</div>
+        <div class="resource-body">
+          <h4>MATLAB Phased Array System Toolbox</h4>
+          <p>MathWorks toolbox with functions for array design, beam forming, and signal simulation. Useful for prototyping focal laws and evaluating grating lobes.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Software</span>
+            <span class="tag">MATLAB</span>
+            <span class="tag">Arrays</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STANDARDS ──────────────────────────────────── -->
+      <div class="resource-item visible" data-type="standard" data-text="ASTM E2491 phased array standard practice">
+        <div class="resource-icon">&#128220;</div>
+        <div class="resource-body">
+          <h4>ASTM E2491 — Standard Guide for Evaluating PA UT Equipment</h4>
+          <p>Covers verification of phased-array systems: beam steering, focal depth, sensitivity calibration. Reference for qualifying PA UT setups.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-purple tag">Standard</span>
+            <span class="tag">ASTM</span>
+            <span class="tag">Phased Arrays</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="standard" data-text="ASTM E2580 TOFD time of flight diffraction">
+        <div class="resource-icon">&#128220;</div>
+        <div class="resource-body">
+          <h4>ASTM E2580 — Standard Practice for TOFD</h4>
+          <p>Establishes procedures for time-of-flight diffraction UT of welds. Covers probe placement, calibration, and defect sizing.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-purple tag">Standard</span>
+            <span class="tag">ASTM</span>
+            <span class="tag">TOFD</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="standard" data-text="ASME BPVC V Article 4 UT pressure vessel">
+        <div class="resource-icon">&#128220;</div>
+        <div class="resource-body">
+          <h4>ASME BPVC Section V — Article 4: Ultrasonic Examination</h4>
+          <p>Governing code for UT of pressure vessels and piping. Required knowledge for anyone inspecting ASME-coded components.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-purple tag">Standard</span>
+            <span class="tag">ASME</span>
+            <span class="tag">Pressure Vessels</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="standard" data-text="ISO 16827 characterization sizing defects">
+        <div class="resource-icon">&#128220;</div>
+        <div class="resource-body">
+          <h4>ISO 16827 — Characterization and Sizing of Discontinuities</h4>
+          <p>International standard for defect sizing by UT: 6 dB drop, 20 dB drop, DGS, and TOFD methods. Widely used in European aerospace and power generation.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag-purple tag">Standard</span>
+            <span class="tag">ISO</span>
+            <span class="tag">Sizing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ONLINE ──────────────────────────────────────── -->
+      <div class="resource-item visible" data-type="online" data-text="NDTS online training ASNT UT Level II course">
+        <div class="resource-icon">&#127760;</div>
+        <div class="resource-body">
+          <h4>ASNT NDT Resource Center — e-learning</h4>
+          <p>ASNT's online learning portal with UT Level I &amp; II study materials, quizzes, and reference data. Good supplement to formal training.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Online</span>
+            <span class="tag-green tag">Free</span>
+            <span class="tag">Training</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="online" data-text="NDT resource center Iowa State CNDE">
+        <div class="resource-icon">&#127760;</div>
+        <div class="resource-body">
+          <h4>NDT Resource Center — Iowa State / CNDE</h4>
+          <p>Comprehensive online reference by the Center for NDE at Iowa State. Covers all major NDE methods with diagrams, equations, and interactive applets.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Online</span>
+            <span class="tag-green tag">Free</span>
+            <span class="tag">Reference</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="online" data-text="Guided waves 101 video course YouTube">
+        <div class="resource-icon">&#127760;</div>
+        <div class="resource-body">
+          <h4>IEEE T-UFFC — IEEE Transactions on Ultrasonics, Ferroelectrics, and Frequency Control</h4>
+          <p>The primary journal for UT and acoustics research. Open access articles available. Subscribe for new publication alerts relevant to your research area.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Online</span>
+            <span class="tag">Journal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-item visible" data-type="online" data-text="NDT global forum industry community">
+        <div class="resource-icon">&#127760;</div>
+        <div class="resource-body">
+          <h4>NDT.net — Open Access NDT Journal &amp; Community</h4>
+          <p>Large archive of conference proceedings, journal articles, and technical reports on NDE. Many papers are freely downloadable. Good for industry-practice literature.</p>
+          <div class="card-tags" style="margin-top:.4rem;">
+            <span class="tag">Online</span>
+            <span class="tag-green tag">Free</span>
+            <span class="tag">Archive</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /resource-list -->
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="resources.html">Resources</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  let activeFilter = 'all';
+
+  function setFilter(type, btn) {
+    activeFilter = type;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function filterResources() { applyFilters(); }
+
+  function applyFilters() {
+    const query = (document.getElementById('res-search').value || '').toLowerCase();
+    document.querySelectorAll('.resource-item').forEach(item => {
+      const typeMatch = activeFilter === 'all' || item.dataset.type === activeFilter;
+      const textMatch = !query || item.dataset.text.toLowerCase().includes(query)
+                        || item.innerText.toLowerCase().includes(query);
+      item.classList.toggle('visible', typeMatch && textMatch);
+    });
+  }
+</script>
+</body>
+</html>

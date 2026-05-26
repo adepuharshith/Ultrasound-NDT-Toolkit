@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Theory — Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="theory.html" class="active">Theory</a></li>
+    <li><a href="calculators.html">Calculators</a></li>
+    <li><a href="resources.html">Resources</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>&#128200; Theory</h1>
+  <p>Foundations of ultrasonic wave physics, transducer design, and NDE imaging modes</p>
+</div>
+
+<!-- CONTENT -->
+<section class="section">
+  <div class="container">
+    <div class="two-col-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="topic-sidebar">
+        <h4>Topics</h4>
+        <a href="#wave-propagation">Wave Propagation</a>
+        <a href="#acoustic-impedance">Acoustic Impedance</a>
+        <a href="#attenuation">Attenuation</a>
+        <a href="#transducers">Transducers</a>
+        <a href="#beam-physics">Beam Physics</a>
+        <a href="#snell">Snell's Law &amp; Mode Conversion</a>
+        <a href="#imaging">Imaging Modes</a>
+        <a href="#signal-processing">Signal Processing</a>
+        <a href="#phased-arrays">Phased Arrays</a>
+        <a href="#advanced">Advanced Techniques</a>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main>
+
+        <!-- Wave Propagation -->
+        <div class="theory-section" id="wave-propagation">
+          <h2>&#127744; Wave Propagation</h2>
+          <p>
+            Ultrasonic waves are mechanical disturbances that propagate through a medium by
+            transferring kinetic and potential energy between neighboring particles. In NDE,
+            frequencies typically range from <strong>0.1 MHz to 50 MHz</strong>, well above
+            the audible limit.
+          </p>
+
+          <h3>Wave Equation</h3>
+          <p>The scalar wave equation governing pressure in a fluid:</p>
+          <div class="eq-box">&#8711;&sup2;p &minus; (1/c&sup2;) &part;&sup2;p/&part;t&sup2; = 0</div>
+          <p>where <em>p</em> is acoustic pressure and <em>c</em> is the wave speed.</p>
+
+          <h3>Wave Modes in Solids</h3>
+          <ul>
+            <li><strong>Longitudinal (P-wave):</strong> particle motion parallel to propagation. Fastest mode; exists in all media.</li>
+            <li><strong>Shear (S-wave / transverse):</strong> particle motion perpendicular to propagation. Only in solids; slower than P-waves (c<sub>S</sub> ≈ 0.55 c<sub>L</sub>).</li>
+            <li><strong>Rayleigh (surface) wave:</strong> elliptical particle motion confined to the surface; useful for surface defect detection.</li>
+            <li><strong>Lamb waves (plate waves):</strong> guided waves in thin plates; symmetric (S) and antisymmetric (A) modes; highly dispersive.</li>
+          </ul>
+
+          <h3>Wave Speed in Isotropic Solids</h3>
+          <div class="eq-box">
+            c<sub>L</sub> = &radic;[(E(1&minus;&nu;)) / (&rho;(1+&nu;)(1&minus;2&nu;))]<br/>
+            c<sub>S</sub> = &radic;[G/&rho;] = &radic;[E / (2&rho;(1+&nu;))]
+          </div>
+          <p>where <em>E</em> = Young's modulus, <em>&nu;</em> = Poisson's ratio, <em>&rho;</em> = density, <em>G</em> = shear modulus.</p>
+
+          <div class="callout">
+            <strong>Typical values:</strong> Longitudinal speed in steel ≈ 5900 m/s; in aluminum ≈ 6320 m/s; in water ≈ 1480 m/s; in HDPE ≈ 2500 m/s.
+          </div>
+
+          <h3>Wavelength and Resolution</h3>
+          <div class="eq-box">&lambda; = c / f</div>
+          <p>Spatial resolution is fundamentally limited to approximately one wavelength. Higher frequency → smaller wavelength → finer resolution, but also more attenuation. This is the central design trade-off in UT inspection.</p>
+        </div>
+
+        <!-- Acoustic Impedance -->
+        <div class="theory-section" id="acoustic-impedance">
+          <h2>&#128260; Acoustic Impedance</h2>
+          <p>
+            Acoustic impedance <em>Z</em> is a material property that determines how much of an
+            incident wave is reflected or transmitted at an interface.
+          </p>
+          <div class="eq-box">Z = &rho; &times; c &nbsp;&nbsp; [units: Pa·s/m = Rayl]</div>
+
+          <h3>Reflection &amp; Transmission Coefficients (Normal Incidence)</h3>
+          <div class="eq-box">
+            R = [(Z<sub>2</sub> &minus; Z<sub>1</sub>) / (Z<sub>2</sub> + Z<sub>1</sub>)]&sup2; &nbsp;&nbsp;&nbsp; (intensity reflection)<br/>
+            T = 1 &minus; R &nbsp;&nbsp;&nbsp; (intensity transmission)
+          </div>
+
+          <div class="callout">
+            <strong>Example:</strong> Steel–air interface: Z<sub>steel</sub> ≈ 46 MRayl, Z<sub>air</sub> ≈ 0.0004 MRayl → R ≈ 100%. Nearly all energy reflects — this is why couplant is essential.
+          </div>
+
+          <h3>Importance of Couplant</h3>
+          <p>
+            A thin liquid couplant (water, gel, oil) between the transducer and test piece eliminates the
+            air gap, enabling energy transmission. Without couplant, the transducer–air–solid interface
+            reflects nearly all acoustic energy back.
+          </p>
+        </div>
+
+        <!-- Attenuation -->
+        <div class="theory-section" id="attenuation">
+          <h2>&#128308; Attenuation</h2>
+          <p>
+            Wave amplitude decreases with propagation distance due to
+            <strong>absorption</strong> (conversion to heat) and <strong>scattering</strong>
+            (energy redirected by grain boundaries, pores, inclusions).
+          </p>
+          <div class="eq-box">A(x) = A<sub>0</sub> &middot; e<sup>&minus;&alpha;&middot;x</sup></div>
+          <p>or in dB: <strong>Loss (dB) = &alpha;<sub>dB</sub> &middot; f &middot; x</strong></p>
+          <p>
+            &alpha;<sub>dB</sub> is the attenuation coefficient in dB/(mm·MHz); it is material- and
+            frequency-dependent and must be measured experimentally for each material.
+          </p>
+
+          <h3>Frequency Dependence</h3>
+          <ul>
+            <li><strong>Absorption:</strong> scales roughly linearly with frequency (viscous losses).</li>
+            <li><strong>Rayleigh scattering (d ≪ λ):</strong> scales as f⁴ — dominant in fine-grained materials at high frequency.</li>
+            <li><strong>Stochastic scattering (d ~ λ):</strong> scales as f² — typical grain-noise regime in metals.</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Rule of thumb:</strong> For carbon steel, &alpha; ≈ 0.5–2 dB/(mm·MHz) at 5 MHz depending on grain size. Coarse-grained castings can be 10× worse.
+          </div>
+        </div>
+
+        <!-- Transducers -->
+        <div class="theory-section" id="transducers">
+          <h2>&#128268; Transducers</h2>
+          <p>
+            Ultrasonic transducers convert electrical energy to acoustic energy (and back) via the
+            piezoelectric effect. The active element is typically a piezoelectric crystal
+            (PZT, PVDF, LiNbO₃) that deforms when a voltage is applied.
+          </p>
+
+          <h3>Piezoelectric Effect</h3>
+          <p>
+            When mechanical stress is applied to a piezoelectric material, an electric charge is
+            generated (direct effect). Conversely, applying voltage produces mechanical deformation
+            (converse effect). NDE transducers exploit both: transmit (converse) and receive (direct).
+          </p>
+
+          <h3>Transducer Types</h3>
+          <ul>
+            <li><strong>Contact transducers:</strong> used directly on the test surface with couplant. Available as straight-beam (longitudinal) or angle-beam (shear/Rayleigh).</li>
+            <li><strong>Immersion transducers:</strong> water-coupled; allow precise focal control and scanning. Common for C-scan imaging.</li>
+            <li><strong>Dual-element (TR) transducers:</strong> separate transmit and receive elements; reduced near-surface dead zone; useful for corrosion mapping.</li>
+            <li><strong>EMAT (Electromagnetic Acoustic Transducer):</strong> non-contact; generates waves via Lorentz force; no couplant needed; lower sensitivity.</li>
+            <li><strong>Air-coupled transducers:</strong> non-contact, used for composites and foam. Low impedance mismatch managed by matching layers.</li>
+          </ul>
+
+          <h3>Bandwidth &amp; Pulse Shape</h3>
+          <p>
+            A transducer's <strong>−6 dB bandwidth</strong> determines axial resolution. Broadband
+            transducers (80–120% fractional bandwidth) give short pulses and fine axial resolution.
+            Narrowband transducers sacrifice resolution for sensitivity.
+          </p>
+        </div>
+
+        <!-- Beam Physics -->
+        <div class="theory-section" id="beam-physics">
+          <h2>&#128301; Beam Physics</h2>
+
+          <h3>Near Field (Fresnel Zone)</h3>
+          <p>
+            In the near field, the beam intensity varies irregularly due to constructive/destructive
+            interference. The near-field distance (also called Rayleigh distance) is:
+          </p>
+          <div class="eq-box">N = D&sup2; / (4&lambda;) = D&sup2; &middot; f / (4c)</div>
+          <p>where <em>D</em> = transducer diameter, <em>&lambda;</em> = wavelength. Inspection is generally
+          more reliable in the far field (beyond N), or at the natural focus.</p>
+
+          <h3>Far Field (Fraunhofer Zone)</h3>
+          <p>Beyond the near field, beam diverges with a half-angle:</p>
+          <div class="eq-box">sin(&theta;<sub>½</sub>) ≈ 0.514 &lambda; / D &nbsp;&nbsp; (−6 dB edge)</div>
+
+          <h3>Focused Transducers</h3>
+          <p>
+            A lens or curved element focuses the beam at a depth <em>F</em>. The −6 dB focal spot
+            diameter governs lateral resolution:
+          </p>
+          <div class="eq-box">d<sub>spot</sub> ≈ 1.02 &lambda; F / D = 1.02 F / (f-number)</div>
+
+          <div class="callout">
+            <strong>Design trade-off:</strong> Tighter focus (smaller f-number) → better lateral resolution, but shorter depth of field. For thick parts, an unfocused or weakly focused beam may be preferred.
+          </div>
+        </div>
+
+        <!-- Snell's Law -->
+        <div class="theory-section" id="snell">
+          <h2>&#128200; Snell's Law &amp; Mode Conversion</h2>
+          <p>
+            At an oblique interface between two media, refraction and mode conversion occur.
+            The generalized Snell's law (for all mode combinations) is:
+          </p>
+          <div class="eq-box">
+            sin(&theta;<sub>i</sub>) / c<sub>i</sub> = sin(&theta;<sub>r</sub>) / c<sub>r</sub>
+          </div>
+
+          <h3>Critical Angles</h3>
+          <ul>
+            <li><strong>First critical angle:</strong> refracted longitudinal wave travels at 90°; only shear wave transmitted.</li>
+            <li><strong>Second critical angle:</strong> refracted shear wave travels at 90°; total internal reflection (surface/Rayleigh waves generated).</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Angle beam inspection:</strong> Wedge transducers exploit mode conversion at the wedge–part interface to inject shear waves at a specific angle (e.g., 45°, 60°, 70°) for weld inspection.
+          </div>
+        </div>
+
+        <!-- Imaging Modes -->
+        <div class="theory-section" id="imaging">
+          <h2>&#129302; Imaging Modes</h2>
+
+          <h3>A-scan</h3>
+          <p>
+            The most basic display: amplitude vs. time. Shows echoes from interfaces and defects
+            along the beam axis. The time axis is converted to depth using <em>d = c·t/2</em>
+            (round-trip).
+          </p>
+
+          <h3>B-scan</h3>
+          <p>
+            A 2D cross-section: the transducer is scanned linearly, and A-scans are stacked to form
+            a depth profile. Resembles a medical ultrasound image.
+          </p>
+
+          <h3>C-scan</h3>
+          <p>
+            A planar top-view map: the transducer is raster-scanned over the part surface, and a
+            gated amplitude (or TOF) value is recorded at each XY position. Widely used for
+            composite inspection and corrosion mapping.
+          </p>
+
+          <h3>SAFT (Synthetic Aperture Focusing Technique)</h3>
+          <p>
+            Post-processing algorithm that computationally focuses pulse-echo data from a single-element
+            transducer. Each A-scan contributes to a spatially coherent image at every depth point.
+            Equivalent to SAR in radar.
+          </p>
+
+          <h3>FMC / TFM (Full Matrix Capture / Total Focusing Method)</h3>
+          <p>
+            With a phased array, every transmit–receive element combination is recorded (Full Matrix).
+            TFM then delay-and-sums this data to focus at every pixel in the image, achieving
+            near-optimal resolution everywhere. The current gold standard for advanced array imaging.
+          </p>
+
+          <h3>TOFD (Time of Flight Diffraction)</h3>
+          <p>
+            Uses diffracted signals (not reflected) from defect tips. Two angled transducers straddle
+            a weld; diffraction at crack tips allows precise depth sizing independent of orientation.
+            Excellent for vertical planar defects.
+          </p>
+        </div>
+
+        <!-- Signal Processing -->
+        <div class="theory-section" id="signal-processing">
+          <h2>&#128250; Signal Processing</h2>
+
+          <h3>Envelope Detection (Hilbert Transform)</h3>
+          <p>
+            The RF signal from a transducer is a modulated sinusoid. The <strong>envelope</strong>
+            (magnitude of the analytic signal) is computed via the Hilbert transform and used for
+            display and gating.
+          </p>
+
+          <h3>Filtering</h3>
+          <p>
+            Bandpass filtering removes out-of-band noise and DC offset. A typical filter is centered
+            at the transducer's center frequency with a bandwidth matching the transducer's −6 dB bandwidth.
+          </p>
+
+          <h3>Time Gain Compensation (TGC)</h3>
+          <p>
+            Depth-dependent amplification applied to compensate for attenuation. A TGC ramp keeps
+            the displayed signal level roughly constant with depth.
+          </p>
+
+          <h3>Pulse Compression</h3>
+          <p>
+            Transmitting a long coded pulse (chirp) and applying matched filter at reception increases
+            SNR (processing gain) while maintaining range resolution. Used in air-coupled and low-SNR
+            applications.
+          </p>
+
+          <h3>SNR &amp; Noise Sources</h3>
+          <ul>
+            <li><strong>Electronic noise:</strong> amplifier Johnson noise floor.</li>
+            <li><strong>Coherent grain noise (grass):</strong> scattering from microstructure; coherent with signal; hardest to suppress.</li>
+            <li><strong>Geometric noise:</strong> surface roughness, part geometry echoes.</li>
+          </ul>
+        </div>
+
+        <!-- Phased Arrays -->
+        <div class="theory-section" id="phased-arrays">
+          <h2>&#128264; Phased Arrays</h2>
+          <p>
+            A phased array transducer contains many small elements (typically 16–256) that can be
+            excited with programmable time delays, enabling electronic beam steering and focusing
+            without physical movement.
+          </p>
+
+          <h3>Beam Steering</h3>
+          <div class="eq-box">t<sub>n</sub> = (n &middot; d &middot; sin&theta;) / c</div>
+          <p>Applying delay <em>t<sub>n</sub></em> to element <em>n</em> steers the beam to angle &theta;.
+          Pitch <em>d</em> must be &le; &lambda;/2 to avoid grating lobes.</p>
+
+          <h3>Sectorial Scan (S-scan)</h3>
+          <p>
+            The most common phased-array display: the beam is electronically swept over a range of angles
+            (e.g., 40°–70°) at a fixed focal depth, creating a fan-shaped image. Used extensively for
+            weld inspection.
+          </p>
+
+          <h3>Linear Scan (E-scan)</h3>
+          <p>
+            A fixed aperture (subset of elements) is electronically stepped along the array while
+            keeping the same focal law. Equivalent to mechanically scanning a single-element probe but
+            much faster.
+          </p>
+
+          <div class="callout">
+            <strong>Key advantage of phased arrays:</strong> Electronic scanning is orders of magnitude faster than mechanical scanning, enables rapid volumetric coverage, and allows real-time image reconstruction at inspection speed.
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="theory-section" id="advanced">
+          <h2>&#128300; Advanced Techniques</h2>
+
+          <h3>Nonlinear Ultrasound</h3>
+          <p>
+            At high acoustic amplitudes, material nonlinearity generates harmonics (2f, 3f …) of the
+            fundamental frequency. The <strong>acoustic nonlinearity parameter &beta;</strong> is
+            sensitive to early-stage fatigue damage, dislocations, and microcracking — well before
+            linear methods detect anything.
+          </p>
+
+          <h3>Guided Wave Inspection</h3>
+          <p>
+            Long-range inspection of pipes and plates using Lamb / SH waves. A single transducer ring
+            can screen tens of meters of pipe for corrosion. Mode selection and frequency tuning are
+            critical to maximizing sensitivity for a given defect type.
+          </p>
+
+          <h3>Photoacoustic / Laser UT</h3>
+          <p>
+            A pulsed laser generates broadband ultrasound via thermoelastic expansion (non-contact
+            transmitter). Detection can use a laser interferometer (LDV/SLDV) or an air-coupled
+            transducer. Enables inspection of hot, moving, or inaccessible surfaces.
+          </p>
+
+          <h3>Acoustic Microscopy</h3>
+          <p>
+            High-frequency (50 MHz–2 GHz) focused ultrasound for microstructural imaging and
+            sub-surface feature detection in electronics, biomaterials, and thin coatings.
+            Resolution can reach sub-micron at GHz frequencies.
+          </p>
+        </div>
+
+      </main>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="resources.html">Resources</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

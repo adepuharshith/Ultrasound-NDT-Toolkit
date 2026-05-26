@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculators — Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+      gap: 1.75rem;
+    }
+    @media (max-width: 580px) { .calc-grid { grid-template-columns: 1fr; } }
+
+    .calc-section-title {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--brand-cyan);
+      margin-bottom: .25rem;
+    }
+    .calc-box h3 { font-size: 1.05rem; color: var(--brand-navy); margin-bottom: 1.25rem; }
+    .calc-box .btn { margin-top: .5rem; }
+
+    .mat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+      margin-top: .75rem;
+    }
+    .mat-table th {
+      background: var(--brand-navy);
+      color: #fff;
+      padding: .5rem .75rem;
+      text-align: left;
+      font-weight: 600;
+    }
+    .mat-table td {
+      padding: .45rem .75rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .mat-table tr:last-child td { border-bottom: none; }
+    .mat-table tr:hover td { background: var(--accent-light); }
+
+    .z-result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .6rem;
+      margin-top: 1rem;
+    }
+    .z-cell {
+      background: var(--accent-light);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      text-align: center;
+    }
+    .z-cell .z-label { font-size: .72rem; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: .05em; }
+    .z-cell .z-val   { font-size: 1.2rem; font-weight: 800; color: var(--brand-navy); margin-top: .2rem; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="theory.html">Theory</a></li>
+    <li><a href="calculators.html" class="active">Calculators</a></li>
+    <li><a href="resources.html">Resources</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>&#129518; Calculators</h1>
+  <p>Interactive tools for common ultrasonic NDE computations — live, no install required</p>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="calc-grid">
+
+      <!-- 1. Wavelength -->
+      <div class="calc-box" id="wavelength">
+        <div class="calc-section-title">Wave Physics</div>
+        <h3>&#128200; Wavelength Calculator</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="wl-freq">Frequency (MHz)</label>
+            <input type="number" id="wl-freq" value="5" min="0.01" step="0.1" oninput="calcWavelength()" />
+          </div>
+          <div class="form-group">
+            <label for="wl-vel">Wave Speed (m/s)</label>
+            <input type="number" id="wl-vel" value="5900" min="1" step="10" oninput="calcWavelength()" />
+          </div>
+        </div>
+        <div class="calc-result" id="wl-result">
+          <div class="result-label">Wavelength &lambda;</div>
+          <span class="result-value">—</span>
+          <span class="result-unit">mm</span>
+        </div>
+        <div class="calc-formula">&lambda; = c / f</div>
+        <p class="calc-desc">Tip: use c = 5900 m/s for steel (L-wave), 3200 m/s for steel (S-wave), 1480 m/s for water.</p>
+      </div>
+
+      <!-- 2. Near-Field Distance -->
+      <div class="calc-box" id="nearfield">
+        <div class="calc-section-title">Beam Physics</div>
+        <h3>&#128301; Near-Field Distance (N)</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nf-diam">Transducer Diameter (mm)</label>
+            <input type="number" id="nf-diam" value="12.7" min="0.1" step="0.1" oninput="calcNearField()" />
+          </div>
+          <div class="form-group">
+            <label for="nf-freq">Frequency (MHz)</label>
+            <input type="number" id="nf-freq" value="5" min="0.01" step="0.1" oninput="calcNearField()" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="nf-vel">Wave Speed (m/s)</label>
+          <input type="number" id="nf-vel" value="5900" min="1" step="10" oninput="calcNearField()" />
+        </div>
+        <div class="calc-result" id="nf-result">
+          <div class="result-label">Near-Field Distance N</div>
+          <span class="result-value">—</span>
+          <span class="result-unit">mm</span>
+        </div>
+        <div class="calc-formula">N = D&sup2; / (4&lambda;) = D&sup2; &middot; f / (4c)</div>
+        <p class="calc-desc">Inspection is most reliable at or beyond N. For focused transducers, focal depth should be &le; N.</p>
+      </div>
+
+      <!-- 3. TOF to Depth -->
+      <div class="calc-box" id="tof">
+        <div class="calc-section-title">Depth Sizing</div>
+        <h3>&#9203; Time-of-Flight → Depth</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tof-time">Round-Trip TOF (&mu;s)</label>
+            <input type="number" id="tof-time" value="2.0" min="0" step="0.01" oninput="calcDepth()" />
+          </div>
+          <div class="form-group">
+            <label for="tof-vel">Wave Speed (m/s)</label>
+            <input type="number" id="tof-vel" value="5900" min="1" step="10" oninput="calcDepth()" />
+          </div>
+        </div>
+        <div class="calc-result" id="tof-result">
+          <div class="result-label">Depth (one-way)</div>
+          <span class="result-value">—</span>
+          <span class="result-unit">mm</span>
+        </div>
+        <div class="calc-formula">d = (TOF &times; c) / 2</div>
+        <p class="calc-desc">Enter the total round-trip time measured from the A-scan. Result is one-way depth to the reflector.</p>
+      </div>
+
+      <!-- 4. Attenuation -->
+      <div class="calc-box" id="attenuation">
+        <div class="calc-section-title">Signal Loss</div>
+        <h3>&#128308; Attenuation Loss</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="att-coeff">Attenuation Coeff. &alpha; (dB/mm/MHz)</label>
+            <input type="number" id="att-coeff" value="0.5" min="0" step="0.01" oninput="calcAttenuation()" />
+          </div>
+          <div class="form-group">
+            <label for="att-freq">Frequency (MHz)</label>
+            <input type="number" id="att-freq" value="5" min="0" step="0.1" oninput="calcAttenuation()" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="att-dist">Propagation Distance (mm)</label>
+          <input type="number" id="att-dist" value="50" min="0" step="1" oninput="calcAttenuation()" />
+        </div>
+        <div class="calc-result" id="att-result">
+          <div class="result-label">Total Attenuation</div>
+          <span class="result-value">—</span>
+          <span class="result-unit">dB</span>
+        </div>
+        <div class="calc-formula">Loss = &alpha; &times; f &times; d</div>
+        <p class="calc-desc">Typical &alpha;: steel 0.3–1.5 dB/mm/MHz, aluminum 0.2–0.8, composites 1–5 (fiber direction), HDPE 2–5.</p>
+      </div>
+
+      <!-- 5. Snell's Law -->
+      <div class="calc-box" id="snell">
+        <div class="calc-section-title">Refraction &amp; Mode Conversion</div>
+        <h3>&#128200; Snell's Law &amp; Critical Angle</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="sn-angle">Incident Angle &theta;<sub>1</sub> (deg)</label>
+            <input type="number" id="sn-angle" value="20" min="0" max="90" step="0.5" oninput="calcSnell()" />
+          </div>
+          <div class="form-group">
+            <label for="sn-v1">Speed in Medium 1 (m/s)</label>
+            <input type="number" id="sn-v1" value="1480" min="1" step="10" oninput="calcSnell()" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="sn-v2">Speed in Medium 2 (m/s)</label>
+          <input type="number" id="sn-v2" value="5900" min="1" step="10" oninput="calcSnell()" />
+        </div>
+        <div class="calc-result" id="sn-result">
+          <div class="result-label">Refracted Angle &theta;<sub>2</sub></div>
+          <span class="result-value">—</span>
+          <span class="result-unit">°</span>
+        </div>
+        <div class="calc-formula">sin(&theta;<sub>2</sub>) = (c<sub>2</sub> / c<sub>1</sub>) &middot; sin(&theta;<sub>1</sub>)</div>
+        <p class="calc-desc">Default: water → steel (L-wave). Use c<sub>2</sub> = 3200 m/s for shear wave refraction in steel. "TIR" = total internal reflection.</p>
+      </div>
+
+      <!-- 6. Acoustic Impedance -->
+      <div class="calc-box" id="impedance">
+        <div class="calc-section-title">Interface Analysis</div>
+        <h3>&#128260; Acoustic Impedance &amp; Reflection</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="z-rho1">Density 1 &rho;<sub>1</sub> (kg/m&sup3;)</label>
+            <input type="number" id="z-rho1" value="1000" min="1" step="10" oninput="calcImpedance()" />
+          </div>
+          <div class="form-group">
+            <label for="z-v1">Wave Speed 1 c<sub>1</sub> (m/s)</label>
+            <input type="number" id="z-v1" value="1480" min="1" step="10" oninput="calcImpedance()" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="z-rho2">Density 2 &rho;<sub>2</sub> (kg/m&sup3;)</label>
+            <input type="number" id="z-rho2" value="7800" min="1" step="10" oninput="calcImpedance()" />
+          </div>
+          <div class="form-group">
+            <label for="z-v2">Wave Speed 2 c<sub>2</sub> (m/s)</label>
+            <input type="number" id="z-v2" value="5900" min="1" step="10" oninput="calcImpedance()" />
+          </div>
+        </div>
+        <div class="z-result-grid">
+          <div class="z-cell"><div class="z-label">Z<sub>1</sub></div><div class="z-val" id="z-z1">—</div></div>
+          <div class="z-cell"><div class="z-label">Z<sub>2</sub></div><div class="z-val" id="z-z2">—</div></div>
+          <div class="z-cell"><div class="z-label">Reflection R</div><div class="z-val" id="z-r">—</div></div>
+          <div class="z-cell"><div class="z-label">Transmission T</div><div class="z-val" id="z-t">—</div></div>
+        </div>
+        <div class="calc-formula">Z = &rho;c &nbsp;&nbsp; R = [(Z<sub>2</sub>&minus;Z<sub>1</sub>)/(Z<sub>2</sub>+Z<sub>1</sub>)]&sup2;</div>
+        <p class="calc-desc">Default: water / steel. Reflection and transmission are intensity coefficients (sum to 100%).</p>
+      </div>
+
+    </div>
+
+    <!-- Material Reference Table -->
+    <div style="margin-top:3rem;">
+      <h2 style="margin-bottom:.5rem;">&#128206; Material Reference</h2>
+      <p style="margin-bottom:1rem; font-size:.9rem;">Common values for longitudinal wave speed, density, and acoustic impedance at room temperature.</p>
+      <div style="overflow-x:auto;">
+        <table class="mat-table">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>c<sub>L</sub> (m/s)</th>
+              <th>c<sub>S</sub> (m/s)</th>
+              <th>&rho; (kg/m&sup3;)</th>
+              <th>Z (MRayl)</th>
+              <th>&alpha; (dB/mm/MHz)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Steel (carbon)</td><td>5900</td><td>3200</td><td>7800</td><td>46.0</td><td>0.5–1.5</td></tr>
+            <tr><td>Aluminum 6061</td><td>6320</td><td>3130</td><td>2700</td><td>17.1</td><td>0.2–0.8</td></tr>
+            <tr><td>Titanium Ti-6Al-4V</td><td>6070</td><td>3110</td><td>4430</td><td>26.9</td><td>0.3–1.0</td></tr>
+            <tr><td>Water (20°C)</td><td>1480</td><td>—</td><td>998</td><td>1.48</td><td>0.002</td></tr>
+            <tr><td>Glycerin</td><td>1920</td><td>—</td><td>1260</td><td>2.42</td><td>0.05</td></tr>
+            <tr><td>HDPE</td><td>2500</td><td>900</td><td>950</td><td>2.38</td><td>2–5</td></tr>
+            <tr><td>CFRP (0° fiber, L)</td><td>~7000</td><td>—</td><td>1550</td><td>~10.9</td><td>1–5</td></tr>
+            <tr><td>Glass (borosilicate)</td><td>5640</td><td>3280</td><td>2230</td><td>12.6</td><td>0.1</td></tr>
+            <tr><td>Copper</td><td>4700</td><td>2260</td><td>8900</td><td>41.8</td><td>0.4</td></tr>
+            <tr><td>PZT-5A (piezo)</td><td>4350</td><td>—</td><td>7750</td><td>33.7</td><td>—</td></tr>
+            <tr><td>Air (20°C)</td><td>343</td><td>—</td><td>1.21</td><td>0.0004</td><td>high</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.78rem; color:var(--text-muted); margin-top:.5rem;">Values are approximate; always measure material-specific properties for critical inspections.</p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="resources.html">Resources</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  /* Auto-run all calculators on load */
+  window.addEventListener('load', () => {
+    calcWavelength();
+    calcNearField();
+    calcDepth();
+    calcAttenuation();
+    calcSnell();
+    calcImpedance();
+  });
+</script>
+</body>
+</html>

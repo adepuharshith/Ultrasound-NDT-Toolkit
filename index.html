@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="theory.html">Theory</a></li>
+    <li><a href="calculators.html">Calculators</a></li>
+    <li><a href="resources.html">Resources</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Built by researchers &middot; for researchers</div>
+    <h1>Ultrasound &amp; Nondestructive Testing Toolkit</h1>
+    <p class="lead">
+      Interactive calculators, theory guides, and curated resources for
+      ultrasonic NDE — compiled from real lab experience at Purdue.
+    </p>
+    <div class="hero-cta">
+      <a href="calculators.html" class="btn btn-primary">&#9654; Open Calculators</a>
+      <a href="theory.html"      class="btn btn-outline">&#128218; Explore Theory</a>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK PATHWAYS -->
+<section class="pathways">
+  <h2>What are you trying to do?</h2>
+  <div class="pathway-grid">
+    <a href="theory.html#wave-propagation" class="pathway-card">
+      <div class="pw-icon">&#128200;</div>
+      <h3>Understand wave physics</h3>
+      <p>Wave equations, modes, dispersion, and propagation in solids</p>
+    </a>
+    <a href="calculators.html#wavelength" class="pathway-card">
+      <div class="pw-icon">&#128300;</div>
+      <h3>Calculate wavelength / near-field</h3>
+      <p>Frequency-velocity-wavelength and Rayleigh distance tools</p>
+    </a>
+    <a href="theory.html#transducers" class="pathway-card">
+      <div class="pw-icon">&#128268;</div>
+      <h3>Learn about transducers</h3>
+      <p>Piezoelectrics, beam profiles, pulse-echo, phased arrays</p>
+    </a>
+    <a href="calculators.html#snell" class="pathway-card">
+      <div class="pw-icon">&#128200;</div>
+      <h3>Model refraction / mode conversion</h3>
+      <p>Snell's law, critical angles, oblique incidence</p>
+    </a>
+    <a href="theory.html#imaging" class="pathway-card">
+      <div class="pw-icon">&#129302;</div>
+      <h3>Understand imaging modes</h3>
+      <p>A-scan, B-scan, C-scan, SAFT, FMC/TFM, TOFD</p>
+    </a>
+    <a href="resources.html" class="pathway-card">
+      <div class="pw-icon">&#128218;</div>
+      <h3>Find textbooks &amp; papers</h3>
+      <p>Curated references from classic NDE texts to recent literature</p>
+    </a>
+  </div>
+</section>
+
+<!-- MAIN SECTIONS -->
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Explore the Toolkit</h2>
+      <p>Each section is built to help you go from first principles to practical lab use.</p>
+    </div>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-icon">&#128200;</div>
+        <h3>Theory</h3>
+        <p>Wave propagation, acoustic impedance, attenuation, transducer physics, beam forming, imaging modes, and signal processing fundamentals.</p>
+        <div class="card-tags">
+          <span class="tag">Wave Equations</span>
+          <span class="tag">Piezoelectrics</span>
+          <span class="tag">Beam Physics</span>
+        </div>
+        <a href="theory.html" class="card-link">Open Theory</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">&#129518;</div>
+        <h3>Calculators</h3>
+        <p>Interactive tools: wavelength, near-field distance, attenuation, TOF-to-depth, Snell's law, and acoustic impedance / reflection coefficients.</p>
+        <div class="card-tags">
+          <span class="tag-green tag">Live Compute</span>
+          <span class="tag">6 Calculators</span>
+        </div>
+        <a href="calculators.html" class="card-link">Open Calculators</a>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">&#128218;</div>
+        <h3>Resources</h3>
+        <p>Textbooks, landmark papers, open-source software, simulation tools, and standards (ASTM, ISO) relevant to ultrasonic NDE.</p>
+        <div class="card-tags">
+          <span class="tag-orange tag">Textbooks</span>
+          <span class="tag-purple tag">Standards</span>
+          <span class="tag">Software</span>
+        </div>
+        <a href="resources.html" class="card-link">Open Resources</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT STRIP -->
+<section style="background:#fff; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:2.5rem 2rem;">
+  <div class="container" style="max-width:700px; text-align:center;">
+    <h2 style="margin-bottom:.75rem;">About this toolkit</h2>
+    <p style="font-size:1rem;">
+      This site is an open educational resource compiled from PhD research in
+      ultrasonic NDE at <strong>Purdue University</strong>. It is designed for
+      graduate students, early-career researchers, and engineers entering the
+      field who need both conceptual grounding and practical tools — in one place.
+    </p>
+    <p style="font-size:.88rem; margin-top:.75rem;">
+      Content is continuously updated. Contributions and corrections welcome.
+    </p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="resources.html">Resources</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab &mdash;
+     Built with curiosity and caffeine.</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
