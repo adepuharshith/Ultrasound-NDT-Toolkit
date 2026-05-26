@@ -61,6 +61,33 @@
     }
     .z-cell .z-label { font-size: .72rem; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: .05em; }
     .z-cell .z-val   { font-size: 1.2rem; font-weight: 800; color: var(--brand-navy); margin-top: .2rem; }
+
+    /* --- Water Path Calculator --- */
+    .calc-wide { grid-column: 1 / -1; }
+    .wp-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.75rem;
+      align-items: start;
+      margin-top: .25rem;
+    }
+    .wp-canvas-wrap {
+      background: #f0f9ff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      line-height: 0;
+    }
+    #wp-canvas {
+      display: block;
+      width: 280px;
+      height: 430px;
+    }
+    @media (max-width: 700px) {
+      .wp-layout { grid-template-columns: 1fr; }
+      #wp-canvas { width: 100%; height: auto; aspect-ratio: 280/430; }
+    }
   </style>
 </head>
 <body>
@@ -262,6 +289,63 @@
         <p class="calc-desc">Default: water / steel. Reflection and transmission are intensity coefficients (sum to 100%).</p>
       </div>
 
+      <!-- 7. Water Path -->
+      <div class="calc-box calc-wide" id="waterpath">
+        <div class="calc-section-title">Immersion Testing</div>
+        <h3>&#128167; Water Path Calculator</h3>
+        <div class="wp-layout">
+
+          <!-- ANIMATION -->
+          <div class="wp-canvas-wrap">
+            <canvas id="wp-canvas" width="280" height="430"></canvas>
+          </div>
+
+          <!-- CONTROLS -->
+          <div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="wp-focal">Focal Length <em>f</em> (mm)</label>
+                <input type="number" id="wp-focal" value="75" min="1" step="1" oninput="calcWaterPath()" />
+              </div>
+              <div class="form-group">
+                <label for="wp-thick">Material Thickness (mm)</label>
+                <input type="number" id="wp-thick" value="30" min="0.1" step="1" oninput="calcWaterPath()" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="wp-cs">Speed in Material <em>c<sub>s</sub></em> (m/s)</label>
+                <input type="number" id="wp-cs" value="5900" min="1" step="10" oninput="calcWaterPath()" />
+              </div>
+              <div class="form-group">
+                <label for="wp-cw">Speed in Water <em>c<sub>w</sub></em> (m/s)</label>
+                <input type="number" id="wp-cw" value="1495" min="1" step="1" oninput="calcWaterPath()" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="wp-focus">Focus Depth in Material <em>mp</em> (mm)</label>
+              <input type="number" id="wp-focus" value="15" min="0.1" step="0.5" oninput="calcWaterPath()" />
+              <p style="font-size:.78rem;color:var(--text-muted);margin-top:.25rem;">Must be &le; material thickness</p>
+            </div>
+
+            <div class="calc-result" id="wp-result">
+              <div class="result-label">Required Water Path (WP)</div>
+              <span class="result-value">—</span>
+              <span class="result-unit">mm</span>
+            </div>
+            <div class="calc-formula">WP = f &minus; mp &times; (c<sub>s</sub> / c<sub>w</sub>)</div>
+            <p class="calc-desc" style="margin-top:.6rem;">
+              Set the transducer face this far above the material surface. The equivalent path length
+              in material (<em>mp &times; c<sub>s</sub>/c<sub>w</sub></em>) shifts the acoustic focus to
+              the desired depth.<br/><br/>
+              <strong>c<sub>w</sub> default 1495 m/s</strong> ≈ water at 23 °C. Adjust for temperature:
+              ~3 m/s per °C.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
     </div>
 
     <!-- Material Reference Table -->
@@ -321,6 +405,12 @@
     calcAttenuation();
     calcSnell();
     calcImpedance();
+    calcWaterPath();   /* also starts the canvas animation */
+  });
+
+  /* Pause animation when tab is hidden, resume on return */
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) _wpPause(); else _wpResume();
   });
 </script>
 </body>
