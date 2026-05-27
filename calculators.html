@@ -15,10 +15,12 @@
       gap: 1.75rem;
     }
 
-    /* ---- Inner 2-panel: inputs left, viz right ---- */
+    /* ---- Inner 2-panel: inputs left, viz right ----
+       clamp(260px, 38%, 400px) keeps inputs column
+       proportional at any viewport width.            */
     .calc-inner {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: clamp(260px, 38%, 400px) 1fr;
       gap: 1.5rem;
       align-items: start;
       margin-top: .5rem;
@@ -482,15 +484,15 @@
 
 <script src="assets/js/main.js"></script>
 <script>
-  window.addEventListener('load', () => {
-    calcWavelength();
-    calcWaterPath();
-    calcNearField();
-    calcDepth();
-    calcAttenuation();
-    calcSnell();
-    calcImpedance();
-  });
+  /* Script is at end of <body> — DOM is fully parsed, call directly. */
+  calcWavelength();
+  calcWaterPath();
+  calcNearField();
+  calcDepth();
+  calcAttenuation();
+  calcSnell();
+  calcImpedance();
+
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) _wpPause(); else _wpResume();
   });
