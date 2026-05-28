@@ -591,7 +591,131 @@ function _drawZViz(Z1, Z2, R, T) {
 }
 
 /* ============================================================
-   7. WATER PATH CALCULATOR + ANIMATION
+   7. BEAM DIVERGENCE  —  inputs: D (mm), f (MHz), v (m/s)
+   ============================================================ */
+function calcBeamDiv() {
+  const D = parseFloat(document.getElementById('bd-diam').value) || 12.7;
+  const f = parseFloat(document.getElementById('bd-freq').value) || 5;
+  const v = parseFloat(document.getElementById('bd-vel').value)  || 5900;
+
+  const lam_mm = v / (f * 1e6) * 1000;
+  const N_mm   = (D * D) / (4 * lam_mm);
+
+  const sinHalf = 0.514 * lam_mm / D;
+  const r1 = document.getElementById('bd-res1');
+  const r2 = document.getElementById('bd-res2');
+
+  if (sinHalf >= 1) {
+    if (r1) { r1.querySelector('.result-value').textContent = '>90'; r1.querySelector('.result-unit').textContent = '°'; }
+    if (r2) { r2.querySelector('.result-value').textContent = '>90'; r2.querySelector('.result-unit').textContent = '°'; }
+  } else {
+    const halfDeg = Math.asin(sinHalf) * 180 / Math.PI;
+    const fullDeg = 2 * halfDeg;
+    if (r1) { r1.querySelector('.result-value').textContent = fmt(halfDeg); r1.querySelector('.result-unit').textContent = '°'; }
+    if (r2) { r2.querySelector('.result-value').textContent = fmt(fullDeg);  r2.querySelector('.result-unit').textContent = '°'; }
+  }
+
+  _drawBeamDivViz(D, lam_mm, N_mm, sinHalf);
+}
+
+function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
+  const canvas = document.getElementById('bd-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH);
+
+  const PAD = 18;
+  const transX = PAD + 22;
+  const totalLen = CW - transX - PAD;
+
+  const showMM  = Math.max(N_mm * 2.6, 25);
+  const sc      = totalLen / showMM;
+  const Npx     = Math.min(N_mm * sc, totalLen * 0.55);
+  const cy      = CH / 2;
+  const beamHPx = Math.min(D_mm * sc / 2, CH * 0.34);
+
+  /* Near-field tinted region */
+  const nfGrad = ctx.createLinearGradient(transX, 0, transX + Npx, 0);
+  nfGrad.addColorStop(0, 'rgba(8,145,178,.22)');
+  nfGrad.addColorStop(1, 'rgba(8,145,178,.05)');
+  ctx.fillStyle = nfGrad;
+  ctx.fillRect(transX, cy - beamHPx, Npx, beamHPx * 2);
+
+  /* Transducer */
+  ctx.fillStyle = '#0f2d5e';
+  ctx.fillRect(PAD, cy - beamHPx - 5, 22, beamHPx * 2 + 10);
+  ctx.fillStyle = '#0891b2';
+  ctx.fillRect(PAD + 16, cy - beamHPx, 6, beamHPx * 2);
+
+  /* Near-field parallel edges */
+  ctx.strokeStyle = 'rgba(8,145,178,.55)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(transX, cy - beamHPx); ctx.lineTo(transX + Npx, cy - beamHPx);
+  ctx.moveTo(transX, cy + beamHPx); ctx.lineTo(transX + Npx, cy + beamHPx);
+  ctx.stroke(); ctx.setLineDash([]);
+
+  /* Far-field diverging lines at −6 dB half-angle */
+  const farEnd  = CW - PAD;
+  const farLen  = farEnd - (transX + Npx);
+  const halfAng = Math.asin(Math.min(sinHalf, 0.9999));
+
+  ctx.strokeStyle = 'rgba(8,145,178,.50)'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(transX + Npx, cy - beamHPx);
+  ctx.lineTo(farEnd, cy - beamHPx - farLen * Math.tan(halfAng));
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(transX + Npx, cy + beamHPx);
+  ctx.lineTo(farEnd, cy + beamHPx + farLen * Math.tan(halfAng));
+  ctx.stroke();
+
+  /* Axis centreline */
+  ctx.strokeStyle = 'rgba(8,145,178,.20)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(transX, cy); ctx.lineTo(farEnd, cy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* N marker */
+  ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(transX + Npx, cy - beamHPx - 10);
+  ctx.lineTo(transX + Npx, cy + beamHPx + 10);
+  ctx.stroke(); ctx.setLineDash([]);
+
+  /* Angle arc at the N boundary */
+  const arcR = Math.min(farLen * 0.28, 38);
+  ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.arc(transX + Npx, cy + beamHPx, arcR, Math.PI / 2, Math.PI / 2 + halfAng);
+  ctx.stroke();
+
+  /* Labels */
+  ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
+  ctx.fillStyle = 'rgba(8,145,178,.85)';
+  ctx.fillText('Near Field', transX + Npx / 2, 13);
+  ctx.fillStyle = 'rgba(8,145,178,.65)';
+  ctx.fillText('Far Field', transX + Npx + farLen / 2, 13);
+
+  /* N value */
+  ctx.fillStyle = '#0891b2'; ctx.font = 'bold 10px Inter,sans-serif';
+  ctx.fillText(`N = ${fmt(N_mm, 3)} mm`, transX + Npx, cy + beamHPx + 22);
+
+  /* θ½ label beside arc */
+  const halfDeg = halfAng * 180 / Math.PI;
+  ctx.fillStyle = '#0891b2'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText(`θ½ = ${fmt(halfDeg, 3)}°`, transX + Npx + arcR + 4, cy + beamHPx + arcR / 2 + 4);
+
+  /* D label */
+  ctx.fillStyle = '#475569'; ctx.textAlign = 'left';
+  ctx.fillText(`D = ${D_mm} mm`, PAD + 2, 13);
+
+  /* λ label */
+  ctx.fillStyle = '#64748b'; ctx.textAlign = 'right';
+  ctx.fillText(`λ = ${fmt(lam_mm, 3)} mm`, CW - PAD, CH - 4);
+}
+
+/* ============================================================
+   8. WATER PATH CALCULATOR + ANIMATION
    ============================================================ */
 let _wpPhase  = 0;
 let _wpAnimId = null;

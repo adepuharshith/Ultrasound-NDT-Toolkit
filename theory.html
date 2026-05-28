@@ -106,6 +106,7 @@
         <a href="#imaging">Imaging Modes</a>
         <a href="#signal-processing">Signal Processing</a>
         <a href="#phased-arrays">Phased Arrays</a>
+        <a href="#calibration">Calibration &amp; DAC</a>
         <a href="#advanced">Advanced Techniques</a>
       </aside>
 
@@ -253,6 +254,23 @@
             transducers (80–120% fractional bandwidth) give short pulses and fine axial resolution.
             Narrowband transducers sacrifice resolution for sensitivity.
           </p>
+
+          <h3>Couplant</h3>
+          <p>
+            A couplant is a liquid or gel that fills the microscopic air gaps between the transducer face
+            and the test surface. Without it, the extreme acoustic impedance mismatch at the air interface
+            (Z<sub>air</sub> ≈ 0.0004 MRayl vs Z<sub>steel</sub> ≈ 46 MRayl) reflects nearly 100% of
+            the incident energy, making transmission impossible.
+          </p>
+          <ul>
+            <li><strong>Oil / glycerin:</strong> high viscosity; good for rough or vertical surfaces. Glycerin is preferred for high-temperature applications.</li>
+            <li><strong>Water-based gel:</strong> low cost, easy cleanup; most common for field contact inspection.</li>
+            <li><strong>Water (immersion):</strong> both transducer and part submerged in a tank. Maintains perfectly consistent coupling during computer-controlled scanning.</li>
+            <li><strong>Water jet (squirter):</strong> a focused stream maintains coupling without full immersion — used for large structures or elevated temperatures.</li>
+          </ul>
+          <div class="callout">
+            <strong>Detection limits:</strong> Hand scanning in fine-grained steel typically detects ≥ 1 mm defects. Automated immersion scanning at higher frequencies achieves 0.1–0.2 mm; under laboratory conditions, defects as small as 0.04 mm diameter can be resolved.
+          </div>
         </div>
 
         <!-- Beam Physics -->
@@ -282,6 +300,27 @@
           <div class="callout">
             <strong>Design trade-off:</strong> Tighter focus (smaller f-number) → better lateral resolution, but shorter depth of field. For thick parts, an unfocused or weakly focused beam may be preferred.
           </div>
+
+          <h3>Beam Spread &amp; Divergence</h3>
+          <p>
+            In the far field, the beam expands symmetrically about the acoustic axis.
+            <strong>Beam divergence</strong> is the half-angle from the central axis to the −6 dB pressure edge;
+            <strong>beam spread</strong> is the full angle from side to side (= 2 × divergence).
+          </p>
+          <div class="eq-box">
+            sin(&theta;<sub>½</sub>) = 0.514 &lambda; / D &nbsp;&nbsp;&nbsp; (−6 dB half-angle)<br/>
+            sin(&theta;) = 1.2 &lambda; / D &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (first-null / Rayleigh criterion)
+          </div>
+          <p>
+            Both formulas use the same variables: &lambda; = wavelength, D = transducer diameter.
+            Lower frequency or smaller diameter increases divergence. The two constants (0.514 vs 1.2)
+            reflect different pressure threshold definitions — the 0.514 form is most common in NDE.
+          </p>
+          <div class="callout">
+            <strong>Example (NDE-ED):</strong> 5 MHz, 12.7 mm diameter transducer in steel (c = 5900 m/s):
+            &lambda; = 1.18 mm. &theta;<sub>½</sub> = arcsin(0.514 &times; 1.18 / 12.7) ≈ 2.7°; full spread ≈ 5.4°.
+            The same probe at 1 MHz would have &theta;<sub>½</sub> ≈ 13.5° — nearly 5× wider.
+          </div>
         </div>
 
         <!-- Snell's Law -->
@@ -304,6 +343,24 @@
           <div class="callout">
             <strong>Angle beam inspection:</strong> Wedge transducers exploit mode conversion at the wedge–part interface to inject shear waves at a specific angle (e.g., 45°, 60°, 70°) for weld inspection.
           </div>
+
+          <h3>Angle Beam Inspection Geometry</h3>
+          <p>
+            For a shear wave refracted at angle &theta;<sub>R</sub> traveling beam path <em>x</em>
+            through the material, the defect location is:
+          </p>
+          <div class="eq-box">
+            Depth = x &middot; cos(&theta;<sub>R</sub>) &nbsp;&nbsp;&nbsp;
+            Surface distance = x &middot; sin(&theta;<sub>R</sub>)
+          </div>
+          <p>
+            A <strong>full skip</strong> (V-path) off the back wall covers a total beam path of
+            2T / cos(&theta;<sub>R</sub>), where T is the material thickness. Weld inspectors use
+            skip distance charts to position the probe at the correct standoff for a given weld cap.
+          </p>
+          <div class="callout">
+            <strong>Example:</strong> 45° shear wave, T = 20 mm steel. Full-skip beam path = 2 &times; 20 / cos(45°) ≈ 56.6 mm. Surface distance to back-wall skip = 2T &times; tan(45°) = 40 mm — the probe must be placed 40 mm from the weld centreline to receive the back-wall echo.
+          </div>
         </div>
 
         <!-- Imaging Modes -->
@@ -314,20 +371,31 @@
           <p>
             The most basic display: amplitude vs. time. Shows echoes from interfaces and defects
             along the beam axis. The time axis is converted to depth using <em>d = c·t/2</em>
-            (round-trip).
+            (round-trip). The <strong>initial pulse (IP)</strong> appears near time zero;
+            the <strong>back-wall (BW)</strong> reflection appears at the end; internal defects
+            appear as intermediate peaks.
+          </p>
+          <p>
+            Instruments offer three display options: <strong>RF (radio frequency)</strong> — the raw bipolar waveform;
+            <strong>full rectified</strong> — both halves folded positive, easiest for gate placement;
+            <strong>envelope</strong> — the smooth amplitude profile computed via the Hilbert transform.
+            Most field instruments default to rectified RF.
           </p>
 
           <h3>B-scan</h3>
           <p>
             A 2D cross-section: the transducer is scanned linearly, and A-scans are stacked to form
-            a depth profile. Resembles a medical ultrasound image.
+            a depth profile (transducer position horizontal, depth vertical). Shows reflector depth and
+            approximate size in the scan direction. <em>Limitation:</em> a large near-surface reflector
+            can mask smaller, deeper reflectors in the same beam path.
           </p>
 
           <h3>C-scan</h3>
           <p>
             A planar top-view map: the transducer is raster-scanned over the part surface, and a
-            gated amplitude (or TOF) value is recorded at each XY position. Widely used for
-            composite inspection and corrosion mapping.
+            gated amplitude (or TOF) value is recorded at each XY position. Amplitude is displayed
+            as grayscale or false color. Widely used for composite inspection and corrosion mapping.
+            Requires automated data acquisition — typically computer-controlled immersion scanning.
           </p>
 
           <h3>SAFT (Synthetic Aperture Focusing Technique)</h3>
@@ -421,6 +489,65 @@
           <div class="callout">
             <strong>Key advantage of phased arrays:</strong> Electronic scanning is orders of magnitude faster than mechanical scanning, enables rapid volumetric coverage, and allows real-time image reconstruction at inspection speed.
           </div>
+        </div>
+
+        <!-- Calibration & DAC -->
+        <div class="theory-section" id="calibration">
+          <h2>&#128207; Calibration &amp; Reference Levels</h2>
+          <p>
+            Calibration establishes a quantitative reference so that any indication can be evaluated
+            consistently regardless of its depth or scan position. All UT accept/reject decisions are
+            made relative to a calibrated sensitivity level.
+          </p>
+
+          <h3>Decibel Scale</h3>
+          <p>Ultrasonic amplitudes are expressed in <strong>decibels (dB)</strong>. For pressure amplitudes:</p>
+          <div class="eq-box">&Delta;I (dB) = 20 log<sub>10</sub>(P<sub>2</sub> / P<sub>1</sub>)</div>
+          <p>
+            Every <strong>6 dB</strong> corresponds to a factor of 2 in amplitude (voltage).
+            Every <strong>20 dB</strong> is a factor of 10.
+            A positive dB value means P<sub>2</sub> &gt; P<sub>1</sub> (gain); negative means loss.
+          </p>
+          <div class="callout">
+            <strong>Quick conversions:</strong>
+            +6 dB = &times;2 amplitude &nbsp;|&nbsp;
+            +20 dB = &times;10 &nbsp;|&nbsp;
+            −6 dB = &times;0.5 &nbsp;|&nbsp;
+            −20 dB = &times;0.1 &nbsp;|&nbsp;
+            −40 dB = &times;0.01
+          </div>
+
+          <h3>Distance Amplitude Correction (DAC)</h3>
+          <p>
+            A reflector of fixed size produces a smaller echo as its depth increases, because
+            attenuation and beam divergence both reduce amplitude with distance.
+            <strong>DAC</strong> is a reference curve constructed by recording the peak amplitude
+            from identical reference reflectors (side-drilled holes or flat-bottom holes) at multiple
+            depths within the same material.
+          </p>
+          <p>
+            Once the DAC curve is plotted on the A-scan display, any indication that reaches or
+            exceeds the curve is evaluated as a recordable indication — the curve has already
+            accounted for the expected amplitude decay with depth. DAC curves must be built separately
+            for each material/frequency/transducer combination because near-field length, beam spread,
+            attenuation, and acoustic velocity all vary.
+          </p>
+
+          <h3>Reference Blocks &amp; Standards</h3>
+          <ul>
+            <li><strong>ASTM E127 / E428:</strong> Flat-bottom hole (FBH) blocks — standard for immersion calibration.</li>
+            <li><strong>ASTM E1158:</strong> Distance-amplitude blocks — side-drilled holes at increasing depths for DAC construction.</li>
+            <li><strong>ASME Basic Calibration Block:</strong> Required for code-based pressure vessel and piping inspection (ASME Sec. V).</li>
+            <li><strong>IIW V1 / V2 blocks:</strong> International Welding Institute blocks for velocity measurement and angle-probe index checks.</li>
+          </ul>
+
+          <h3>Transfer Correction</h3>
+          <p>
+            The calibration block and the real part may differ in surface roughness, curvature, or
+            coupling efficiency. A <strong>transfer correction</strong> (measured in dB, typically
+            2–6 dB) is added to the reference gain to ensure the DAC level applies to the actual
+            inspection surface.
+          </p>
         </div>
 
         <!-- Advanced -->
