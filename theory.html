@@ -7,6 +7,53 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ---- Particle animation demo ---- */
+    .particle-demo {
+      margin: 1.25rem 0 1.75rem;
+      background: #0d1b2a;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #1e3a5f;
+    }
+    .particle-demo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .45rem 1rem;
+      background: rgba(255,255,255,.04);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .particle-demo-header span {
+      font-size: .75rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .particle-demo-btn {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      color: #cbd5e1;
+      border-radius: 5px;
+      padding: .28rem .75rem;
+      font-size: .78rem;
+      cursor: pointer;
+      transition: background .15s;
+      font-family: var(--font, sans-serif);
+    }
+    .particle-demo-btn:hover { background: rgba(255,255,255,.16); }
+    #particle-canvas { display: block; width: 100%; height: auto; }
+    .particle-caption {
+      font-size: .78rem;
+      color: #64748b;
+      padding: .5rem 1rem;
+      margin: 0;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
 
@@ -74,6 +121,23 @@
             frequencies typically range from <strong>0.1 MHz to 50 MHz</strong>, well above
             the audible limit.
           </p>
+
+          <!-- ── Particle animation ── -->
+          <div class="particle-demo">
+            <div class="particle-demo-header">
+              <span>&#127759; Live simulation &mdash; longitudinal wave &amp; particle motion</span>
+              <button class="particle-demo-btn" id="particle-playpause">&#9646;&#9646; Pause</button>
+            </div>
+            <canvas id="particle-canvas" width="720" height="270"></canvas>
+            <p class="particle-caption">
+              <strong style="color:#fb923c;">Orange arrow</strong> = instantaneous <em>particle velocity</em> v&#8346;
+              on the highlighted particle — oscillates back and forth, magnitude varies sinusoidally.&ensp;
+              <strong style="color:#22d3ee;">Cyan arrow</strong> = <em>wave (phase) velocity</em> c —
+              the pattern always advances to the right at c&nbsp;=&nbsp;f&lambda;, independent of v&#8346;.&ensp;
+              Colour bands: <span style="color:#67e8f9;">blue = compression</span> (particles crowded),
+              <span style="color:#fdba74;">orange = rarefaction</span> (particles spread).
+            </p>
+          </div>
 
           <h3>Wave Equation</h3>
           <p>The scalar wave equation governing pressure in a fluid:</p>
@@ -409,5 +473,218 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script>
+/* ============================================================
+   PARTICLE WAVE ANIMATION  —  theory.html
+   Longitudinal wave: particles oscillate horizontally,
+   wave pattern travels rightward.
+   ============================================================ */
+(function () {
+  const canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const CW = canvas.width;   /* 720 */
+  const CH = canvas.height;  /* 270 */
+
+  /* ---- Layout ---- */
+  const LEFT = 28, RIGHT = 692, TOP = 42, BOT = 194;
+  const PW = RIGHT - LEFT;   /* 664 px  */
+  const PH = BOT  - TOP;     /* 152 px  */
+
+  /* ---- Particle grid ---- */
+  const NX = 22, NY = 6;
+  const dx0 = PW / NX;          /* rest horiz. spacing ≈ 30.2 px */
+  const dy0 = PH / (NY - 1);    /* rest vert.  spacing ≈ 30.4 px */
+
+  /* ---- Wave parameters ---- */
+  const N_WAVES = 3;
+  const LAM_PX  = PW / N_WAVES;             /* visual λ ≈ 221 px  */
+  const K       = 2 * Math.PI / LAM_PX;     /* spatial freq        */
+  const A       = 9;                         /* amplitude in px     */
+  const PERIOD  = 160;                       /* frames per period   */
+  const OMEGA   = 2 * Math.PI / PERIOD;     /* angular freq (vis)  */
+  /* Phase velocity: c_vis = OMEGA/K = LAM_PX/PERIOD px/frame       */
+
+  /* ---- Highlighted particle: col 4, row 2 (near top-left quad) ---- */
+  const HI_I  = 4,  HI_J = 2;
+  const HI_X0 = LEFT + (HI_I + 0.5) * dx0;
+  const HI_Y0 = TOP  + HI_J * dy0;
+
+  /* ---- State ---- */
+  let frame = 0, running = true;
+
+  /* Play / Pause button */
+  const btn = document.getElementById('particle-playpause');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      running = !running;
+      btn.innerHTML = running ? '&#9646;&#9646; Pause' : '&#9654; Play';
+      if (running) requestAnimationFrame(tick);
+    });
+  }
+
+  function tick() {
+    if (!running) return;
+    draw();
+    frame++;
+    requestAnimationFrame(tick);
+  }
+
+  /* ---- Arrow helper (local, no dependency on main.js) ---- */
+  function arrowAt(x1, y1, x2, y2, hs) {
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+    ctx.moveTo(x2 - hs * Math.cos(ang - 0.42), y2 - hs * Math.sin(ang - 0.42));
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x2 - hs * Math.cos(ang + 0.42), y2 - hs * Math.sin(ang + 0.42));
+    ctx.stroke();
+  }
+
+  /* ---- Main draw ---- */
+  function draw() {
+    /* Background */
+    ctx.fillStyle = '#0d1b2a';
+    ctx.fillRect(0, 0, CW, CH);
+
+    /* ---- Compression / rarefaction band tint ---- */
+    /*
+     * Pressure ∝ −∂u/∂x = −Ak·cos(kx − ωt)
+     * +ve → compression (particles crowded) → cyan tint
+     * −ve → rarefaction (particles spread)  → orange tint
+     */
+    for (let px = LEFT; px < RIGHT; px++) {
+      const xr  = px - LEFT;
+      const prs = -A * K * Math.cos(K * xr - OMEGA * frame); /* pressure */
+      const n   = prs / (A * K);  /* normalised ≈ [−1, 1] */
+      if (n > 0.05) {
+        ctx.fillStyle = `rgba(8,145,178,${Math.min(0.30, n * 0.30).toFixed(3)})`;
+        ctx.fillRect(px, TOP, 1, PH);
+      } else if (n < -0.05) {
+        ctx.fillStyle = `rgba(251,146,60,${Math.min(0.24, -n * 0.24).toFixed(3)})`;
+        ctx.fillRect(px, TOP, 1, PH);
+      }
+    }
+
+    /* ---- Particles ---- */
+    for (let j = 0; j < NY; j++) {
+      for (let i = 0; i < NX; i++) {
+        const xRest = LEFT + (i + 0.5) * dx0;
+        const yRest = TOP  + j * dy0;
+        const xr    = xRest - LEFT;
+        const disp  = A * Math.sin(K * xr - OMEGA * frame);
+        const xDraw = xRest + disp;
+        const isHi  = (i === HI_I && j === HI_J);
+
+        if (isHi) {
+          /* Gold glow for highlighted particle */
+          ctx.shadowBlur = 12; ctx.shadowColor = '#fde047';
+          ctx.beginPath(); ctx.arc(xDraw, yRest, 5.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#fde047'; ctx.fill();
+          ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+        } else {
+          /* Colour by local pressure: compression = blue-white, rarefaction = warm */
+          const prs  = -A * K * Math.cos(K * xr - OMEGA * frame);
+          const norm = Math.max(-1, Math.min(1, prs / (A * K)));
+          let r, g, b;
+          if (norm > 0.12) {
+            r = Math.round(120 + 130 * norm);
+            g = Math.round(200 +  55 * norm);
+            b = 255;
+          } else if (norm < -0.12) {
+            r = 255;
+            g = Math.round(200 +  55 * norm);
+            b = Math.round(200 +  55 * norm);
+          } else {
+            const v = Math.round(150 + 50 * Math.abs(norm));
+            r = g = b = v;
+          }
+          ctx.beginPath(); ctx.arc(xDraw, yRest, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgb(${r},${g},${b})`; ctx.fill();
+        }
+      }
+    }
+
+    /* ---- Particle-velocity arrow on highlighted particle ---- */
+    const hiXr   = HI_X0 - LEFT;
+    const hiDisp = A * Math.sin(K * hiXr - OMEGA * frame);
+    const hiVel  = -A * OMEGA * Math.cos(K * hiXr - OMEGA * frame); /* px/frame */
+    const hiXd   = HI_X0 + hiDisp;
+    const arrY   = HI_Y0 - 22;               /* above particle     */
+    const velPx  = (hiVel / (A * OMEGA)) * 30; /* max ±30 px arrow  */
+
+    /* Dashed oscillation range guide */
+    ctx.setLineDash([2, 3]);
+    ctx.strokeStyle = 'rgba(251,146,60,.30)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(HI_X0 - A - 2, arrY); ctx.lineTo(HI_X0 + A + 2, arrY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* Velocity arrow (orange) */
+    ctx.strokeStyle = '#fb923c'; ctx.fillStyle = '#fb923c'; ctx.lineWidth = 2.2;
+    if (Math.abs(velPx) > 2) {
+      arrowAt(hiXd, arrY, hiXd + velPx, arrY, 7);
+    } else {
+      /* Near zero: dot */
+      ctx.beginPath(); ctx.arc(hiXd, arrY, 3, 0, Math.PI * 2); ctx.fill();
+    }
+
+    /* "particle velocity" label above arrow */
+    ctx.fillStyle = '#fb923c';
+    ctx.font = 'bold 9.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('particle velocity  vₚ = −Aω cos(kx − ωt)', HI_X0, arrY - 8);
+
+    /* ---- Dynamic Compression / Rarefaction labels (follow crests) ---- */
+    /*
+     * Compression peak: cos(kx − ωt) = −1  → kx = ωt + π  → x = (ωt + π + 2πn)/k
+     * Rarefaction peak: cos(kx − ωt) =  1  → kx = ωt       → x = (ωt     + 2πn)/k
+     */
+    ctx.font = '8.5px Inter,sans-serif';
+    for (let n = -1; n <= N_WAVES + 1; n++) {
+      const xC = (OMEGA * frame + Math.PI + 2 * Math.PI * n) / K + LEFT;
+      if (xC > LEFT + 30 && xC < RIGHT - 30) {
+        ctx.fillStyle = '#67e8f9'; ctx.textAlign = 'center';
+        ctx.fillText('▼ compression', xC, TOP - 5);
+      }
+      const xR = (OMEGA * frame + 2 * Math.PI * n) / K + LEFT;
+      if (xR > LEFT + 35 && xR < RIGHT - 35) {
+        ctx.fillStyle = '#fdba74';
+        ctx.fillText('▼ rarefaction', xR, TOP - 5);
+      }
+    }
+
+    /* ---- Wave / phase-velocity arrow ---- */
+    const wvY   = CH - 50;
+    const wvEnd = LEFT + PW * 0.68;
+    ctx.strokeStyle = '#22d3ee'; ctx.fillStyle = '#22d3ee'; ctx.lineWidth = 2.5;
+    arrowAt(LEFT, wvY, wvEnd, wvY, 9);
+
+    ctx.font = 'bold 10.5px Inter,sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('wave / phase velocity  c = ω / k = fλ', wvEnd + 10, wvY + 4);
+
+    /* λ tick marks under the arrow */
+    ctx.strokeStyle = 'rgba(34,211,238,.28)'; ctx.lineWidth = 1;
+    for (let n = 0; n <= N_WAVES; n++) {
+      const tx = LEFT + n * LAM_PX;
+      ctx.beginPath(); ctx.moveTo(tx, wvY - 5); ctx.lineTo(tx, wvY + 6); ctx.stroke();
+    }
+    for (let n = 0; n < N_WAVES; n++) {
+      ctx.fillStyle = 'rgba(34,211,238,.50)';
+      ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('λ', LEFT + (n + 0.5) * LAM_PX, wvY + 17);
+    }
+
+    /* ---- Bottom caption line ---- */
+    ctx.fillStyle = 'rgba(148,163,184,.65)';
+    ctx.font = '8.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(
+      'Each particle oscillates locally (vₚ ↔).  The wave pattern advances at c (→).  vₚ and c are independent quantities.',
+      CW / 2, CH - 7
+    );
+  }
+
+  requestAnimationFrame(tick);
+})();
+</script>
 </body>
 </html>

@@ -15,20 +15,28 @@
       gap: 1.75rem;
     }
 
-    /* ---- Inner 2-panel: inputs left, viz right ----
-       clamp(260px, 38%, 400px) keeps inputs column
-       proportional at any viewport width.            */
+    /* ---- Inner 2-panel: inputs left, viz right ---- */
     .calc-inner {
-      display: grid;
-      grid-template-columns: clamp(260px, 38%, 400px) 1fr;
+      display: flex;
       gap: 1.5rem;
-      align-items: start;
+      align-items: flex-start;
       margin-top: .5rem;
     }
-    .calc-inputs { display: flex; flex-direction: column; gap: 0; }
+    .calc-inputs {
+      flex: 0 0 auto;
+      width: min(360px, 42%);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .calc-inputs-wide {        /* water-path has more controls */
+      width: min(400px, 44%);
+    }
 
     /* ---- Canvas visualization wrapper ---- */
     .calc-viz {
+      flex: 1 1 auto;
+      min-width: 0;            /* allow flex shrinking */
       background: #f0f9ff;
       border: 1.5px solid var(--border);
       border-radius: 10px;
@@ -37,7 +45,7 @@
     }
     .calc-viz canvas {
       display: block;
-      max-width: 100%;
+      width: 100%;             /* always fill the viz column */
       height: auto;
     }
 
@@ -83,8 +91,9 @@
     .mat-table tr:last-child td { border-bottom: none; }
     .mat-table tr:hover td { background: var(--accent-light); }
 
-    @media (max-width: 760px) {
-      .calc-inner { grid-template-columns: 1fr; }
+    @media (max-width: 720px) {
+      .calc-inner { flex-direction: column; }
+      .calc-inputs, .calc-inputs-wide { width: 100%; }
       .result-row { grid-template-columns: 1fr; }
     }
   </style>
@@ -180,7 +189,7 @@
         <h3>&#128167; Water Path Calculator</h3>
         <div class="calc-inner">
 
-          <div class="calc-inputs">
+          <div class="calc-inputs calc-inputs-wide">
             <div class="form-row">
               <div class="form-group">
                 <label for="wp-focal">Focal Length <em>f</em> (mm)</label>

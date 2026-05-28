@@ -37,9 +37,10 @@ CONTEXT.md          ← this file
 
 ## calculators.html — layout rules
 - `.calc-grid` — `grid-template-columns: 1fr` (one card per row, full width)
-- `.calc-inner` — `grid-template-columns: clamp(260px, 38%, 400px) 1fr` (inputs | viz)
-- `.calc-viz` — wrapper div for all canvas elements; `background:#f0f9ff; border-radius:10px`
-- Canvas elements have `max-width:100%; height:auto` (scales with container)
+- `.calc-inner` — **flex row**: `.calc-inputs` gets `width: min(360px, 42%)`, `.calc-viz` gets `flex:1 1 auto`
+- `.calc-viz canvas` — `width:100%; height:auto` (fills viz column, scales proportionally)
+- Water path uses `.calc-inputs-wide` → `width: min(400px, 44%)`
+- Stacks to single column at `max-width: 720px`
 - **Init**: calculators are called DIRECTLY at bottom of `<body>` (no load event listener)
 
 ---
@@ -85,6 +86,15 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 ## theory.html — sections (IDs for sidebar links)
 `wave-propagation`, `acoustic-impedance`, `attenuation`, `transducers`,
 `beam-physics`, `snell`, `imaging`, `signal-processing`, `phased-arrays`, `advanced`
+
+### Particle animation (wave-propagation section)
+- Canvas: `#particle-canvas` 720×270, inline `<script>` at bottom of theory.html
+- Self-contained IIFE — no dependency on main.js
+- Physics: longitudinal wave u = A·sin(kx − ωt), NX=22 cols, NY=6 rows
+- Highlights one particle (#4,2) with orange particle-velocity arrow
+- Dynamic compression/rarefaction labels follow wave crests
+- Cyan wave-velocity arrow at bottom; pause/play via `#particle-playpause`
+- All animation state is local (`frame`, `running`, `arrowAt()` helper)
 
 ---
 
