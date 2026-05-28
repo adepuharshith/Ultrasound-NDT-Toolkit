@@ -13,8 +13,8 @@ GitHub Pages: `https://adepuharshith.github.io/ultrasound-ndt-toolkit/`
 ## File map
 ```
 index.html          Landing page — hero, pathway strip, 3 section cards
-theory.html         10 theory sections — sticky sidebar scroll-spy
-calculators.html    7 live calculators — single-column, input-left + canvas-right
+theory.html         11 theory sections — sticky sidebar scroll-spy
+calculators.html    8 live calculators — single-column, input-left + canvas-right
 resources.html      Filterable resource library (type buttons + search input)
 assets/css/style.css  Global tokens, nav, hero, cards, calc components
 assets/js/main.js     All calculator logic + canvas animations
@@ -55,6 +55,7 @@ CONTEXT.md          ← this file
 | Attenuation | `att-coeff`, `att-freq`, `att-dist` | `att-result` | `att-canvas` 560×160 | `calcAttenuation()` + `_drawAttViz()` |
 | Snell's Law | `sn-angle`, `sn-v1`, `sn-v2` | `sn-result` | `sn-canvas` 420×220 | `calcSnell()` + `_drawSnellViz()` |
 | Impedance | `z-rho1`, `z-v1`, `z-rho2`, `z-v2` | `z-z1/z2/r/t` | `z-canvas` 440×200 | `calcImpedance()` + `_drawZViz()` |
+| Beam Divergence | `bd-diam`, `bd-freq`, `bd-vel` | `bd-res1`, `bd-res2` | `bd-canvas` 500×200 | `calcBeamDiv()` + `_drawBeamDivViz()` |
 
 ---
 
@@ -85,7 +86,7 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 
 ## theory.html — sections (IDs for sidebar links)
 `wave-propagation`, `acoustic-impedance`, `attenuation`, `transducers`,
-`beam-physics`, `snell`, `imaging`, `signal-processing`, `phased-arrays`, `advanced`
+`beam-physics`, `snell`, `imaging`, `signal-processing`, `phased-arrays`, `calibration`, `advanced`
 
 ### Particle animation (wave-propagation section)
 - Canvas: `#particle-canvas` 720×270, inline `<script>` at bottom of theory.html
@@ -107,15 +108,16 @@ attribute (`textbook | paper | software | standard | online`) and search query a
 
 ## Git log (recent)
 ```
-2ba79ce  Redesign calculators: single-column, input-left + viz-right layout
-7a6e227  Add Water Path calculator with live 2D beam animation
-9cbff01  Initial site framework: Ultrasound & NDT Toolkit
+9dcce90  Add NDE-ED content: beam divergence calc + theory expansions
+97b1dfb  Fix calc-box width: remove 540px max-width cap
+b66ae4a  Fix calc layout width; add particle wave animation to theory
+746699b  Fix layout width + calc init; add CONTEXT.md
 ```
 
 ---
 
 ## Known issues / next steps
 - Add more theory content (user's own PhD material)
-- Add calculators: beam divergence, focal spot size, SNR estimator, dispersion curves
+- Add calculators: focal spot size, SNR estimator, dispersion curves
 - Add Lab Techniques page
 - GitHub Pages not yet enabled (push → Settings → Pages → main branch)
