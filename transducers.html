@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transducers — Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ---- Transducer type cards ---- */
+    .transducer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .t-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .t-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+    .t-card-icon {
+      font-size: 1.9rem;
+      line-height: 1;
+    }
+    .t-card h3 {
+      color: var(--text);
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    .t-card p {
+      font-size: .875rem;
+      color: var(--text-muted);
+      margin: 0;
+      flex: 1;
+    }
+    .t-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
+      margin-top: .25rem;
+    }
+
+    /* ---- Specs table inside cards ---- */
+    .spec-row {
+      display: flex;
+      gap: .75rem;
+      font-size: .82rem;
+      padding: .3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--text-muted); min-width: 110px; flex-shrink: 0; }
+    .spec-val { color: var(--text); font-weight: 500; }
+
+    /* ---- Compare table (same as theory page) ---- */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: .88rem;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .compare-table th {
+      background: var(--brand-navy);
+      color: #fff;
+      padding: .65rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: .85rem;
+    }
+    .compare-table td {
+      padding: .58rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:nth-child(even) td { background: #f8fafc; }
+    .compare-table .hi { color: var(--brand-cyan); font-weight: 700; }
+
+    /* ---- Resource links ---- */
+    .resource-link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+    .res-link-card {
+      display: flex;
+      align-items: flex-start;
+      gap: .9rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+      text-decoration: none !important;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .res-link-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    .res-link-card .rlc-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: .1rem; }
+    .res-link-card h4 { color: var(--text); font-size: .95rem; margin: 0 0 .18rem; }
+    .res-link-card p  { color: var(--text-muted); font-size: .8rem; margin: 0; }
+    .res-link-card .rlc-arrow { margin-left: auto; color: var(--brand-cyan); font-size: 1rem; flex-shrink: 0; align-self: center; }
+
+    /* ---- Piezo principle figure ---- */
+    .piezo-figure {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ---- Section divider ---- */
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--border);
+      margin: 3rem 0 2rem;
+    }
+
+    /* ---- Sidebar (same as theory) ---- */
+    .topic-sidebar h4 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: .75rem; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="theory.html">Theory</a></li>
+    <li><a href="transducers.html" class="active">Transducers</a></li>
+    <li><a href="calculators.html">Calculators</a></li>
+    <li><a href="resources.html">Resources</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>&#128268; Transducers</h1>
+  <p>How ultrasound is generated, received, and shaped — transducer types, designs, and selection</p>
+</div>
+
+<!-- CONTENT -->
+<section class="section">
+  <div class="container">
+    <div class="two-col-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="topic-sidebar">
+        <h4>Sections</h4>
+        <a href="#piezoelectric">Piezoelectric Effect</a>
+        <a href="#anatomy">Transducer Anatomy</a>
+        <a href="#types">Transducer Types</a>
+        <a href="#contact">Contact Transducers</a>
+        <a href="#immersion">Immersion Transducers</a>
+        <a href="#dual-element">Dual-Element (TR)</a>
+        <a href="#angle-beam">Angle-Beam</a>
+        <a href="#emat">EMAT</a>
+        <a href="#air-coupled">Air-Coupled</a>
+        <a href="#phased-array">Phased Array</a>
+        <a href="#selection">How to Choose?</a>
+        <a href="#links">Resources &amp; Links</a>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main>
+
+        <!-- ══════════════════════════════════════════════
+             Piezoelectric Effect
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="piezoelectric">
+          <h2>&#9889; The Piezoelectric Effect</h2>
+          <p>
+            All ultrasonic transducers used in NDE exploit the <strong>piezoelectric effect</strong> —
+            the ability of certain materials to convert between electrical energy and mechanical vibration.
+          </p>
+
+          <div class="piezo-figure">
+            <svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg" style="max-width:500px; width:100%;">
+              <defs>
+                <marker id="pa" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                  <polygon points="0 0, 7 3.5, 0 7" fill="#0891b2"/>
+                </marker>
+                <marker id="pa2" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                  <polygon points="0 0, 7 3.5, 0 7" fill="#fbbf24"/>
+                </marker>
+              </defs>
+
+              <!-- LEFT: Direct effect -->
+              <text x="120" y="18" text-anchor="middle" fill="#0f172a" font-size="11.5" font-weight="700">Direct Effect</text>
+              <text x="120" y="32" text-anchor="middle" fill="#64748b" font-size="9.5">Force in → Voltage out</text>
+              <!-- Crystal -->
+              <rect x="70" y="42" width="100" height="60" rx="4" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.5"/>
+              <text x="120" y="77" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="600">Piezo Crystal</text>
+              <!-- Force arrows inward -->
+              <line x1="30" y1="72" x2="64" y2="72" stroke="#ef4444" stroke-width="2" marker-end="url(#pa)"/>
+              <line x1="210" y1="72" x2="176" y2="72" stroke="#ef4444" stroke-width="2" marker-end="url(#pa)"/>
+              <text x="10" y="68" fill="#ef4444" font-size="9.5" font-weight="700">F</text>
+              <text x="217" y="68" fill="#ef4444" font-size="9.5" font-weight="700">F</text>
+              <!-- Voltage output lines -->
+              <line x1="90"  y1="42" x2="90"  y2="28" stroke="#fbbf24" stroke-width="1.5"/>
+              <line x1="150" y1="42" x2="150" y2="28" stroke="#fbbf24" stroke-width="1.5"/>
+              <line x1="90"  y1="28" x2="150" y2="28" stroke="#fbbf24" stroke-width="1.5"/>
+              <text x="120" y="22" text-anchor="middle" fill="#fbbf24" font-size="9.5" font-weight="700">+ V</text>
+              <line x1="90"  y1="102" x2="90"  y2="118" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="150" y1="102" x2="150" y2="118" stroke="#64748b" stroke-width="1.5"/>
+              <line x1="90"  y1="118" x2="150" y2="118" stroke="#64748b" stroke-width="1.5"/>
+              <text x="120" y="133" text-anchor="middle" fill="#64748b" font-size="9">− (GND)</text>
+              <text x="120" y="150" text-anchor="middle" fill="#64748b" font-size="8.5">Squeeze = charge = voltage</text>
+
+              <!-- Divider -->
+              <line x1="260" y1="10" x2="260" y2="150" stroke="#e2e8f0" stroke-width="1.5"/>
+
+              <!-- RIGHT: Converse effect -->
+              <text x="390" y="18" text-anchor="middle" fill="#0f172a" font-size="11.5" font-weight="700">Converse Effect</text>
+              <text x="390" y="32" text-anchor="middle" fill="#64748b" font-size="9.5">Voltage in → Vibration out</text>
+              <!-- Crystal -->
+              <rect x="340" y="42" width="100" height="60" rx="4" fill="#ecfdf5" stroke="#0d9488" stroke-width="1.5"/>
+              <text x="390" y="77" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="600">Piezo Crystal</text>
+              <!-- Voltage lines -->
+              <line x1="360" y1="42" x2="360" y2="28" stroke="#fbbf24" stroke-width="1.5"/>
+              <line x1="420" y1="42" x2="420" y2="28" stroke="#fbbf24" stroke-width="1.5"/>
+              <line x1="360" y1="28" x2="420" y2="28" stroke="#fbbf24" stroke-width="1.5"/>
+              <text x="390" y="22" text-anchor="middle" fill="#fbbf24" font-size="9.5" font-weight="700">Apply V</text>
+              <!-- Expansion arrows outward -->
+              <line x1="336" y1="72" x2="300" y2="72" stroke="#0d9488" stroke-width="2" marker-end="url(#pa)"/>
+              <line x1="444" y1="72" x2="480" y2="72" stroke="#0d9488" stroke-width="2" marker-end="url(#pa)"/>
+              <text x="480" y="68" fill="#0d9488" font-size="9" font-weight="700">expand</text>
+              <!-- Sound waves -->
+              <path d="M 340 68 Q 320 72 340 76" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <path d="M 330 62 Q 305 72 330 82" fill="none" stroke="#22d3ee" stroke-width="1.2" stroke-dasharray="3,2" opacity=".7"/>
+              <text x="390" y="150" text-anchor="middle" fill="#64748b" font-size="8.5">Voltage = physical deformation = ultrasound</text>
+            </svg>
+          </div>
+
+          <h3>Common Piezoelectric Materials</h3>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Common name</th>
+                <th>Strengths</th>
+                <th>Limitations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Lead Zirconate Titanate</strong></td>
+                <td>PZT ceramic</td>
+                <td class="hi">High sensitivity; most common in NDE</td>
+                <td>Brittle; Curie temperature ~150–350&deg;C</td>
+              </tr>
+              <tr>
+                <td><strong>Polyvinylidene fluoride</strong></td>
+                <td>PVDF film</td>
+                <td>Flexible; wideband; good for broadband detection</td>
+                <td>Lower output; temperature limited</td>
+              </tr>
+              <tr>
+                <td><strong>Lithium Niobate</strong></td>
+                <td>LiNbO&sub3;</td>
+                <td>Stable at high temperatures (&gt;300&deg;C)</td>
+                <td>More expensive; fragile</td>
+              </tr>
+              <tr>
+                <td><strong>Quartz</strong></td>
+                <td>SiO&sub2; (natural/synthetic)</td>
+                <td>Very stable; reproducible</td>
+                <td>Lower piezoelectric coupling than PZT</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Transducer Anatomy
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="anatomy">
+          <h2>&#128268; Transducer Anatomy</h2>
+          <p>
+            A typical contact or immersion transducer has several layers, each with a specific function:
+          </p>
+
+          <div class="piezo-figure">
+            <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg" style="max-width:460px; width:100%;">
+              <defs>
+                <marker id="la" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0, 6 3, 0 6" fill="#475569"/>
+                </marker>
+                <marker id="lav" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0, 6 3, 0 6" fill="#fbbf24"/>
+                </marker>
+                <marker id="las" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0, 6 3, 0 6" fill="#22d3ee"/>
+                </marker>
+              </defs>
+
+              <!-- Case -->
+              <rect x="120" y="14" width="210" height="178" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+
+              <!-- Backing -->
+              <rect x="125" y="18" width="200" height="62" rx="5" fill="#0f172a"/>
+              <text x="225" y="44" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="600">Backing Material</text>
+              <text x="225" y="60" text-anchor="middle" fill="#475569" font-size="9.5">high-attenuation, absorbs rearward energy</text>
+
+              <!-- Electrodes (thin lines) -->
+              <rect x="125" y="84" width="200" height="3" fill="#cbd5e1"/>
+              <rect x="125" y="114" width="200" height="3" fill="#cbd5e1"/>
+
+              <!-- Piezoelectric element -->
+              <rect x="125" y="87" width="200" height="27" rx="3" fill="#0891b2" stroke="#22d3ee" stroke-width="1.5"/>
+              <text x="225" y="104" text-anchor="middle" fill="white" font-size="12" font-weight="700">Piezoelectric Element (PZT)</text>
+
+              <!-- Matching layer(s) -->
+              <rect x="125" y="120" width="200" height="18" fill="#0e7490"/>
+              <text x="225" y="132" text-anchor="middle" fill="white" font-size="10" font-weight="600">1st Matching Layer</text>
+              <rect x="125" y="140" width="200" height="12" fill="#0891b2" opacity=".5"/>
+              <text x="225" y="150" text-anchor="middle" fill="rgba(255,255,255,.8)" font-size="9">2nd Matching Layer</text>
+
+              <!-- Wear plate -->
+              <rect x="125" y="154" width="200" height="16" rx="0" fill="#334155"/>
+              <text x="225" y="165" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-weight="600">Wear Plate (alumina / epoxy)</text>
+
+              <!-- Couplant region -->
+              <rect x="125" y="173" width="200" height="9" fill="rgba(34,211,238,.15)" stroke="#22d3ee" stroke-width="0.6"/>
+              <text x="225" y="180" text-anchor="middle" fill="#22d3ee" font-size="8.5">couplant</text>
+
+              <!-- Test material -->
+              <rect x="40" y="184" width="370" height="78" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+              <text x="225" y="228" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="600">Test Material</text>
+
+              <!-- Sound wave arcs -->
+              <path d="M 170 186 Q 225 198 280 186" fill="none" stroke="#22d3ee" stroke-width="1.7" stroke-dasharray="5,3" opacity=".9"/>
+              <path d="M 162 196 Q 225 212 288 196" fill="none" stroke="#22d3ee" stroke-width="1.3" stroke-dasharray="5,3" opacity=".6"/>
+              <path d="M 154 208 Q 225 228 296 208" fill="none" stroke="#22d3ee" stroke-width="1" stroke-dasharray="5,3" opacity=".35"/>
+
+              <!-- Right-side labels -->
+              <line x1="325" y1="49" x2="358" y2="49" stroke="#475569" stroke-width="1" marker-end="url(#la)"/>
+              <text x="362" y="46" fill="#94a3b8" font-size="10" font-weight="600">Backing</text>
+              <text x="362" y="58" fill="#64748b" font-size="8.5">damps reverberations</text>
+
+              <line x1="325" y1="100" x2="358" y2="100" stroke="#22d3ee" stroke-width="1" marker-end="url(#las)"/>
+              <text x="362" y="97" fill="#22d3ee" font-size="10" font-weight="600">Piezo Element</text>
+              <text x="362" y="109" fill="#64748b" font-size="8.5">converts voltage ↔ vibration</text>
+
+              <line x1="325" y1="132" x2="358" y2="132" stroke="#475569" stroke-width="1" marker-end="url(#la)"/>
+              <text x="362" y="129" fill="#94a3b8" font-size="9.5">Matching layers</text>
+              <text x="362" y="141" fill="#64748b" font-size="8">maximise energy transfer</text>
+
+              <line x1="325" y1="162" x2="358" y2="162" stroke="#475569" stroke-width="1" marker-end="url(#la)"/>
+              <text x="362" y="159" fill="#94a3b8" font-size="9.5">Wear plate</text>
+              <text x="362" y="171" fill="#64748b" font-size="8">protects crystal</text>
+
+              <!-- Voltage arrow (left) -->
+              <line x1="80" y1="100" x2="118" y2="100" stroke="#fbbf24" stroke-width="1.8" marker-end="url(#lav)"/>
+              <text x="22" y="90" fill="#fbbf24" font-size="10.5" font-weight="700">Voltage</text>
+              <text x="28" y="104" fill="#fbbf24" font-size="8.5">pulse in</text>
+
+              <!-- Ultrasound label -->
+              <text x="225" y="258" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="600">&#128266; Ultrasound propagates through material</text>
+            </svg>
+          </div>
+
+          <h3>What each layer does</h3>
+          <div class="spec-row"><span class="spec-key">Backing material</span><span class="spec-val">Heavily damped epoxy or tungsten-loaded rubber. Absorbs any sound going rearward, shortening the pulse and improving axial resolution.</span></div>
+          <div class="spec-row"><span class="spec-key">Electrodes</span><span class="spec-val">Thin metal films (silver, gold) that apply the drive voltage across the crystal and capture the received signal.</span></div>
+          <div class="spec-row"><span class="spec-key">Piezoelectric element</span><span class="spec-val">The active layer. PZT disk or plate; its thickness sets the resonant frequency (t = &lambda;/2; thinner = higher frequency).</span></div>
+          <div class="spec-row"><span class="spec-key">Matching layer(s)</span><span class="spec-val">One or two &lambda;/4-thick layers with impedance between crystal (~30 MRayl) and water (~1.5 MRayl) or steel (~46 MRayl). Maximises energy transmission.</span></div>
+          <div class="spec-row"><span class="spec-key">Wear plate</span><span class="spec-val">Hard protective layer (alumina, boron carbide, or epoxy) that physically contacts the test surface or couplant. Prevents crystal abrasion.</span></div>
+
+          <div class="callout">
+            <strong>Bandwidth and resolution:</strong> The backing and matching layers together determine the transducer's <strong>&minus;6 dB bandwidth</strong>. A heavily damped, broadband transducer (80–120% fractional bandwidth) produces very short pulses and fine axial resolution. Narrowband transducers sacrifice axial resolution for higher sensitivity.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Transducer Types Overview
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="types">
+          <h2>&#128270; Transducer Types — Overview</h2>
+          <p>
+            Different inspection problems call for different transducer configurations. Here is a summary of
+            the major categories used in industrial NDE.
+          </p>
+
+          <div class="transducer-grid">
+            <div class="t-card">
+              <div class="t-card-icon">&#128269;</div>
+              <h3>Contact (Straight-Beam)</h3>
+              <p>Placed directly on the test surface with couplant. Generates longitudinal waves straight into the material. The workhorse for thickness measurement and lamination/inclusion detection.</p>
+              <div class="t-card-tags">
+                <span class="tag">Longitudinal wave</span>
+                <span class="tag">0.5–25 MHz</span>
+                <span class="tag-green tag">Most common</span>
+              </div>
+            </div>
+            <div class="t-card">
+              <div class="t-card-icon">&#128200;</div>
+              <h3>Angle-Beam (Wedge)</h3>
+              <p>A wedge refracts the beam at Snell's law, converting to shear waves at a set angle (45°, 60°, 70°). Standard for weld inspection and crack detection in welds, pipes, and rails.</p>
+              <div class="t-card-tags">
+                <span class="tag">Shear / Rayleigh wave</span>
+                <span class="tag">1–10 MHz</span>
+                <span class="tag-orange tag">Weld inspection</span>
+              </div>
+            </div>
+            <div class="t-card">
+              <div class="t-card-icon">&#128166;</div>
+              <h3>Immersion</h3>
+              <p>Both transducer and part submerged in water. The water column couples the beam and allows precise computer-controlled scanning. Common for C-scan imaging and complex geometry parts.</p>
+              <div class="t-card-tags">
+                <span class="tag">Water-coupled</span>
+                <span class="tag">1–50 MHz</span>
+                <span class="tag-purple tag">C-scan / production</span>
+              </div>
+            </div>
+            <div class="t-card">
+              <div class="t-card-icon">&#128258;</div>
+              <h3>Dual-Element (TR)</h3>
+              <p>Separate transmitter and receiver elements in one housing, inclined slightly toward each other. Eliminates the near-surface dead zone; ideal for corrosion mapping of thin sections.</p>
+              <div class="t-card-tags">
+                <span class="tag">Pulse-echo variant</span>
+                <span class="tag">2–10 MHz</span>
+                <span class="tag-orange tag">Corrosion mapping</span>
+              </div>
+            </div>
+            <div class="t-card">
+              <div class="t-card-icon">&#9889;</div>
+              <h3>EMAT</h3>
+              <p>Electromagnetic Acoustic Transducer. Non-contact generation via Lorentz force and magnetostriction. No couplant needed; works on rough, coated, or hot surfaces.</p>
+              <div class="t-card-tags">
+                <span class="tag">Non-contact</span>
+                <span class="tag">Shear or Lamb waves</span>
+                <span class="tag-green tag">No couplant</span>
+              </div>
+            </div>
+            <div class="t-card">
+              <div class="t-card-icon">&#127788;</div>
+              <h3>Air-Coupled</h3>
+              <p>Non-contact with air as couplant. Very low impedance mismatch managed by matching layers and signal averaging. Used for composites, foam, ceramics, and paper.</p>
+              <div class="t-card-tags">
+                <span class="tag">Non-contact</span>
+                <span class="tag">0.05–5 MHz</span>
+                <span class="tag-purple tag">Composites</span>
+              </div>
+            </div>
+            <div class="t-card">
+              <div class="t-card-icon">&#128301;</div>
+              <h3>Phased Array (PAUT)</h3>
+              <p>Multi-element array (16–256 elements) with programmable delay laws. Electronic beam steering, focusing, and sectorial scans without mechanical movement. Current industry standard for weld and structural inspection.</p>
+              <div class="t-card-tags">
+                <span class="tag">All wave modes</span>
+                <span class="tag">1–15 MHz</span>
+                <span class="tag-green tag">Gold standard</span>
+              </div>
+            </div>
+            <div class="t-card">
+              <div class="t-card-icon">&#128307;</div>
+              <h3>TOFD Probes</h3>
+              <p>Time-of-Flight Diffraction uses two angled probes straddling a weld. Measures diffracted signals from crack tips, giving very accurate depth sizing independent of crack orientation.</p>
+              <div class="t-card-tags">
+                <span class="tag">Angled-beam pair</span>
+                <span class="tag">2–10 MHz</span>
+                <span class="tag-orange tag">Weld / crack sizing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Contact Transducers
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="contact">
+          <h2>Contact Transducers (Straight-Beam)</h2>
+          <p>
+            The simplest and most widely used configuration: the transducer face is pressed against
+            the test surface (with a thin layer of couplant), and longitudinal waves travel perpendicular
+            to the surface.
+          </p>
+          <h3>Key Design Parameters</h3>
+          <div class="spec-row"><span class="spec-key">Frequency</span><span class="spec-val">1–25 MHz. Higher frequency for fine-grained metals; lower for coarse-grained castings or plastics.</span></div>
+          <div class="spec-row"><span class="spec-key">Element diameter</span><span class="spec-val">Typically 6–25 mm. Larger diameter &rarr; narrower divergence in far field, longer near-field zone.</span></div>
+          <div class="spec-row"><span class="spec-key">Near-field length</span><span class="spec-val">N = D² / (4&lambda;). Inspection in the near field is unreliable due to interference — plan scan depth accordingly.</span></div>
+          <div class="spec-row"><span class="spec-key">Bandwidth</span><span class="spec-val">60–120% fractional bandwidth. Broadband = short pulse = good axial resolution.</span></div>
+          <h3>Applications</h3>
+          <ul>
+            <li>Thickness measurement (corrosion inspection, wall-loss)</li>
+            <li>Laminar flaw detection (delaminations, inclusions)</li>
+            <li>Bond integrity testing</li>
+            <li>Velocity measurement for material characterisation</li>
+          </ul>
+          <div class="callout">
+            <strong>Couplant required.</strong> A thin liquid or gel film (water, glycerin, or commercial gel) is needed between the transducer face and the part to displace air and allow energy transfer. Without couplant, nearly 100% of energy is reflected at the air gap.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Immersion Transducers
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="immersion">
+          <h2>Immersion Transducers</h2>
+          <p>
+            The transducer is aimed at the part from a distance, with water filling the gap. The water
+            column acts as a perfect, consistent couplant and a variable focal length.
+          </p>
+          <h3>Advantages over contact</h3>
+          <ul>
+            <li>No transducer wear; uniform coupling across a scan</li>
+            <li>Precise computer-controlled XY positioning</li>
+            <li>Focused transducers can be tuned by adjusting water path (focal distance)</li>
+            <li>Enables high-frequency (up to 50 MHz) inspection with minimal surface noise</li>
+          </ul>
+          <h3>Types</h3>
+          <div class="spec-row"><span class="spec-key">Flat (unfocused)</span><span class="spec-val">Natural cylindrical beam; used when the full thickness must be interrogated.</span></div>
+          <div class="spec-row"><span class="spec-key">Spherically focused</span><span class="spec-val">Lens or curved crystal focuses the beam to a point — best lateral resolution at the focus depth.</span></div>
+          <div class="spec-row"><span class="spec-key">Cylindrically focused</span><span class="spec-val">Focuses in one plane only; used to interrogate a line rather than a point.</span></div>
+          <div class="callout">
+            <strong>Water path calculation:</strong> To place the focal spot at depth d inside a material of velocity c<sub>m</sub>, the required water path W is approximated by W &asymp; F &minus; d &times; (c<sub>w</sub> / c<sub>m</sub>), where F is the transducer's focal length in water and c<sub>w</sub> &asymp; 1480 m/s.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Dual-Element
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="dual-element">
+          <h2>Dual-Element (TR) Transducers</h2>
+          <p>
+            A TR (transmit-receive) transducer houses two separate elements side by side in one housing,
+            acoustically isolated from each other, and angled slightly toward one another ("roof angle").
+            The transmitter fires; the receiver picks up reflections.
+          </p>
+          <h3>Why use it?</h3>
+          <ul>
+            <li><strong>No dead zone:</strong> The transmitter is electrically isolated from the receiver, so near-surface echoes are not masked by the main bang.</li>
+            <li><strong>Corrosion mapping:</strong> Ideal for measuring remaining wall thickness in pipes and vessels with internal corrosion.</li>
+            <li><strong>Rough surfaces:</strong> Less sensitive to surface condition variations.</li>
+          </ul>
+          <div class="callout">
+            <strong>Limitation:</strong> The crossed-beam geometry creates a pseudo-focal zone (the intersection depth) that varies with the roof angle. Sensitivity is not flat with depth — the beam is optimised for a specific depth range set by the design.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Angle-Beam
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="angle-beam">
+          <h2>Angle-Beam Transducers (Wedge Probes)</h2>
+          <p>
+            A standard straight-beam transducer is mounted on a plastic wedge. When sound enters the
+            wedge at an oblique angle, Snell's law converts it to shear waves in the test material at
+            a specific refraction angle. Common angles are <strong>45°, 60°, and 70°</strong> (shear wave
+            in the material).
+          </p>
+          <div class="eq-box">sin(&theta;<sub>2</sub>) / c<sub>S</sub> = sin(&theta;<sub>1</sub>) / c<sub>wedge</sub></div>
+          <h3>Applications</h3>
+          <ul>
+            <li>Weld inspection (fusion zone flaws, porosity, lack of penetration)</li>
+            <li>Pipe seam welds and circumferential scanning</li>
+            <li>Rail inspection</li>
+            <li>Turbine blade root inspection</li>
+          </ul>
+          <div class="callout">
+            <strong>Index point and beam exit:</strong> The "index point" is the precise location on the wedge face where the beam exits. Always mark the index point and measure from it when calculating reflector position. It changes with wear — check regularly on a calibration block (IIW V1 or V2).
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             EMAT
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="emat">
+          <h2>EMAT — Electromagnetic Acoustic Transducers</h2>
+          <p>
+            EMATs generate and receive ultrasound using electromagnetic forces rather than piezoelectric
+            vibration. A coil carrying RF current sits in a static magnetic field above the part.
+            The Lorentz force drives surface currents in the metal, which in turn drives acoustic waves.
+            <strong>No couplant is required.</strong>
+          </p>
+          <h3>Mechanism</h3>
+          <ul>
+            <li><strong>Lorentz force (non-ferromagnetic metals):</strong> RF current in coil → eddy currents in part skin depth → Lorentz force from static B-field → acoustic wave.</li>
+            <li><strong>Magnetostriction (ferromagnetic metals):</strong> Oscillating magnetic field changes the shape of the material at the atomic level, generating stress waves.</li>
+          </ul>
+          <h3>Wave modes available with EMAT</h3>
+          <div class="spec-row"><span class="spec-key">SH (shear-horizontal)</span><span class="spec-val">Unique to EMAT — not easily generated with piezoelectrics. Useful for corrosion and guided wave inspection.</span></div>
+          <div class="spec-row"><span class="spec-key">Rayleigh (surface waves)</span><span class="spec-val">Meander-coil configuration; inspects surface and near-surface regions.</span></div>
+          <div class="spec-row"><span class="spec-key">Lamb waves</span><span class="spec-val">Plate/shell guided waves for long-range screening.</span></div>
+          <h3>Trade-offs</h3>
+          <div class="callout">
+            <strong>Advantage:</strong> Non-contact; works on hot (~500°C), moving, or coated surfaces. <br/>
+            <strong>Limitation:</strong> Signal-to-noise ratio is 20–40 dB lower than comparable piezoelectric probes; requires stronger magnetic fields (permanent magnets or electromagnets) and more signal averaging. Only works on electrically conductive materials.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Air-Coupled
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="air-coupled">
+          <h2>Air-Coupled Transducers</h2>
+          <p>
+            Air-coupled UT eliminates liquid couplant entirely. The impedance mismatch between air
+            (~400 Rayl) and most solids (~1–46 MRayl) means only about 10<sup>&minus;4</sup>% of
+            energy transmits — so specialised designs are needed.
+          </p>
+          <h3>Enabling technologies</h3>
+          <ul>
+            <li><strong>Matching layers:</strong> Multiple &lambda;/4 layers step the impedance from the crystal down toward air.</li>
+            <li><strong>PVDF and capacitive micromachined (CMUT) elements:</strong> Low-impedance transduction that couples better to air.</li>
+            <li><strong>Signal averaging / coded excitation:</strong> Many averages or long-chirp pulses compensate for low SNR.</li>
+          </ul>
+          <h3>Applications</h3>
+          <ul>
+            <li>Carbon-fiber composite inspection (delaminations, impact damage)</li>
+            <li>Foam, honeycomb, paper, and cardboard structures</li>
+            <li>Ceramic and glass panels</li>
+            <li>Situations where liquid contamination is unacceptable</li>
+          </ul>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Phased Array
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="phased-array">
+          <h2>Phased Array Transducers (PAUT)</h2>
+          <p>
+            A phased array probe contains many individual piezoelectric elements (typically 16, 32, 64,
+            or 128) arranged in a linear, annular, or 2D matrix. By firing elements with programmable
+            time delays (<em>focal laws</em>), the beam can be steered, focused, and swept electronically.
+          </p>
+
+          <h3>Scan modes</h3>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Mode</th><th>Description</th><th>Typical use</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>E-scan (linear)</strong></td>
+                <td>A fixed aperture is stepped along the array; same focal law at each position.</td>
+                <td>Equivalent to a mechanically scanned single element; fast coverage</td>
+              </tr>
+              <tr>
+                <td><strong>S-scan (sectorial)</strong></td>
+                <td>Beam angle swept over a range (e.g., 40°–70°) using the full array; fan-shaped image.</td>
+                <td class="hi">Weld volumetric inspection — current standard</td>
+              </tr>
+              <tr>
+                <td><strong>FMC / TFM</strong></td>
+                <td>Every element fires in sequence while all others receive. Post-process TFM focuses at every point.</td>
+                <td>Highest image quality; flaw characterisation; research</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Key specification parameters</h3>
+          <div class="spec-row"><span class="spec-key">Number of elements</span><span class="spec-val">16–256. More elements &rarr; wider steering range and finer beam control.</span></div>
+          <div class="spec-row"><span class="spec-key">Element pitch (d)</span><span class="spec-val">Must be &le; &lambda;/2 to avoid grating lobes (false beams at off-axis angles).</span></div>
+          <div class="spec-row"><span class="spec-key">Center frequency</span><span class="spec-val">1–15 MHz for structural NDE; up to 50 MHz for medical and microelectronics.</span></div>
+          <div class="spec-row"><span class="spec-key">Aperture</span><span class="spec-val">Active element count &times; pitch. Larger aperture &rarr; narrower beam in far field.</span></div>
+
+          <div class="callout">
+            <strong>Why phased arrays dominate modern NDE:</strong> A single probe replaces an entire set of angle-beam probes. Inspection of a full weld volume takes seconds instead of minutes. Real-time imaging with TFM delivers near-CT-quality cross-sections in the field.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Selection Guide
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="selection">
+          <h2>&#127919; How to Choose a Transducer</h2>
+          <p>
+            No single transducer works best for every situation. Use this guide as a starting point:
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Inspection need</th>
+                <th>Recommended type</th>
+                <th>Frequency guidance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Wall thickness / corrosion</td>
+                <td>Contact straight-beam or dual-element (TR)</td>
+                <td>2–10 MHz</td>
+              </tr>
+              <tr>
+                <td>Weld inspection (manual)</td>
+                <td>Angle-beam wedge (45°/60°/70° shear)</td>
+                <td>2–5 MHz</td>
+              </tr>
+              <tr>
+                <td>Weld inspection (encoded)</td>
+                <td>Phased array (S-scan) + TOFD</td>
+                <td>2–10 MHz</td>
+              </tr>
+              <tr>
+                <td>Composite delamination</td>
+                <td>Immersion or contact straight-beam; air-coupled if no couplant</td>
+                <td>5–15 MHz</td>
+              </tr>
+              <tr>
+                <td>Large structure long-range screening</td>
+                <td>EMAT or Guided Wave (low-frequency ring array)</td>
+                <td>30–300 kHz</td>
+              </tr>
+              <tr>
+                <td>High-resolution imaging, electronics</td>
+                <td>Immersion focused, high-frequency</td>
+                <td>15–100 MHz</td>
+              </tr>
+              <tr>
+                <td>Hot surface or no-couplant required</td>
+                <td>EMAT or air-coupled</td>
+                <td>Application-specific</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>Frequency vs. resolution vs. penetration:</strong>
+            Higher frequency = smaller wavelength = finer resolution, but more attenuation = less depth penetration.
+            Start with the minimum frequency that gives you the resolution you need. If attenuation is too high, step down in frequency.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             Resources & Links
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="links">
+          <h2>&#128218; Resources &amp; External Links</h2>
+          <p>
+            The following manufacturers and educational resources provide datasheets, tutorials,
+            application notes, and online configurators for ultrasonic transducers.
+          </p>
+
+          <h3>Manufacturers</h3>
+          <div class="resource-link-grid">
+            <a href="https://www.olympus-ims.com/en/ultrasonic-transducers/" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128269;</div>
+              <div>
+                <h4>Olympus NDT (Evident)</h4>
+                <p>Comprehensive catalog of contact, immersion, angle-beam, and phased array transducers with selection guides and application notes.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://www.bakerhughes.com/panametrics/ultrasonic-sensors" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128268;</div>
+              <div>
+                <h4>Panametrics (Baker Hughes)</h4>
+                <p>Wide frequency range transducers, immersion and contact probes, specialty high-temperature sensors.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://www.sonatest.com/products/transducers" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128308;</div>
+              <div>
+                <h4>Sonatest</h4>
+                <p>Contact, angle-beam, and immersion transducers with focus on industrial UT and phased array applications.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://www.imasonic.com" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#127794;</div>
+              <div>
+                <h4>Imasonic</h4>
+                <p>Custom phased array transducer design and manufacturing. Strong in medical and NDE high-frequency arrays.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://www.zetec.com" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128301;</div>
+              <div>
+                <h4>Zetec</h4>
+                <p>Phased array and eddy-current inspection systems with integrated probe libraries for power generation and aerospace.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://www.m2m-ndt.com" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128200;</div>
+              <div>
+                <h4>M2M NDT</h4>
+                <p>Phased array UT systems; particularly strong in aerospace composite inspection applications.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+          </div>
+
+          <h3>Educational &amp; Open Resources</h3>
+          <div class="resource-link-grid">
+            <a href="https://www.nde-ed.org/Physics/Sound/soundpropagation.xhtml" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128218;</div>
+              <div>
+                <h4>NDT Resource Center (NDE-ED)</h4>
+                <p>Free online textbook covering all aspects of UT and transducer physics. Maintained by Iowa State University and the FAA.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://www.asnt.org" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#127970;</div>
+              <div>
+                <h4>ASNT — American Society for NDT</h4>
+                <p>Professional standards body. Provides training materials, certification guidelines, and access to research journals.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://www.astm.org/standards/e317" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128220;</div>
+              <div>
+                <h4>ASTM E317 — Transducer Characterization</h4>
+                <p>Standard practice for evaluating performance characteristics of ultrasonic pulse-echo testing instruments and systems.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+            <a href="https://github.com/NDTtoolbox/NDTtoolbox" class="res-link-card" target="_blank" rel="noopener">
+              <div class="rlc-icon">&#128187;</div>
+              <div>
+                <h4>Open-source UT Simulation Tools</h4>
+                <p>Python and MATLAB packages for ultrasound beam modelling, including CIVA-compatible models and FMC/TFM reconstruction.</p>
+              </div>
+              <div class="rlc-arrow">&#8594;</div>
+            </a>
+          </div>
+
+          <div class="callout">
+            <strong>Back to Theory:</strong> For wave physics, scanning methods, and signal processing fundamentals, see the
+            <a href="theory.html">Theory page</a>.
+            For interactive calculators (wavelength, near-field distance, beam divergence), see
+            <a href="calculators.html">Calculators</a>.
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="transducers.html">Transducers</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="resources.html">Resources</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

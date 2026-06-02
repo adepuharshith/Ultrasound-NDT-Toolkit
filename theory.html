@@ -8,50 +8,274 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <style>
-    /* ---- Particle animation demo ---- */
-    .particle-demo {
-      margin: 1.25rem 0 1.75rem;
+    /* ---- Wave animation panels ---- */
+    .wave-demo {
       background: #0d1b2a;
       border-radius: 10px;
       overflow: hidden;
       border: 1px solid #1e3a5f;
     }
-    .particle-demo-header {
+    .wave-demo-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: .45rem 1rem;
+      padding: .42rem 1rem;
       background: rgba(255,255,255,.04);
       border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .particle-demo-header span {
-      font-size: .75rem;
+    .wave-demo-header span {
+      font-size: .73rem;
       font-weight: 700;
       color: #94a3b8;
       text-transform: uppercase;
       letter-spacing: .08em;
     }
-    .particle-demo-btn {
+    .wave-demo-btn {
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.15);
       color: #cbd5e1;
       border-radius: 5px;
-      padding: .28rem .75rem;
-      font-size: .78rem;
+      padding: .25rem .7rem;
+      font-size: .76rem;
       cursor: pointer;
       transition: background .15s;
       font-family: var(--font, sans-serif);
     }
-    .particle-demo-btn:hover { background: rgba(255,255,255,.16); }
-    #particle-canvas { display: block; width: 100%; height: auto; }
-    .particle-caption {
+    .wave-demo-btn:hover { background: rgba(255,255,255,.16); }
+    .wave-canvas { display: block; width: 100%; height: auto; }
+    .wave-caption {
       font-size: .78rem;
       color: #64748b;
-      padding: .5rem 1rem;
+      padding: .45rem 1rem;
       margin: 0;
       background: #f8fafc;
       border-top: 1px solid var(--border);
       line-height: 1.6;
+    }
+
+    /* ---- Wave pair layout ---- */
+    .wave-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0 1.75rem;
+    }
+    @media (max-width: 680px) { .wave-pair { grid-template-columns: 1fr; } }
+
+    /* ---- Comparison table ---- */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: .88rem;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .compare-table th {
+      background: var(--brand-navy);
+      color: #fff;
+      padding: .65rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: .85rem;
+    }
+    .compare-table td {
+      padding: .58rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:nth-child(even) td { background: #f8fafc; }
+    .compare-table .hi { color: var(--brand-cyan); font-weight: 700; }
+    .compare-table .hi-orange { color: #ea580c; font-weight: 700; }
+    .compare-table strong { color: var(--text); }
+
+    /* ---- Speed comparison visual ---- */
+    .speed-bar-wrap { margin: 1.25rem 0; }
+    .speed-bar-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .25rem;
+    }
+    .speed-bar-track {
+      height: 28px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: .5rem;
+    }
+    .speed-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding-left: .6rem;
+      font-size: .75rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    /* ---- Frequency spectrum ---- */
+    .spectrum-wrap { margin: 1.5rem 0 1rem; }
+    .spectrum-bar {
+      display: flex;
+      height: 52px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: .5rem;
+      box-shadow: var(--shadow);
+    }
+    .spec-seg {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .68rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.9);
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 0 4px;
+    }
+    .spectrum-ticks {
+      display: flex;
+      position: relative;
+      height: 22px;
+    }
+    .spec-tick {
+      position: absolute;
+      transform: translateX(-50%);
+      font-size: .7rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.2;
+    }
+    .nde-highlight {
+      border: 2px solid var(--brand-cyan);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      background: #eff6ff;
+      margin: .5rem 0 1.25rem;
+    }
+
+    /* ---- Transducer SVG diagram ---- */
+    .transducer-diagram {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      display: flex;
+      justify-content: center;
+    }
+    .transducer-link-card {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      background: linear-gradient(135deg, #0f2d5e, #0c4a6e);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      text-decoration: none !important;
+      transition: opacity .18s;
+    }
+    .transducer-link-card:hover { opacity: .9; }
+    .transducer-link-card .tlc-icon { font-size: 2rem; flex-shrink: 0; }
+    .transducer-link-card h4 { color: #fff; margin: 0 0 .2rem; font-size: 1rem; }
+    .transducer-link-card p { color: #93c5fd; font-size: .85rem; margin: 0; }
+    .transducer-link-card .tlc-arrow {
+      margin-left: auto;
+      color: #7dd3fc;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    /* ---- Scan method diagrams ---- */
+    .scan-svg-wrap {
+      background: #0d1b2a;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1.25rem 0 1.75rem;
+    }
+    .scan-svg-wrap svg { display: block; width: 100%; height: auto; }
+
+    /* ---- Step badge on h2 ---- */
+    .theory-section h2 {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .step-n {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 30px;
+      background: var(--brand-cyan);
+      color: #fff;
+      border-radius: 50%;
+      font-size: .82rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    /* ---- Sidebar step numbers ---- */
+    .topic-sidebar .step-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 17px;
+      height: 17px;
+      background: var(--brand-cyan);
+      color: #fff;
+      border-radius: 50%;
+      font-size: .62rem;
+      font-weight: 800;
+      margin-right: .42rem;
+      line-height: 1;
+    }
+    .sidebar-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: .8rem 0 .4rem;
+    }
+    .sidebar-label {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      padding: .1rem .6rem .3rem;
+    }
+
+    /* ---- Advanced section divider ---- */
+    .adv-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem 0 2rem;
+    }
+    .adv-divider::before, .adv-divider::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+    }
+    .adv-divider span {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      white-space: nowrap;
     }
   </style>
 </head>
@@ -73,20 +297,23 @@
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
     <li><a href="theory.html" class="active">Theory</a></li>
+    <li><a href="transducers.html">Transducers</a></li>
     <li><a href="calculators.html">Calculators</a></li>
     <li><a href="resources.html">Resources</a></li>
   </ul>
   <button class="nav-hamburger" aria-label="Menu">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
   </button>
 </nav>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
-  <h1>&#128200; Theory</h1>
-  <p>Foundations of ultrasonic wave physics, transducer design, and NDE imaging modes</p>
+  <h1>Theory</h1>
+  <p>A student-friendly guide — from fundamental wave physics to inspection methods</p>
 </div>
 
 <!-- CONTENT -->
@@ -96,77 +323,743 @@
 
       <!-- SIDEBAR -->
       <aside class="topic-sidebar">
-        <h4>Topics</h4>
-        <a href="#wave-propagation">Wave Propagation</a>
+        <h4>Student Path</h4>
+        <a href="#wave-types"><span class="step-dot">1</span>Wave Types</a>
+        <a href="#speed-comparison"><span class="step-dot">2</span>Speed in Media</a>
+        <a href="#energy-loss"><span class="step-dot">3</span>Energy Loss</a>
+        <a href="#why-longitudinal"><span class="step-dot">4</span>Why Longitudinal?</a>
+        <a href="#ultrasound-spectrum"><span class="step-dot">5</span>Ultrasound Spectrum</a>
+        <a href="#generating-ultrasound"><span class="step-dot">6</span>Generating Ultrasound</a>
+        <a href="#a-scan"><span class="step-dot">7</span>A-scan</a>
+        <a href="#b-scan"><span class="step-dot">8</span>B-scan</a>
+        <a href="#c-scan"><span class="step-dot">9</span>C-scan</a>
+        <hr class="sidebar-sep"/>
+        <div class="sidebar-label">Advanced Topics</div>
         <a href="#acoustic-impedance">Acoustic Impedance</a>
         <a href="#attenuation">Attenuation</a>
-        <a href="#transducers">Transducers</a>
         <a href="#beam-physics">Beam Physics</a>
         <a href="#snell">Snell's Law &amp; Mode Conversion</a>
-        <a href="#imaging">Imaging Modes</a>
         <a href="#signal-processing">Signal Processing</a>
         <a href="#phased-arrays">Phased Arrays</a>
         <a href="#calibration">Calibration &amp; DAC</a>
-        <a href="#advanced">Advanced Techniques</a>
       </aside>
 
       <!-- MAIN CONTENT -->
       <main>
 
-        <!-- Wave Propagation -->
-        <div class="theory-section" id="wave-propagation">
-          <h2>&#127744; Wave Propagation</h2>
+        <!-- ══════════════════════════════════════════════
+             SECTION 1 — Longitudinal vs Transverse Waves
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="wave-types">
+          <h2><span class="step-n">1</span> Longitudinal vs Transverse Waves</h2>
+
           <p>
-            Ultrasonic waves are mechanical disturbances that propagate through a medium by
-            transferring kinetic and potential energy between neighboring particles. In NDE,
-            frequencies typically range from <strong>0.1 MHz to 50 MHz</strong>, well above
-            the audible limit.
+            All waves transfer energy through a medium without permanently displacing the material itself.
+            The key difference between wave types is <strong>how the particles in the medium move</strong>
+            relative to the direction the wave is travelling.
           </p>
 
-          <!-- ── Particle animation ── -->
-          <div class="particle-demo">
-            <div class="particle-demo-header">
-              <span>&#127759; Live simulation &mdash; longitudinal wave &amp; particle motion</span>
-              <button class="particle-demo-btn" id="particle-playpause">&#9646;&#9646; Pause</button>
+          <div class="wave-pair">
+            <div class="wave-demo">
+              <div class="wave-demo-header">
+                <span>&#127759; Longitudinal wave — particles oscillate along wave direction</span>
+                <button class="wave-demo-btn" id="long-playpause">&#9646;&#9646; Pause</button>
+              </div>
+              <canvas id="long-canvas" class="wave-canvas" width="380" height="200"></canvas>
+              <p class="wave-caption">
+                <strong style="color:#67e8f9;">Blue bands</strong> = compression (particles crowded) &ensp;
+                <strong style="color:#fdba74;">Orange bands</strong> = rarefaction (particles spread). &ensp;
+                Particles push and pull <em>in the same direction</em> the wave travels.
+              </p>
             </div>
-            <canvas id="particle-canvas" width="720" height="270"></canvas>
-            <p class="particle-caption">
-              <strong style="color:#fb923c;">Orange arrow</strong> = instantaneous <em>particle velocity</em> v&#8346;
-              on the highlighted particle — oscillates back and forth, magnitude varies sinusoidally.&ensp;
-              <strong style="color:#22d3ee;">Cyan arrow</strong> = <em>wave (phase) velocity</em> c —
-              the pattern always advances to the right at c&nbsp;=&nbsp;f&lambda;, independent of v&#8346;.&ensp;
-              Colour bands: <span style="color:#67e8f9;">blue = compression</span> (particles crowded),
-              <span style="color:#fdba74;">orange = rarefaction</span> (particles spread).
-            </p>
+
+            <div class="wave-demo">
+              <div class="wave-demo-header">
+                <span>&#127774; Transverse wave — particles oscillate perpendicular to wave direction</span>
+                <button class="wave-demo-btn" id="trans-playpause">&#9646;&#9646; Pause</button>
+              </div>
+              <canvas id="trans-canvas" class="wave-canvas" width="380" height="200"></canvas>
+              <p class="wave-caption">
+                <strong style="color:#67e8f9;">Blue particles</strong> = displaced upward &ensp;
+                <strong style="color:#fdba74;">Orange particles</strong> = displaced downward. &ensp;
+                Particles oscillate <em>perpendicular</em> to the wave's travel direction.
+              </p>
+            </div>
           </div>
 
-          <h3>Wave Equation</h3>
-          <p>The scalar wave equation governing pressure in a fluid:</p>
-          <div class="eq-box">&#8711;&sup2;p &minus; (1/c&sup2;) &part;&sup2;p/&part;t&sup2; = 0</div>
-          <p>where <em>p</em> is acoustic pressure and <em>c</em> is the wave speed.</p>
-
-          <h3>Wave Modes in Solids</h3>
-          <ul>
-            <li><strong>Longitudinal (P-wave):</strong> particle motion parallel to propagation. Fastest mode; exists in all media.</li>
-            <li><strong>Shear (S-wave / transverse):</strong> particle motion perpendicular to propagation. Only in solids; slower than P-waves (c<sub>S</sub> ≈ 0.55 c<sub>L</sub>).</li>
-            <li><strong>Rayleigh (surface) wave:</strong> elliptical particle motion confined to the surface; useful for surface defect detection.</li>
-            <li><strong>Lamb waves (plate waves):</strong> guided waves in thin plates; symmetric (S) and antisymmetric (A) modes; highly dispersive.</li>
-          </ul>
-
-          <h3>Wave Speed in Isotropic Solids</h3>
-          <div class="eq-box">
-            c<sub>L</sub> = &radic;[(E(1&minus;&nu;)) / (&rho;(1+&nu;)(1&minus;2&nu;))]<br/>
-            c<sub>S</sub> = &radic;[G/&rho;] = &radic;[E / (2&rho;(1+&nu;))]
-          </div>
-          <p>where <em>E</em> = Young's modulus, <em>&nu;</em> = Poisson's ratio, <em>&rho;</em> = density, <em>G</em> = shear modulus.</p>
+          <h3>Key Difference — At a Glance</h3>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Longitudinal (P-wave)</th>
+                <th>Transverse / Shear (S-wave)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Particle motion</strong></td>
+                <td>Parallel to wave direction (back &amp; forth)</td>
+                <td>Perpendicular to wave direction (up &amp; down)</td>
+              </tr>
+              <tr>
+                <td><strong>Other names</strong></td>
+                <td>Compression wave, P-wave, pressure wave</td>
+                <td>Shear wave, S-wave</td>
+              </tr>
+              <tr>
+                <td><strong>Media it can travel in</strong></td>
+                <td class="hi">Solids, liquids, and gases</td>
+                <td>Solids only (no shear stiffness in fluids)</td>
+              </tr>
+              <tr>
+                <td><strong>Speed in steel</strong></td>
+                <td>~5,900 m/s</td>
+                <td>~3,200 m/s (about 0.55 &times; longitudinal)</td>
+              </tr>
+              <tr>
+                <td><strong>Everyday examples</strong></td>
+                <td>Sound, speech, ultrasound, earthquake P-waves</td>
+                <td>Vibrating guitar string, earthquake S-waves</td>
+              </tr>
+            </tbody>
+          </table>
 
           <div class="callout">
-            <strong>Typical values:</strong> Longitudinal speed in steel ≈ 5900 m/s; in aluminum ≈ 6320 m/s; in water ≈ 1480 m/s; in HDPE ≈ 2500 m/s.
+            <strong>Simple analogy:</strong> Push and pull a Slinky along its length &rarr; you get a longitudinal wave (compressions travel along it). Shake a rope up and down &rarr; you get a transverse wave. Both carry energy from your hand to the other end, but by very different particle motions.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 2 — Speed Comparison
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="speed-comparison">
+          <h2><span class="step-n">2</span> Speed: Sound vs Electromagnetic Waves</h2>
+
+          <p>
+            How fast a wave travels depends on the wave type and the medium it moves through.
+            Sound (a mechanical wave) and light (an electromagnetic wave) behave very differently.
+          </p>
+
+          <h3>Speed of Sound in Different Media</h3>
+          <p>
+            Sound needs a medium to travel. The stiffer and denser the material, the faster sound travels —
+            counterintuitively, sound is <em>fastest in solids</em>, not gases.
+          </p>
+
+          <div class="speed-bar-wrap">
+            <div class="speed-bar-label">Steel (solid) — 5,900 m/s</div>
+            <div class="speed-bar-track">
+              <div class="speed-bar-fill" style="width:100%; background:linear-gradient(90deg,#0891b2,#06b6d4);">5,900 m/s</div>
+            </div>
+            <div class="speed-bar-label">Aluminum (solid) — 6,320 m/s</div>
+            <div class="speed-bar-track">
+              <div class="speed-bar-fill" style="width:100%; background:linear-gradient(90deg,#0e7490,#22d3ee);">6,320 m/s</div>
+            </div>
+            <div class="speed-bar-label">Water (liquid) — 1,480 m/s</div>
+            <div class="speed-bar-track">
+              <div class="speed-bar-fill" style="width:25%; background:linear-gradient(90deg,#1e40af,#3b82f6);">1,480 m/s</div>
+            </div>
+            <div class="speed-bar-label">Air (gas) — 343 m/s</div>
+            <div class="speed-bar-track">
+              <div class="speed-bar-fill" style="width:6%; min-width:60px; background:linear-gradient(90deg,#334155,#64748b);">343 m/s</div>
+            </div>
           </div>
 
-          <h3>Wavelength and Resolution</h3>
-          <div class="eq-box">&lambda; = c / f</div>
-          <p>Spatial resolution is fundamentally limited to approximately one wavelength. Higher frequency → smaller wavelength → finer resolution, but also more attenuation. This is the central design trade-off in UT inspection.</p>
+          <h3>Sound vs Electromagnetic (EM) Waves</h3>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Medium</th>
+                <th>Sound Speed (longitudinal)</th>
+                <th>EM Wave Speed (light)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Steel (solid)</strong></td>
+                <td>~5,900 m/s</td>
+                <td>EM waves do not penetrate metals (absorbed)</td>
+              </tr>
+              <tr>
+                <td><strong>Water (liquid)</strong></td>
+                <td>~1,480 m/s</td>
+                <td>~225,000,000 m/s (n ≈ 1.33)</td>
+              </tr>
+              <tr>
+                <td><strong>Air (gas)</strong></td>
+                <td>~343 m/s</td>
+                <td class="hi">~300,000,000 m/s</td>
+              </tr>
+              <tr>
+                <td><strong>Vacuum</strong></td>
+                <td class="hi-orange">Cannot travel (needs a medium)</td>
+                <td class="hi">300,000,000 m/s (c — constant)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>Key insight:</strong> Sound is roughly <strong>50,000&times; slower</strong> than light in air.
+            That slowness is actually an <em>advantage</em> for inspection — the time it takes an ultrasonic pulse to travel through a 50 mm steel block (~17 &micro;s) is easily measurable with standard electronics, letting us compute the exact depth of a flaw from time-of-flight (d = c &times; t / 2).
+          </div>
+
+          <p>
+            EM waves (X-rays, microwaves, light) do not penetrate metals, which is why sound —
+            specifically <strong>ultrasound</strong> — is the preferred wave for inspecting metallic structures.
+          </p>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 3 — Energy Loss
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="energy-loss">
+          <h2><span class="step-n">3</span> Energy Loss: Longitudinal vs Transverse</h2>
+
+          <p>
+            As a wave travels through a material, it gradually loses energy. This is called
+            <strong>attenuation</strong> and comes from two sources: <em>absorption</em> (energy converted to heat)
+            and <em>scattering</em> (energy deflected in all directions by grain boundaries, pores, and inclusions).
+          </p>
+
+          <h3>Comparing Attenuation</h3>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Wave Type</th>
+                <th>Travels in</th>
+                <th>Attenuation in Steel</th>
+                <th>Practical implication</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Longitudinal (P)</strong></td>
+                <td class="hi">All media</td>
+                <td>~0.5–2 dB/(mm&middot;MHz)</td>
+                <td>Can penetrate thick sections; couples through liquid couplant</td>
+              </tr>
+              <tr>
+                <td><strong>Transverse / Shear (S)</strong></td>
+                <td>Solids only</td>
+                <td>~1–4 dB/(mm&middot;MHz) — typically 2&times; higher</td>
+                <td>Higher loss limits inspection range; cannot travel through couplant layer</td>
+              </tr>
+              <tr>
+                <td><strong>Surface (Rayleigh)</strong></td>
+                <td>Solid surface only</td>
+                <td>Low in-surface attenuation</td>
+                <td>Useful for surface cracks; depth limited to ~1&lambda;</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>Why can't shear waves travel in liquids or gases?</strong>
+            Liquids and gases have no shear stiffness — their molecules slide past each other freely.
+            A shear wave requires adjacent layers of material to pull on each other sideways, which only happens in solids.
+            This is also why earthquakes S-waves stop at Earth's liquid outer core — a clue that helped
+            geologists discover it is molten!
+          </div>
+
+          <h3>Attenuation Law</h3>
+          <div class="eq-box">A(x) = A<sub>0</sub> &middot; e<sup>&minus;&alpha;&middot;x</sup></div>
+          <p>
+            where &alpha; is the attenuation coefficient [dB/(mm&middot;MHz)], x is propagation distance,
+            and A<sub>0</sub> is the initial amplitude. Attenuation increases with frequency — there is always
+            a trade-off between resolution (higher frequency) and penetration depth (lower frequency).
+          </p>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 4 — Why Longitudinal for Metal Inspection
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="why-longitudinal">
+          <h2><span class="step-n">4</span> Why Longitudinal Waves for Metal Inspection?</h2>
+
+          <p>
+            Given that both wave types exist in solids, why do most straight-beam contact and immersion
+            inspections use longitudinal waves? Here are the key reasons:
+          </p>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Reason</th>
+                <th>Explanation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Works through liquid couplant</strong></td>
+                <td>A thin layer of water or gel is needed between the transducer and the metal surface. Only longitudinal waves can travel through this liquid film — shear waves die immediately in the liquid.</td>
+              </tr>
+              <tr>
+                <td><strong>Lower attenuation</strong></td>
+                <td>Longitudinal waves attenuate less per unit distance in metals, allowing inspection of thicker sections and detection of deeper flaws.</td>
+              </tr>
+              <tr>
+                <td><strong>Simple generation</strong></td>
+                <td>A straight-face transducer naturally generates longitudinal waves. No wedge or angle adapter is needed for most thickness measurements and flaw detection.</td>
+              </tr>
+              <tr>
+                <td><strong>Predictable speed</strong></td>
+                <td>Longitudinal wave speed in metals is stable and well-characterised (~5,900 m/s in steel). Time-of-flight to depth conversion is straightforward.</td>
+              </tr>
+              <tr>
+                <td><strong>Works in all materials</strong></td>
+                <td>The same approach works in metals, plastics, ceramics, and composites — no limitation to solids only.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>When are shear (transverse) waves used?</strong>
+            Shear waves are deliberately introduced using wedge transducers for <em>weld inspection</em> and
+            <em>crack detection</em>. Because cracks are typically oriented vertically, a shear wave hitting the
+            crack face at an angle reflects strongly, making them excellent for detecting weld defects. The technique
+            is called angle-beam (or TOFD) inspection. This is an advanced topic — see Snell's Law below.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 5 — Ultrasound Spectrum
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="ultrasound-spectrum">
+          <h2><span class="step-n">5</span> The Ultrasound Spectrum for Inspection</h2>
+
+          <p>
+            "Ultrasound" simply means sound above the human hearing limit of ~20 kHz.
+            For industrial NDE, the useful range extends from <strong>0.1 MHz to 50 MHz</strong> —
+            frequencies far beyond anything audible.
+          </p>
+
+          <div class="spectrum-wrap">
+            <div class="spectrum-bar">
+              <!-- Infrasound / subaudible: 0-1.3% log range → 0-22% -->
+              <div class="spec-seg" style="width:22%; background:#64748b; font-size:.62rem;">Audible &amp; below</div>
+              <!-- Low ultrasound 20kHz-100kHz: log 4.3-5.0 out of 4.3-7.7 → 0-20% of remaining -->
+              <div class="spec-seg" style="width:10%; background:#0d9488; font-size:.6rem;">Low UT</div>
+              <!-- Medical / low NDE 100kHz-1MHz: log 5.0-6.0 → 29% of remaining -->
+              <div class="spec-seg" style="width:16%; background:#0891b2; font-size:.62rem;">Medical</div>
+              <!-- NDE main 1-10 MHz -->
+              <div class="spec-seg" style="width:30%; background:#1e40af; border-left:3px solid #60a5fa;">NDE Main Range</div>
+              <!-- High freq NDE 10-50 MHz -->
+              <div class="spec-seg" style="width:22%; background:#0f2d5e; font-size:.65rem;">Fine-Res NDE</div>
+            </div>
+            <!-- Tick labels (approximate log-scale positions) -->
+            <div style="position:relative; height:34px; font-size:.68rem; color:var(--text-muted);">
+              <span style="position:absolute; left:0%;">20 Hz</span>
+              <span style="position:absolute; left:22%; transform:translateX(-50%);">20 kHz</span>
+              <span style="position:absolute; left:32%; transform:translateX(-50%);">100 kHz</span>
+              <span style="position:absolute; left:48%; transform:translateX(-50%);">1 MHz</span>
+              <span style="position:absolute; left:70%; transform:translateX(-50%);">10 MHz</span>
+              <span style="position:absolute; right:0; transform:translateX(0);">50 MHz</span>
+            </div>
+          </div>
+
+          <h3>Choosing the Right Frequency</h3>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Frequency Range</th>
+                <th>Wavelength in Steel</th>
+                <th>Best for</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>0.1 – 0.5 MHz</strong></td>
+                <td>12 – 59 mm</td>
+                <td>Coarse-grained castings, concrete, rough surfaces; high penetration</td>
+              </tr>
+              <tr>
+                <td><strong>1 – 5 MHz</strong></td>
+                <td>1.2 – 5.9 mm</td>
+                <td class="hi">Most common NDE range — good balance of penetration and resolution</td>
+              </tr>
+              <tr>
+                <td><strong>5 – 15 MHz</strong></td>
+                <td>0.4 – 1.2 mm</td>
+                <td>Small defects, thin sections, fine-grained metals, composites</td>
+              </tr>
+              <tr>
+                <td><strong>15 – 50 MHz</strong></td>
+                <td>0.12 – 0.4 mm</td>
+                <td>High-resolution imaging, microelectronics, thin coatings</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>The fundamental trade-off:</strong>
+            Resolution is limited to approximately one wavelength (&lambda; = c / f).
+            Higher frequency &rarr; shorter wavelength &rarr; finer resolution.
+            But higher frequency also means more attenuation — the wave dies out sooner.
+            A 5 MHz probe in steel gives &lambda; &approx; 1.2 mm; at 1 MHz, &lambda; &approx; 5.9 mm.
+            Choose frequency based on the smallest flaw you need to detect vs. the depth you need to reach.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 6 — Generating Ultrasound
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="generating-ultrasound">
+          <h2><span class="step-n">6</span> How is Ultrasound Generated?</h2>
+
+          <p>
+            Ultrasound for inspection is generated by a <strong>transducer</strong> — a device that converts
+            electrical energy into mechanical vibration (and back again). The key mechanism is the
+            <em>piezoelectric effect</em>.
+          </p>
+
+          <h3>The Piezoelectric Effect — Simply Put</h3>
+          <p>
+            Certain crystals (quartz, PZT ceramic) have a special property: <strong>squeeze them and they produce
+            a voltage; apply a voltage and they squeeze themselves</strong>. When a short electrical pulse is
+            applied to a piezoelectric element, it vibrates rapidly — generating a burst of ultrasound.
+            When a returning echo hits the element, it produces a tiny voltage that the instrument records.
+            The same element transmits <em>and</em> receives.
+          </p>
+
+          <div class="transducer-diagram">
+            <svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="max-width:440px; width:100%;">
+              <defs>
+                <marker id="arr-y" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                  <polygon points="0 0, 7 3.5, 0 7" fill="#fbbf24"/>
+                </marker>
+                <marker id="arr-s" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                  <polygon points="0 0, 7 3.5, 0 7" fill="#22d3ee"/>
+                </marker>
+              </defs>
+
+              <!-- Case outline -->
+              <rect x="120" y="12" width="200" height="168" rx="7" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+
+              <!-- Backing material -->
+              <rect x="125" y="16" width="190" height="60" rx="5" fill="#0f172a"/>
+              <text x="220" y="42" text-anchor="middle" fill="#94a3b8" font-size="11.5" font-weight="600">Backing Material</text>
+              <text x="220" y="57" text-anchor="middle" fill="#475569" font-size="9.5">absorbs rearward energy, shortens pulse</text>
+
+              <!-- Piezoelectric element -->
+              <rect x="125" y="82" width="190" height="34" rx="3" fill="#0891b2" stroke="#22d3ee" stroke-width="1.5"/>
+              <text x="220" y="102" text-anchor="middle" fill="white" font-size="12" font-weight="700">Piezoelectric Crystal (PZT)</text>
+
+              <!-- Matching layer -->
+              <rect x="125" y="121" width="190" height="14" fill="#0e7490"/>
+              <text x="220" y="131" text-anchor="middle" fill="rgba(255,255,255,.85)" font-size="9" font-weight="600">Matching Layer</text>
+
+              <!-- Wear plate -->
+              <rect x="125" y="139" width="190" height="13" fill="#334155"/>
+              <text x="220" y="149" text-anchor="middle" fill="rgba(255,255,255,.8)" font-size="9" font-weight="600">Wear Plate</text>
+
+              <!-- Couplant -->
+              <rect x="125" y="155" width="190" height="10" fill="rgba(34,211,238,.18)" stroke="#22d3ee" stroke-width="0.7"/>
+              <text x="220" y="163" text-anchor="middle" fill="#22d3ee" font-size="8.5">couplant (water / gel)</text>
+
+              <!-- Test material -->
+              <rect x="30" y="168" width="380" height="76" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+              <text x="220" y="210" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="600">Test Material</text>
+
+              <!-- Sound wave arcs -->
+              <path d="M 165 170 Q 220 182 275 170" fill="none" stroke="#22d3ee" stroke-width="1.6" stroke-dasharray="5,3" opacity=".9"/>
+              <path d="M 158 178 Q 220 193 282 178" fill="none" stroke="#22d3ee" stroke-width="1.3" stroke-dasharray="5,3" opacity=".65"/>
+              <path d="M 150 188 Q 220 206 290 188" fill="none" stroke="#22d3ee" stroke-width="1" stroke-dasharray="5,3" opacity=".4"/>
+
+              <!-- Labels — right side -->
+              <line x1="315" y1="46" x2="350" y2="46" stroke="#475569" stroke-width="1"/>
+              <text x="354" y="43" fill="#94a3b8" font-size="10.5" font-weight="600">Backing</text>
+              <text x="354" y="56" fill="#64748b" font-size="8.5">damps reverb</text>
+
+              <line x1="315" y1="99" x2="350" y2="99" stroke="#22d3ee" stroke-width="1"/>
+              <text x="354" y="96" fill="#22d3ee" font-size="10.5" font-weight="600">Crystal</text>
+              <text x="354" y="109" fill="#64748b" font-size="8.5">vibrates at MHz</text>
+
+              <line x1="315" y1="128" x2="350" y2="128" stroke="#94a3b8" stroke-width="0.8"/>
+              <text x="354" y="125" fill="#94a3b8" font-size="9">Matching layer</text>
+              <text x="354" y="137" fill="#64748b" font-size="8">improves coupling</text>
+
+              <!-- Voltage arrow (left) -->
+              <line x1="85" y1="99" x2="120" y2="99" stroke="#fbbf24" stroke-width="1.8" marker-end="url(#arr-y)"/>
+              <text x="20" y="88" fill="#fbbf24" font-size="11" font-weight="700">Voltage</text>
+              <text x="24" y="102" fill="#fbbf24" font-size="9">pulse in</text>
+
+              <!-- Sound label -->
+              <text x="220" y="248" text-anchor="middle" fill="#22d3ee" font-size="10.5" font-weight="600">&#128266; Ultrasound pulses propagate into the material</text>
+            </svg>
+          </div>
+
+          <h3>The Pulse-Echo Principle</h3>
+          <p>
+            In most NDE setups, the transducer fires a short burst of ultrasound and then
+            listens for echoes. Reflections return from:
+          </p>
+          <ul>
+            <li>The front surface (initial pulse / entry echo)</li>
+            <li>Any internal flaws (defect echo)</li>
+            <li>The back wall of the part (back-wall echo)</li>
+          </ul>
+          <p>
+            The time between sending and receiving each echo, multiplied by the wave speed and
+            divided by 2 (round-trip), gives the <strong>depth</strong> of each reflector.
+          </p>
+
+          <a href="transducers.html" class="transducer-link-card">
+            <div class="tlc-icon">&#128268;</div>
+            <div>
+              <h4>Learn More: Transducer Types, Designs &amp; Resources</h4>
+              <p>Contact, immersion, EMAT, phased array, dual-element — designs, selection guides, and links to manufacturers.</p>
+            </div>
+            <div class="tlc-arrow">&#8594;</div>
+          </a>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 7 — A-scan
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="a-scan">
+          <h2><span class="step-n">7</span> Scanning Methods — A-scan</h2>
+
+          <p>
+            The <strong>A-scan</strong> (Amplitude scan) is the most fundamental display in ultrasonic testing.
+            It shows <strong>amplitude vs. time</strong> for a single transducer position — essentially what
+            the transducer "hears" after it fires a pulse.
+          </p>
+
+          <div class="scan-svg-wrap">
+            <svg viewBox="0 0 580 190" xmlns="http://www.w3.org/2000/svg">
+              <!-- Part cross-section (left panel) -->
+              <rect x="30" y="30" width="170" height="130" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+              <!-- Flaw -->
+              <ellipse cx="105" cy="95" rx="20" ry="11" fill="#ef4444" opacity=".85"/>
+              <text x="105" y="99" text-anchor="middle" fill="white" font-size="9" font-weight="700">flaw</text>
+              <!-- Transducer -->
+              <rect x="70" y="5" width="70" height="22" rx="4" fill="#0891b2"/>
+              <text x="105" y="19" text-anchor="middle" fill="white" font-size="9.5" font-weight="700">Transducer</text>
+              <!-- Beam -->
+              <line x1="82" y1="27" x2="82" y2="30" stroke="#22d3ee" stroke-dasharray="3,2" stroke-width="1.2"/>
+              <line x1="95" y1="27" x2="95" y2="30" stroke="#22d3ee" stroke-dasharray="3,2" stroke-width="1.2"/>
+              <line x1="105" y1="27" x2="105" y2="30" stroke="#22d3ee" stroke-dasharray="3,2" stroke-width="1.2"/>
+              <line x1="115" y1="27" x2="115" y2="30" stroke="#22d3ee" stroke-dasharray="3,2" stroke-width="1.2"/>
+              <line x1="128" y1="27" x2="128" y2="30" stroke="#22d3ee" stroke-dasharray="3,2" stroke-width="1.2"/>
+              <!-- Depth arrows -->
+              <text x="17" y="34" fill="#64748b" font-size="8.5">top</text>
+              <text x="13" y="162" fill="#64748b" font-size="8.5">bottom</text>
+              <!-- Panel label -->
+              <text x="105" y="180" text-anchor="middle" fill="#64748b" font-size="9">Part cross-section</text>
+
+              <!-- A-scan display (right panel) -->
+              <rect x="240" y="18" width="320" height="145" rx="6" fill="#0d1b2a" stroke="#1e3a5f" stroke-width="1.2"/>
+              <!-- Grid -->
+              <line x1="240" y1="100" x2="560" y2="100" stroke="#1e3a5f" stroke-width="0.8"/>
+              <line x1="240" y1="60" x2="560" y2="60" stroke="#1e293b" stroke-width="0.6"/>
+              <line x1="240" y1="140" x2="560" y2="140" stroke="#1e293b" stroke-width="0.6"/>
+              <!-- Initial pulse spike -->
+              <polyline points="258,100 260,100 262,30 264,100" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
+              <!-- Flaw echo spike (mid-depth) -->
+              <polyline points="370,100 372,100 374,52 376,100" fill="none" stroke="#ef4444" stroke-width="2.2"/>
+              <!-- Back wall spike -->
+              <polyline points="500,100 502,100 504,28 506,100" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
+              <!-- Time axis -->
+              <line x1="240" y1="100" x2="560" y2="100" stroke="#334155" stroke-width="1"/>
+              <!-- Axis labels -->
+              <text x="248" y="115" fill="#94a3b8" font-size="8.5">0</text>
+              <text x="395" y="168" text-anchor="middle" fill="#64748b" font-size="9">Time (proportional to depth)</text>
+              <text x="232" y="68" text-anchor="middle" fill="#64748b" font-size="8" transform="rotate(-90,232,68)">Amplitude</text>
+              <!-- Peak labels -->
+              <text x="262" y="24" text-anchor="middle" fill="#7dd3fc" font-size="9" font-weight="700">IP</text>
+              <text x="374" y="46" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="700">Flaw Echo</text>
+              <text x="503" y="22" text-anchor="middle" fill="#86efac" font-size="9" font-weight="700">BW</text>
+              <!-- Depth annotations -->
+              <line x1="262" y1="110" x2="374" y2="110" stroke="#475569" stroke-width="0.8" stroke-dasharray="3,2"/>
+              <text x="318" y="124" text-anchor="middle" fill="#64748b" font-size="8">depth to flaw</text>
+              <line x1="262" y1="128" x2="503" y2="128" stroke="#475569" stroke-width="0.8" stroke-dasharray="3,2"/>
+              <text x="383" y="142" text-anchor="middle" fill="#64748b" font-size="8">part thickness</text>
+              <!-- Panel label -->
+              <text x="400" y="180" text-anchor="middle" fill="#64748b" font-size="9">A-scan display (amplitude vs. time)</text>
+            </svg>
+          </div>
+
+          <p>
+            The time axis is converted to depth using <strong>d = c &times; t / 2</strong> (round-trip).
+            Three key features appear:
+          </p>
+          <ul>
+            <li><strong>Initial pulse (IP):</strong> The transmitted burst — appears at t = 0.</li>
+            <li><strong>Defect echo:</strong> A reflection from an internal flaw — appears at a time proportional to the flaw's depth.</li>
+            <li><strong>Back-wall echo (BW):</strong> Reflection from the far surface — appears at a time proportional to the total thickness.</li>
+          </ul>
+
+          <p>
+            A-scans can be displayed as <strong>RF (raw bipolar)</strong>, <strong>full rectified</strong>
+            (both halves folded positive), or <strong>envelope</strong> (smooth amplitude via Hilbert transform).
+            Most field instruments default to rectified RF.
+          </p>
+
+          <div class="callout">
+            <strong>A-scan formula:</strong> d&nbsp;=&nbsp;c&nbsp;&times;&nbsp;t&nbsp;/&nbsp;2 &nbsp;&nbsp;
+            where d = depth, c = wave speed (material-specific), t = measured time-of-flight.
+            The factor of 2 accounts for the round-trip path (down and back).
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 8 — B-scan
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="b-scan">
+          <h2><span class="step-n">8</span> Scanning Methods — B-scan</h2>
+
+          <p>
+            A <strong>B-scan</strong> (Brightness scan) builds a 2D cross-section image by moving the
+            transducer linearly across the surface and stacking A-scans side by side.
+            The horizontal axis is <em>scan position</em>; the vertical axis is <em>depth</em>.
+          </p>
+
+          <div class="scan-svg-wrap">
+            <svg viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg">
+              <!-- Top: transducer movement schematic -->
+              <!-- Part outline -->
+              <rect x="30" y="50" width="280" height="110" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+              <!-- Flaw -->
+              <ellipse cx="155" cy="110" rx="30" ry="14" fill="#ef4444" opacity=".8"/>
+              <!-- Multiple transducer positions -->
+              <rect x="40" y="28" width="36" height="18" rx="3" fill="#334155" stroke="#475569" stroke-width="1"/>
+              <rect x="96" y="28" width="36" height="18" rx="3" fill="#334155" stroke="#475569" stroke-width="1"/>
+              <rect x="140" y="22" width="36" height="18" rx="3" fill="#0891b2" stroke="#22d3ee" stroke-width="1.5"/>
+              <rect x="188" y="28" width="36" height="18" rx="3" fill="#334155" stroke="#475569" stroke-width="1"/>
+              <rect x="240" y="28" width="36" height="18" rx="3" fill="#334155" stroke="#475569" stroke-width="1"/>
+              <!-- Scan direction arrow -->
+              <line x1="40" y1="14" x2="280" y2="14" stroke="#64748b" stroke-width="1.2" marker-end="url(#arr-scan)"/>
+              <defs>
+                <marker id="arr-scan" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                  <polygon points="0 0, 7 3.5, 0 7" fill="#64748b"/>
+                </marker>
+              </defs>
+              <text x="160" y="9" text-anchor="middle" fill="#94a3b8" font-size="9">Scan direction</text>
+              <!-- Beam from active transducer -->
+              <line x1="155" y1="40" x2="155" y2="50" stroke="#22d3ee" stroke-dasharray="3,2" stroke-width="1.3"/>
+
+              <!-- B-scan image (right panel) -->
+              <rect x="340" y="20" width="220" height="155" rx="6" fill="#0d1b2a" stroke="#1e3a5f" stroke-width="1.2"/>
+              <!-- Top-surface line -->
+              <line x1="340" y1="48" x2="560" y2="48" stroke="#22d3ee" stroke-width="1.5"/>
+              <!-- Bottom-surface line -->
+              <line x1="340" y1="162" x2="560" y2="162" stroke="#22d3ee" stroke-width="1.5"/>
+              <!-- Flaw region (bright) -->
+              <rect x="414" y="90" width="80" height="28" rx="4" fill="#ef4444" opacity=".75"/>
+              <!-- Depth axis -->
+              <text x="330" y="48" text-anchor="end" fill="#64748b" font-size="8">0</text>
+              <text x="325" y="107" text-anchor="end" fill="#64748b" font-size="8" transform="rotate(-90,325,107)">Depth &#8595;</text>
+              <text x="330" y="165" text-anchor="end" fill="#64748b" font-size="8">T</text>
+              <!-- Position axis -->
+              <text x="450" y="188" text-anchor="middle" fill="#64748b" font-size="9">Scan position (X)</text>
+              <!-- Flaw label -->
+              <text x="454" y="112" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="700">flaw</text>
+              <!-- Panel labels -->
+              <text x="170" y="175" text-anchor="middle" fill="#64748b" font-size="9">Part cross-section</text>
+              <text x="450" y="198" text-anchor="middle" fill="#64748b" font-size="9">B-scan image</text>
+            </svg>
+          </div>
+
+          <p>
+            B-scans are excellent for showing <strong>flaw depth</strong> and <strong>through-thickness extent</strong>.
+            They are commonly used for corrosion mapping, weld root inspection, and in-service thickness profiling.
+          </p>
+
+          <div class="callout">
+            <strong>Limitation:</strong> A large near-surface reflector can "shadow" smaller, deeper reflectors in the same beam path because the beam cannot see past a strong reflector. For complex geometries, multiple scan directions or phased-array volumetric methods are preferred.
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             SECTION 9 — C-scan
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="c-scan">
+          <h2><span class="step-n">9</span> Scanning Methods — C-scan</h2>
+
+          <p>
+            A <strong>C-scan</strong> (Plan view scan) produces a <strong>top-down 2D map</strong> of the
+            part. The transducer is raster-scanned in X and Y, and a gated amplitude (or time-of-flight)
+            value is recorded at each position. The result looks like an aerial photograph of the
+            internal structure.
+          </p>
+
+          <div class="scan-svg-wrap">
+            <svg viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg">
+              <!-- Left: Raster scan path -->
+              <rect x="30" y="30" width="220" height="150" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+              <!-- Raster lines -->
+              <defs>
+                <marker id="arr-r" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+                  <polygon points="0 0, 5 2.5, 0 5" fill="#334155"/>
+                </marker>
+              </defs>
+              <line x1="50" y1="55"  x2="228" y2="55"  stroke="#475569" stroke-width="0.9" stroke-dasharray="4,3"/>
+              <line x1="228" y1="72" x2="50" y2="72"   stroke="#475569" stroke-width="0.9" stroke-dasharray="4,3"/>
+              <line x1="50" y1="89"  x2="228" y2="89"  stroke="#475569" stroke-width="0.9" stroke-dasharray="4,3"/>
+              <line x1="228" y1="106" x2="50" y2="106" stroke="#475569" stroke-width="0.9" stroke-dasharray="4,3"/>
+              <line x1="50" y1="123" x2="228" y2="123" stroke="#22d3ee" stroke-width="1.4" stroke-dasharray="4,3"/>
+              <line x1="228" y1="140" x2="50" y2="140" stroke="#475569" stroke-width="0.9" stroke-dasharray="4,3"/>
+              <line x1="50" y1="157" x2="228" y2="157" stroke="#475569" stroke-width="0.9" stroke-dasharray="4,3"/>
+              <!-- Active transducer -->
+              <circle cx="90" cy="123" r="7" fill="#0891b2" stroke="#22d3ee" stroke-width="1.5"/>
+              <!-- X Y arrows -->
+              <text x="140" y="193" text-anchor="middle" fill="#64748b" font-size="9">X</text>
+              <text x="16" y="107" text-anchor="middle" fill="#64748b" font-size="9">Y</text>
+              <text x="140" y="24" text-anchor="middle" fill="#94a3b8" font-size="9">Raster scan pattern (top view)</text>
+
+              <!-- Right: C-scan color map -->
+              <rect x="330" y="18" width="230" height="162" rx="6" fill="#0d1b2a" stroke="#1e3a5f" stroke-width="1.2"/>
+              <!-- Background (no-defect — dark) -->
+              <!-- Defect region — bright color patch -->
+              <ellipse cx="430" cy="100" rx="45" ry="30" fill="#ef4444" opacity=".7"/>
+              <ellipse cx="430" cy="100" rx="28" ry="18" fill="#fbbf24" opacity=".8"/>
+              <ellipse cx="430" cy="100" rx="12" ry="8" fill="#fff" opacity=".7"/>
+              <!-- Colorbar -->
+              <defs>
+                <linearGradient id="cbar" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#fff"/>
+                  <stop offset="40%" stop-color="#fbbf24"/>
+                  <stop offset="100%" stop-color="#ef4444"/>
+                </linearGradient>
+              </defs>
+              <rect x="552" y="30" width="10" height="120" fill="url(#cbar)" rx="3"/>
+              <text x="563" y="34"  fill="#94a3b8" font-size="7.5">High</text>
+              <text x="563" y="154" fill="#94a3b8" font-size="7.5">Low</text>
+              <!-- Axis labels -->
+              <text x="445" y="192" text-anchor="middle" fill="#64748b" font-size="9">C-scan amplitude map</text>
+              <text x="445" y="12"  text-anchor="middle" fill="#94a3b8" font-size="9">X</text>
+              <text x="322" y="100" text-anchor="middle" fill="#94a3b8" font-size="9" transform="rotate(-90,322,100)">Y</text>
+            </svg>
+          </div>
+
+          <p>
+            The color (or grayscale) at each pixel represents either:
+          </p>
+          <ul>
+            <li><strong>Gated amplitude:</strong> Peak amplitude within a depth gate — bright means strong reflection (likely a flaw or delamination).</li>
+            <li><strong>Time-of-flight (TOF):</strong> The depth of the first reflector within the gate — used for thickness mapping and contour following.</li>
+          </ul>
+          <p>
+            C-scans are widely used for <strong>composite inspection</strong> (delamination, impact damage),
+            <strong>corrosion mapping</strong>, and production-line quality control.
+            They require automated data acquisition — typically computer-controlled immersion scanning or
+            a squirter system.
+          </p>
+
+          <div class="callout">
+            <strong>Summary of the three scanning methods:</strong><br/>
+            <strong>A-scan</strong> = what echoes exist at this one spot (amplitude vs. time). &nbsp;
+            <strong>B-scan</strong> = how deep is the flaw along a line (cross-section view). &nbsp;
+            <strong>C-scan</strong> = where is the flaw across the whole surface (map view).
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             ADVANCED TOPICS DIVIDER
+             ══════════════════════════════════════════════ -->
+        <div class="adv-divider" id="advanced-topics">
+          <span>Advanced Topics</span>
         </div>
 
         <!-- Acoustic Impedance -->
@@ -176,7 +1069,7 @@
             Acoustic impedance <em>Z</em> is a material property that determines how much of an
             incident wave is reflected or transmitted at an interface.
           </p>
-          <div class="eq-box">Z = &rho; &times; c &nbsp;&nbsp; [units: Pa·s/m = Rayl]</div>
+          <div class="eq-box">Z = &rho; &times; c &nbsp;&nbsp; [units: Pa&middot;s/m = Rayl]</div>
 
           <h3>Reflection &amp; Transmission Coefficients (Normal Incidence)</h3>
           <div class="eq-box">
@@ -185,7 +1078,7 @@
           </div>
 
           <div class="callout">
-            <strong>Example:</strong> Steel–air interface: Z<sub>steel</sub> ≈ 46 MRayl, Z<sub>air</sub> ≈ 0.0004 MRayl → R ≈ 100%. Nearly all energy reflects — this is why couplant is essential.
+            <strong>Example:</strong> Steel–air interface: Z<sub>steel</sub> &asymp; 46 MRayl, Z<sub>air</sub> &asymp; 0.0004 MRayl &rarr; R &asymp; 100%. Nearly all energy reflects — this is why couplant is essential.
           </div>
 
           <h3>Importance of Couplant</h3>
@@ -196,80 +1089,20 @@
           </p>
         </div>
 
-        <!-- Attenuation -->
+        <!-- Attenuation (Advanced) -->
         <div class="theory-section" id="attenuation">
-          <h2>&#128308; Attenuation</h2>
+          <h2>&#128308; Attenuation — Detailed</h2>
           <p>
-            Wave amplitude decreases with propagation distance due to
-            <strong>absorption</strong> (conversion to heat) and <strong>scattering</strong>
-            (energy redirected by grain boundaries, pores, inclusions).
+            Attenuation is frequency-dependent and must be measured experimentally for each material.
           </p>
-          <div class="eq-box">A(x) = A<sub>0</sub> &middot; e<sup>&minus;&alpha;&middot;x</sup></div>
-          <p>or in dB: <strong>Loss (dB) = &alpha;<sub>dB</sub> &middot; f &middot; x</strong></p>
-          <p>
-            &alpha;<sub>dB</sub> is the attenuation coefficient in dB/(mm·MHz); it is material- and
-            frequency-dependent and must be measured experimentally for each material.
-          </p>
-
           <h3>Frequency Dependence</h3>
           <ul>
             <li><strong>Absorption:</strong> scales roughly linearly with frequency (viscous losses).</li>
-            <li><strong>Rayleigh scattering (d ≪ λ):</strong> scales as f⁴ — dominant in fine-grained materials at high frequency.</li>
-            <li><strong>Stochastic scattering (d ~ λ):</strong> scales as f² — typical grain-noise regime in metals.</li>
-          </ul>
-
-          <div class="callout">
-            <strong>Rule of thumb:</strong> For carbon steel, &alpha; ≈ 0.5–2 dB/(mm·MHz) at 5 MHz depending on grain size. Coarse-grained castings can be 10× worse.
-          </div>
-        </div>
-
-        <!-- Transducers -->
-        <div class="theory-section" id="transducers">
-          <h2>&#128268; Transducers</h2>
-          <p>
-            Ultrasonic transducers convert electrical energy to acoustic energy (and back) via the
-            piezoelectric effect. The active element is typically a piezoelectric crystal
-            (PZT, PVDF, LiNbO₃) that deforms when a voltage is applied.
-          </p>
-
-          <h3>Piezoelectric Effect</h3>
-          <p>
-            When mechanical stress is applied to a piezoelectric material, an electric charge is
-            generated (direct effect). Conversely, applying voltage produces mechanical deformation
-            (converse effect). NDE transducers exploit both: transmit (converse) and receive (direct).
-          </p>
-
-          <h3>Transducer Types</h3>
-          <ul>
-            <li><strong>Contact transducers:</strong> used directly on the test surface with couplant. Available as straight-beam (longitudinal) or angle-beam (shear/Rayleigh).</li>
-            <li><strong>Immersion transducers:</strong> water-coupled; allow precise focal control and scanning. Common for C-scan imaging.</li>
-            <li><strong>Dual-element (TR) transducers:</strong> separate transmit and receive elements; reduced near-surface dead zone; useful for corrosion mapping.</li>
-            <li><strong>EMAT (Electromagnetic Acoustic Transducer):</strong> non-contact; generates waves via Lorentz force; no couplant needed; lower sensitivity.</li>
-            <li><strong>Air-coupled transducers:</strong> non-contact, used for composites and foam. Low impedance mismatch managed by matching layers.</li>
-          </ul>
-
-          <h3>Bandwidth &amp; Pulse Shape</h3>
-          <p>
-            A transducer's <strong>−6 dB bandwidth</strong> determines axial resolution. Broadband
-            transducers (80–120% fractional bandwidth) give short pulses and fine axial resolution.
-            Narrowband transducers sacrifice resolution for sensitivity.
-          </p>
-
-          <h3>Couplant</h3>
-          <p>
-            A couplant is a liquid or gel that fills the microscopic air gaps between the transducer face
-            and the test surface. Without it, the extreme acoustic impedance mismatch at the air interface
-            (Z<sub>air</sub> ≈ 0.0004 MRayl vs Z<sub>steel</sub> ≈ 46 MRayl) reflects nearly 100% of
-            the incident energy, making transmission impossible.
-          </p>
-          <ul>
-            <li><strong>Oil / glycerin:</strong> high viscosity; good for rough or vertical surfaces. Glycerin is preferred for high-temperature applications.</li>
-            <li><strong>Water-based gel:</strong> low cost, easy cleanup; most common for field contact inspection.</li>
-            <li><strong>Water (immersion):</strong> both transducer and part submerged in a tank. Maintains perfectly consistent coupling during computer-controlled scanning.</li>
-            <li><strong>Water jet (squirter):</strong> a focused stream maintains coupling without full immersion — used for large structures or elevated temperatures.</li>
+            <li><strong>Rayleigh scattering (d &laquo; &lambda;):</strong> scales as f&sup4; — dominant in fine-grained materials at high frequency.</li>
+            <li><strong>Stochastic scattering (d ~ &lambda;):</strong> scales as f&sup2; — typical grain-noise regime in metals.</li>
           </ul>
           <div class="callout">
-            <strong>Detection limits:</strong> Hand scanning in fine-grained steel typically detects ≥ 1 mm defects. Automated immersion scanning at higher frequencies achieves 0.1–0.2 mm; under laboratory conditions, defects as small as 0.04 mm diameter can be resolved.
+            <strong>Rule of thumb:</strong> For carbon steel, &alpha; &asymp; 0.5–2 dB/(mm&middot;MHz) at 5 MHz depending on grain size. Coarse-grained castings can be 10&times; worse.
           </div>
         </div>
 
@@ -279,47 +1112,22 @@
 
           <h3>Near Field (Fresnel Zone)</h3>
           <p>
-            In the near field, the beam intensity varies irregularly due to constructive/destructive
-            interference. The near-field distance (also called Rayleigh distance) is:
+            In the near field, beam intensity varies irregularly due to constructive/destructive interference.
+            The near-field distance (Rayleigh distance) is:
           </p>
           <div class="eq-box">N = D&sup2; / (4&lambda;) = D&sup2; &middot; f / (4c)</div>
-          <p>where <em>D</em> = transducer diameter, <em>&lambda;</em> = wavelength. Inspection is generally
-          more reliable in the far field (beyond N), or at the natural focus.</p>
+          <p>Inspection is generally more reliable in the far field (beyond N), or at the natural focus.</p>
 
-          <h3>Far Field (Fraunhofer Zone)</h3>
-          <p>Beyond the near field, beam diverges with a half-angle:</p>
-          <div class="eq-box">sin(&theta;<sub>½</sub>) ≈ 0.514 &lambda; / D &nbsp;&nbsp; (−6 dB edge)</div>
-
-          <h3>Focused Transducers</h3>
-          <p>
-            A lens or curved element focuses the beam at a depth <em>F</em>. The −6 dB focal spot
-            diameter governs lateral resolution:
-          </p>
-          <div class="eq-box">d<sub>spot</sub> ≈ 1.02 &lambda; F / D = 1.02 F / (f-number)</div>
-
-          <div class="callout">
-            <strong>Design trade-off:</strong> Tighter focus (smaller f-number) → better lateral resolution, but shorter depth of field. For thick parts, an unfocused or weakly focused beam may be preferred.
-          </div>
-
-          <h3>Beam Spread &amp; Divergence</h3>
-          <p>
-            In the far field, the beam expands symmetrically about the acoustic axis.
-            <strong>Beam divergence</strong> is the half-angle from the central axis to the −6 dB pressure edge;
-            <strong>beam spread</strong> is the full angle from side to side (= 2 × divergence).
-          </p>
+          <h3>Far Field Beam Divergence</h3>
           <div class="eq-box">
-            sin(&theta;<sub>½</sub>) = 0.514 &lambda; / D &nbsp;&nbsp;&nbsp; (−6 dB half-angle)<br/>
+            sin(&theta;<sub>&frac12;</sub>) &asymp; 0.514 &lambda; / D &nbsp;&nbsp; (&minus;6 dB half-angle)<br/>
             sin(&theta;) = 1.2 &lambda; / D &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (first-null / Rayleigh criterion)
           </div>
-          <p>
-            Both formulas use the same variables: &lambda; = wavelength, D = transducer diameter.
-            Lower frequency or smaller diameter increases divergence. The two constants (0.514 vs 1.2)
-            reflect different pressure threshold definitions — the 0.514 form is most common in NDE.
-          </p>
+
+          <h3>Focused Transducers</h3>
+          <div class="eq-box">d<sub>spot</sub> &asymp; 1.02 &lambda; F / D = 1.02 F / (f-number)</div>
           <div class="callout">
-            <strong>Example (NDE-ED):</strong> 5 MHz, 12.7 mm diameter transducer in steel (c = 5900 m/s):
-            &lambda; = 1.18 mm. &theta;<sub>½</sub> = arcsin(0.514 &times; 1.18 / 12.7) ≈ 2.7°; full spread ≈ 5.4°.
-            The same probe at 1 MHz would have &theta;<sub>½</sub> ≈ 13.5° — nearly 5× wider.
+            <strong>Design trade-off:</strong> Tighter focus (smaller f-number) &rarr; better lateral resolution, but shorter depth of field. For thick parts, an unfocused or weakly focused beam may be preferred.
           </div>
         </div>
 
@@ -328,7 +1136,7 @@
           <h2>&#128200; Snell's Law &amp; Mode Conversion</h2>
           <p>
             At an oblique interface between two media, refraction and mode conversion occur.
-            The generalized Snell's law (for all mode combinations) is:
+            The generalized Snell's law is:
           </p>
           <div class="eq-box">
             sin(&theta;<sub>i</sub>) / c<sub>i</sub> = sin(&theta;<sub>r</sub>) / c<sub>r</sub>
@@ -336,87 +1144,21 @@
 
           <h3>Critical Angles</h3>
           <ul>
-            <li><strong>First critical angle:</strong> refracted longitudinal wave travels at 90°; only shear wave transmitted.</li>
-            <li><strong>Second critical angle:</strong> refracted shear wave travels at 90°; total internal reflection (surface/Rayleigh waves generated).</li>
+            <li><strong>First critical angle:</strong> refracted longitudinal wave travels at 90&deg;; only shear wave transmitted.</li>
+            <li><strong>Second critical angle:</strong> refracted shear wave travels at 90&deg;; total internal reflection (surface/Rayleigh waves generated).</li>
           </ul>
-
           <div class="callout">
-            <strong>Angle beam inspection:</strong> Wedge transducers exploit mode conversion at the wedge–part interface to inject shear waves at a specific angle (e.g., 45°, 60°, 70°) for weld inspection.
+            <strong>Angle beam inspection:</strong> Wedge transducers exploit mode conversion at the wedge–part interface to inject shear waves at a specific angle (e.g., 45&deg;, 60&deg;, 70&deg;) for weld inspection.
           </div>
 
-          <h3>Angle Beam Inspection Geometry</h3>
-          <p>
-            For a shear wave refracted at angle &theta;<sub>R</sub> traveling beam path <em>x</em>
-            through the material, the defect location is:
-          </p>
+          <h3>Angle Beam Geometry</h3>
           <div class="eq-box">
             Depth = x &middot; cos(&theta;<sub>R</sub>) &nbsp;&nbsp;&nbsp;
             Surface distance = x &middot; sin(&theta;<sub>R</sub>)
           </div>
           <p>
-            A <strong>full skip</strong> (V-path) off the back wall covers a total beam path of
-            2T / cos(&theta;<sub>R</sub>), where T is the material thickness. Weld inspectors use
-            skip distance charts to position the probe at the correct standoff for a given weld cap.
-          </p>
-          <div class="callout">
-            <strong>Example:</strong> 45° shear wave, T = 20 mm steel. Full-skip beam path = 2 &times; 20 / cos(45°) ≈ 56.6 mm. Surface distance to back-wall skip = 2T &times; tan(45°) = 40 mm — the probe must be placed 40 mm from the weld centreline to receive the back-wall echo.
-          </div>
-        </div>
-
-        <!-- Imaging Modes -->
-        <div class="theory-section" id="imaging">
-          <h2>&#129302; Imaging Modes</h2>
-
-          <h3>A-scan</h3>
-          <p>
-            The most basic display: amplitude vs. time. Shows echoes from interfaces and defects
-            along the beam axis. The time axis is converted to depth using <em>d = c·t/2</em>
-            (round-trip). The <strong>initial pulse (IP)</strong> appears near time zero;
-            the <strong>back-wall (BW)</strong> reflection appears at the end; internal defects
-            appear as intermediate peaks.
-          </p>
-          <p>
-            Instruments offer three display options: <strong>RF (radio frequency)</strong> — the raw bipolar waveform;
-            <strong>full rectified</strong> — both halves folded positive, easiest for gate placement;
-            <strong>envelope</strong> — the smooth amplitude profile computed via the Hilbert transform.
-            Most field instruments default to rectified RF.
-          </p>
-
-          <h3>B-scan</h3>
-          <p>
-            A 2D cross-section: the transducer is scanned linearly, and A-scans are stacked to form
-            a depth profile (transducer position horizontal, depth vertical). Shows reflector depth and
-            approximate size in the scan direction. <em>Limitation:</em> a large near-surface reflector
-            can mask smaller, deeper reflectors in the same beam path.
-          </p>
-
-          <h3>C-scan</h3>
-          <p>
-            A planar top-view map: the transducer is raster-scanned over the part surface, and a
-            gated amplitude (or TOF) value is recorded at each XY position. Amplitude is displayed
-            as grayscale or false color. Widely used for composite inspection and corrosion mapping.
-            Requires automated data acquisition — typically computer-controlled immersion scanning.
-          </p>
-
-          <h3>SAFT (Synthetic Aperture Focusing Technique)</h3>
-          <p>
-            Post-processing algorithm that computationally focuses pulse-echo data from a single-element
-            transducer. Each A-scan contributes to a spatially coherent image at every depth point.
-            Equivalent to SAR in radar.
-          </p>
-
-          <h3>FMC / TFM (Full Matrix Capture / Total Focusing Method)</h3>
-          <p>
-            With a phased array, every transmit–receive element combination is recorded (Full Matrix).
-            TFM then delay-and-sums this data to focus at every pixel in the image, achieving
-            near-optimal resolution everywhere. The current gold standard for advanced array imaging.
-          </p>
-
-          <h3>TOFD (Time of Flight Diffraction)</h3>
-          <p>
-            Uses diffracted signals (not reflected) from defect tips. Two angled transducers straddle
-            a weld; diffraction at crack tips allows precise depth sizing independent of orientation.
-            Excellent for vertical planar defects.
+            A <strong>full skip</strong> (V-path) off the back wall covers a beam path of
+            2T / cos(&theta;<sub>R</sub>), where T is the material thickness.
           </p>
         </div>
 
@@ -425,30 +1167,13 @@
           <h2>&#128250; Signal Processing</h2>
 
           <h3>Envelope Detection (Hilbert Transform)</h3>
-          <p>
-            The RF signal from a transducer is a modulated sinusoid. The <strong>envelope</strong>
-            (magnitude of the analytic signal) is computed via the Hilbert transform and used for
-            display and gating.
-          </p>
-
-          <h3>Filtering</h3>
-          <p>
-            Bandpass filtering removes out-of-band noise and DC offset. A typical filter is centered
-            at the transducer's center frequency with a bandwidth matching the transducer's −6 dB bandwidth.
-          </p>
+          <p>The envelope (magnitude of the analytic signal) is computed via the Hilbert transform and used for display and gating.</p>
 
           <h3>Time Gain Compensation (TGC)</h3>
-          <p>
-            Depth-dependent amplification applied to compensate for attenuation. A TGC ramp keeps
-            the displayed signal level roughly constant with depth.
-          </p>
+          <p>Depth-dependent amplification applied to compensate for attenuation. A TGC ramp keeps displayed signal level roughly constant with depth.</p>
 
           <h3>Pulse Compression</h3>
-          <p>
-            Transmitting a long coded pulse (chirp) and applying matched filter at reception increases
-            SNR (processing gain) while maintaining range resolution. Used in air-coupled and low-SNR
-            applications.
-          </p>
+          <p>Transmitting a long coded pulse (chirp) and applying matched filter at reception increases SNR while maintaining range resolution. Used in air-coupled and low-SNR applications.</p>
 
           <h3>SNR &amp; Noise Sources</h3>
           <ul>
@@ -462,9 +1187,8 @@
         <div class="theory-section" id="phased-arrays">
           <h2>&#128264; Phased Arrays</h2>
           <p>
-            A phased array transducer contains many small elements (typically 16–256) that can be
-            excited with programmable time delays, enabling electronic beam steering and focusing
-            without physical movement.
+            A phased array transducer contains many small elements (typically 16–256) excited with programmable
+            time delays, enabling electronic beam steering and focusing without physical movement.
           </p>
 
           <h3>Beam Steering</h3>
@@ -473,21 +1197,13 @@
           Pitch <em>d</em> must be &le; &lambda;/2 to avoid grating lobes.</p>
 
           <h3>Sectorial Scan (S-scan)</h3>
-          <p>
-            The most common phased-array display: the beam is electronically swept over a range of angles
-            (e.g., 40°–70°) at a fixed focal depth, creating a fan-shaped image. Used extensively for
-            weld inspection.
-          </p>
+          <p>The beam is electronically swept over a range of angles (e.g., 40&deg;–70&deg;) at a fixed focal depth, creating a fan-shaped image — extensively used for weld inspection.</p>
 
-          <h3>Linear Scan (E-scan)</h3>
-          <p>
-            A fixed aperture (subset of elements) is electronically stepped along the array while
-            keeping the same focal law. Equivalent to mechanically scanning a single-element probe but
-            much faster.
-          </p>
+          <h3>Full Matrix Capture / Total Focusing Method (FMC/TFM)</h3>
+          <p>Every transmit–receive element combination is recorded. TFM delay-and-sums this data to focus at every pixel in the image, achieving near-optimal resolution everywhere — the current gold standard for advanced array imaging.</p>
 
           <div class="callout">
-            <strong>Key advantage of phased arrays:</strong> Electronic scanning is orders of magnitude faster than mechanical scanning, enables rapid volumetric coverage, and allows real-time image reconstruction at inspection speed.
+            <strong>Key advantage:</strong> Electronic scanning is orders of magnitude faster than mechanical scanning, enables rapid volumetric coverage, and allows real-time image reconstruction at inspection speed.
           </div>
         </div>
 
@@ -496,92 +1212,35 @@
           <h2>&#128207; Calibration &amp; Reference Levels</h2>
           <p>
             Calibration establishes a quantitative reference so that any indication can be evaluated
-            consistently regardless of its depth or scan position. All UT accept/reject decisions are
-            made relative to a calibrated sensitivity level.
+            consistently regardless of depth or scan position.
           </p>
 
           <h3>Decibel Scale</h3>
-          <p>Ultrasonic amplitudes are expressed in <strong>decibels (dB)</strong>. For pressure amplitudes:</p>
           <div class="eq-box">&Delta;I (dB) = 20 log<sub>10</sub>(P<sub>2</sub> / P<sub>1</sub>)</div>
-          <p>
-            Every <strong>6 dB</strong> corresponds to a factor of 2 in amplitude (voltage).
-            Every <strong>20 dB</strong> is a factor of 10.
-            A positive dB value means P<sub>2</sub> &gt; P<sub>1</sub> (gain); negative means loss.
-          </p>
           <div class="callout">
             <strong>Quick conversions:</strong>
             +6 dB = &times;2 amplitude &nbsp;|&nbsp;
             +20 dB = &times;10 &nbsp;|&nbsp;
-            −6 dB = &times;0.5 &nbsp;|&nbsp;
-            −20 dB = &times;0.1 &nbsp;|&nbsp;
-            −40 dB = &times;0.01
+            &minus;6 dB = &times;0.5 &nbsp;|&nbsp;
+            &minus;20 dB = &times;0.1 &nbsp;|&nbsp;
+            &minus;40 dB = &times;0.01
           </div>
 
           <h3>Distance Amplitude Correction (DAC)</h3>
           <p>
-            A reflector of fixed size produces a smaller echo as its depth increases, because
-            attenuation and beam divergence both reduce amplitude with distance.
-            <strong>DAC</strong> is a reference curve constructed by recording the peak amplitude
-            from identical reference reflectors (side-drilled holes or flat-bottom holes) at multiple
-            depths within the same material.
-          </p>
-          <p>
-            Once the DAC curve is plotted on the A-scan display, any indication that reaches or
-            exceeds the curve is evaluated as a recordable indication — the curve has already
-            accounted for the expected amplitude decay with depth. DAC curves must be built separately
-            for each material/frequency/transducer combination because near-field length, beam spread,
-            attenuation, and acoustic velocity all vary.
+            DAC is a reference curve constructed by recording peak amplitude from identical reference
+            reflectors (side-drilled holes or flat-bottom holes) at multiple depths. Any indication
+            that reaches or exceeds the DAC curve is evaluated as a recordable indication — the curve
+            has already accounted for amplitude decay with depth.
           </p>
 
           <h3>Reference Blocks &amp; Standards</h3>
           <ul>
             <li><strong>ASTM E127 / E428:</strong> Flat-bottom hole (FBH) blocks — standard for immersion calibration.</li>
-            <li><strong>ASTM E1158:</strong> Distance-amplitude blocks — side-drilled holes at increasing depths for DAC construction.</li>
-            <li><strong>ASME Basic Calibration Block:</strong> Required for code-based pressure vessel and piping inspection (ASME Sec. V).</li>
+            <li><strong>ASTM E1158:</strong> Distance-amplitude blocks — side-drilled holes at increasing depths.</li>
+            <li><strong>ASME Basic Calibration Block:</strong> Required for pressure vessel and piping inspection (ASME Sec. V).</li>
             <li><strong>IIW V1 / V2 blocks:</strong> International Welding Institute blocks for velocity measurement and angle-probe index checks.</li>
           </ul>
-
-          <h3>Transfer Correction</h3>
-          <p>
-            The calibration block and the real part may differ in surface roughness, curvature, or
-            coupling efficiency. A <strong>transfer correction</strong> (measured in dB, typically
-            2–6 dB) is added to the reference gain to ensure the DAC level applies to the actual
-            inspection surface.
-          </p>
-        </div>
-
-        <!-- Advanced -->
-        <div class="theory-section" id="advanced">
-          <h2>&#128300; Advanced Techniques</h2>
-
-          <h3>Nonlinear Ultrasound</h3>
-          <p>
-            At high acoustic amplitudes, material nonlinearity generates harmonics (2f, 3f …) of the
-            fundamental frequency. The <strong>acoustic nonlinearity parameter &beta;</strong> is
-            sensitive to early-stage fatigue damage, dislocations, and microcracking — well before
-            linear methods detect anything.
-          </p>
-
-          <h3>Guided Wave Inspection</h3>
-          <p>
-            Long-range inspection of pipes and plates using Lamb / SH waves. A single transducer ring
-            can screen tens of meters of pipe for corrosion. Mode selection and frequency tuning are
-            critical to maximizing sensitivity for a given defect type.
-          </p>
-
-          <h3>Photoacoustic / Laser UT</h3>
-          <p>
-            A pulsed laser generates broadband ultrasound via thermoelastic expansion (non-contact
-            transmitter). Detection can use a laser interferometer (LDV/SLDV) or an air-coupled
-            transducer. Enables inspection of hot, moving, or inaccessible surfaces.
-          </p>
-
-          <h3>Acoustic Microscopy</h3>
-          <p>
-            High-frequency (50 MHz–2 GHz) focused ultrasound for microstructural imaging and
-            sub-surface feature detection in electronics, biomaterials, and thin coatings.
-            Resolution can reach sub-micron at GHz frequencies.
-          </p>
         </div>
 
       </main>
@@ -593,6 +1252,7 @@
   <div class="footer-links">
     <a href="index.html">Home</a>
     <a href="theory.html">Theory</a>
+    <a href="transducers.html">Transducers</a>
     <a href="calculators.html">Calculators</a>
     <a href="resources.html">Resources</a>
   </div>
@@ -602,47 +1262,34 @@
 <script src="assets/js/main.js"></script>
 <script>
 /* ============================================================
-   PARTICLE WAVE ANIMATION  —  theory.html
-   Longitudinal wave: particles oscillate horizontally,
-   wave pattern travels rightward.
+   LONGITUDINAL WAVE ANIMATION  —  theory.html
+   Particles oscillate horizontally (parallel to wave travel).
    ============================================================ */
 (function () {
-  const canvas = document.getElementById('particle-canvas');
+  const canvas = document.getElementById('long-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  const CW = canvas.width;   /* 380 */
+  const CH = canvas.height;  /* 200 */
 
-  const CW = canvas.width;   /* 720 */
-  const CH = canvas.height;  /* 270 */
+  const LEFT = 20, RIGHT = 360, TOP = 24, BOT = 148;
+  const PW = RIGHT - LEFT;   /* 340 */
+  const PH = BOT - TOP;      /* 124 */
 
-  /* ---- Layout ---- */
-  const LEFT = 28, RIGHT = 692, TOP = 42, BOT = 194;
-  const PW = RIGHT - LEFT;   /* 664 px  */
-  const PH = BOT  - TOP;     /* 152 px  */
+  const NX = 18, NY = 4;
+  const dx0 = PW / NX;
+  const dy0 = PH / (NY - 1);
 
-  /* ---- Particle grid ---- */
-  const NX = 22, NY = 6;
-  const dx0 = PW / NX;          /* rest horiz. spacing ≈ 30.2 px */
-  const dy0 = PH / (NY - 1);    /* rest vert.  spacing ≈ 30.4 px */
-
-  /* ---- Wave parameters ---- */
   const N_WAVES = 3;
-  const LAM_PX  = PW / N_WAVES;             /* visual λ ≈ 221 px  */
-  const K       = 2 * Math.PI / LAM_PX;     /* spatial freq        */
-  const A       = 9;                         /* amplitude in px     */
-  const PERIOD  = 160;                       /* frames per period   */
-  const OMEGA   = 2 * Math.PI / PERIOD;     /* angular freq (vis)  */
-  /* Phase velocity: c_vis = OMEGA/K = LAM_PX/PERIOD px/frame       */
+  const LAM_PX  = PW / N_WAVES;
+  const K       = 2 * Math.PI / LAM_PX;
+  const A       = 7;
+  const PERIOD  = 130;
+  const OMEGA   = 2 * Math.PI / PERIOD;
 
-  /* ---- Highlighted particle: col 4, row 2 (near top-left quad) ---- */
-  const HI_I  = 4,  HI_J = 2;
-  const HI_X0 = LEFT + (HI_I + 0.5) * dx0;
-  const HI_Y0 = TOP  + HI_J * dy0;
-
-  /* ---- State ---- */
   let frame = 0, running = true;
 
-  /* Play / Pause button */
-  const btn = document.getElementById('particle-playpause');
+  const btn = document.getElementById('long-playpause');
   if (btn) {
     btn.addEventListener('click', () => {
       running = !running;
@@ -658,33 +1305,15 @@
     requestAnimationFrame(tick);
   }
 
-  /* ---- Arrow helper (local, no dependency on main.js) ---- */
-  function arrowAt(x1, y1, x2, y2, hs) {
-    const ang = Math.atan2(y2 - y1, x2 - x1);
-    ctx.beginPath();
-    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-    ctx.moveTo(x2 - hs * Math.cos(ang - 0.42), y2 - hs * Math.sin(ang - 0.42));
-    ctx.lineTo(x2, y2);
-    ctx.lineTo(x2 - hs * Math.cos(ang + 0.42), y2 - hs * Math.sin(ang + 0.42));
-    ctx.stroke();
-  }
-
-  /* ---- Main draw ---- */
   function draw() {
-    /* Background */
     ctx.fillStyle = '#0d1b2a';
     ctx.fillRect(0, 0, CW, CH);
 
-    /* ---- Compression / rarefaction band tint ---- */
-    /*
-     * Pressure ∝ −∂u/∂x = −Ak·cos(kx − ωt)
-     * +ve → compression (particles crowded) → cyan tint
-     * −ve → rarefaction (particles spread)  → orange tint
-     */
+    /* Compression / rarefaction band tint */
     for (let px = LEFT; px < RIGHT; px++) {
       const xr  = px - LEFT;
-      const prs = -A * K * Math.cos(K * xr - OMEGA * frame); /* pressure */
-      const n   = prs / (A * K);  /* normalised ≈ [−1, 1] */
+      const prs = -A * K * Math.cos(K * xr - OMEGA * frame);
+      const n   = prs / (A * K);
       if (n > 0.05) {
         ctx.fillStyle = `rgba(8,145,178,${Math.min(0.30, n * 0.30).toFixed(3)})`;
         ctx.fillRect(px, TOP, 1, PH);
@@ -694,7 +1323,7 @@
       }
     }
 
-    /* ---- Particles ---- */
+    /* Particles */
     for (let j = 0; j < NY; j++) {
       for (let i = 0; i < NX; i++) {
         const xRest = LEFT + (i + 0.5) * dx0;
@@ -702,112 +1331,191 @@
         const xr    = xRest - LEFT;
         const disp  = A * Math.sin(K * xr - OMEGA * frame);
         const xDraw = xRest + disp;
-        const isHi  = (i === HI_I && j === HI_J);
 
-        if (isHi) {
-          /* Gold glow for highlighted particle */
-          ctx.shadowBlur = 12; ctx.shadowColor = '#fde047';
-          ctx.beginPath(); ctx.arc(xDraw, yRest, 5.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#fde047'; ctx.fill();
-          ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+        const prs  = -A * K * Math.cos(K * xr - OMEGA * frame);
+        const norm = Math.max(-1, Math.min(1, prs / (A * K)));
+        let r, g, b;
+        if (norm > 0.12) {
+          r = Math.round(120 + 130 * norm);
+          g = Math.round(200 + 55 * norm);
+          b = 255;
+        } else if (norm < -0.12) {
+          r = 255; g = Math.round(200 + 55 * norm); b = Math.round(200 + 55 * norm);
         } else {
-          /* Colour by local pressure: compression = blue-white, rarefaction = warm */
-          const prs  = -A * K * Math.cos(K * xr - OMEGA * frame);
-          const norm = Math.max(-1, Math.min(1, prs / (A * K)));
-          let r, g, b;
-          if (norm > 0.12) {
-            r = Math.round(120 + 130 * norm);
-            g = Math.round(200 +  55 * norm);
-            b = 255;
-          } else if (norm < -0.12) {
-            r = 255;
-            g = Math.round(200 +  55 * norm);
-            b = Math.round(200 +  55 * norm);
-          } else {
-            const v = Math.round(150 + 50 * Math.abs(norm));
-            r = g = b = v;
-          }
-          ctx.beginPath(); ctx.arc(xDraw, yRest, 3.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgb(${r},${g},${b})`; ctx.fill();
+          const v = Math.round(150 + 50 * Math.abs(norm));
+          r = g = b = v;
         }
+        ctx.beginPath();
+        ctx.arc(xDraw, yRest, 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fill();
       }
     }
 
-    /* ---- Particle-velocity arrow on highlighted particle ---- */
-    const hiXr   = HI_X0 - LEFT;
-    const hiDisp = A * Math.sin(K * hiXr - OMEGA * frame);
-    const hiVel  = -A * OMEGA * Math.cos(K * hiXr - OMEGA * frame); /* px/frame */
-    const hiXd   = HI_X0 + hiDisp;
-    const arrY   = HI_Y0 - 22;               /* above particle     */
-    const velPx  = (hiVel / (A * OMEGA)) * 30; /* max ±30 px arrow  */
-
-    /* Dashed oscillation range guide */
-    ctx.setLineDash([2, 3]);
-    ctx.strokeStyle = 'rgba(251,146,60,.30)'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(HI_X0 - A - 2, arrY); ctx.lineTo(HI_X0 + A + 2, arrY); ctx.stroke();
-    ctx.setLineDash([]);
-
-    /* Velocity arrow (orange) */
-    ctx.strokeStyle = '#fb923c'; ctx.fillStyle = '#fb923c'; ctx.lineWidth = 2.2;
-    if (Math.abs(velPx) > 2) {
-      arrowAt(hiXd, arrY, hiXd + velPx, arrY, 7);
-    } else {
-      /* Near zero: dot */
-      ctx.beginPath(); ctx.arc(hiXd, arrY, 3, 0, Math.PI * 2); ctx.fill();
-    }
-
-    /* "particle velocity" label above arrow */
-    ctx.fillStyle = '#fb923c';
-    ctx.font = 'bold 9.5px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('particle velocity  vₚ = −Aω cos(kx − ωt)', HI_X0, arrY - 8);
-
-    /* ---- Dynamic Compression / Rarefaction labels (follow crests) ---- */
-    /*
-     * Compression peak: cos(kx − ωt) = −1  → kx = ωt + π  → x = (ωt + π + 2πn)/k
-     * Rarefaction peak: cos(kx − ωt) =  1  → kx = ωt       → x = (ωt     + 2πn)/k
-     */
-    ctx.font = '8.5px Inter,sans-serif';
+    /* Dynamic compression / rarefaction labels */
+    ctx.font = '8px Inter,sans-serif';
     for (let n = -1; n <= N_WAVES + 1; n++) {
       const xC = (OMEGA * frame + Math.PI + 2 * Math.PI * n) / K + LEFT;
-      if (xC > LEFT + 30 && xC < RIGHT - 30) {
+      if (xC > LEFT + 25 && xC < RIGHT - 25) {
         ctx.fillStyle = '#67e8f9'; ctx.textAlign = 'center';
-        ctx.fillText('▼ compression', xC, TOP - 5);
+        ctx.fillText('compress', xC, TOP - 5);
       }
       const xR = (OMEGA * frame + 2 * Math.PI * n) / K + LEFT;
-      if (xR > LEFT + 35 && xR < RIGHT - 35) {
+      if (xR > LEFT + 30 && xR < RIGHT - 30) {
         ctx.fillStyle = '#fdba74';
-        ctx.fillText('▼ rarefaction', xR, TOP - 5);
+        ctx.fillText('rarefy', xR, TOP - 5);
       }
     }
 
-    /* ---- Wave / phase-velocity arrow ---- */
-    const wvY   = CH - 50;
-    const wvEnd = LEFT + PW * 0.68;
-    ctx.strokeStyle = '#22d3ee'; ctx.fillStyle = '#22d3ee'; ctx.lineWidth = 2.5;
-    arrowAt(LEFT, wvY, wvEnd, wvY, 9);
+    /* Wave direction arrow */
+    const arrowY = CH - 30;
+    ctx.strokeStyle = '#22d3ee'; ctx.fillStyle = '#22d3ee'; ctx.lineWidth = 2;
+    const ax2 = LEFT + PW * 0.52;
+    ctx.beginPath(); ctx.moveTo(LEFT + 10, arrowY); ctx.lineTo(ax2, arrowY);
+    ctx.moveTo(ax2 - 8 * Math.cos(-0.38), arrowY - 8 * Math.sin(-0.38));
+    ctx.lineTo(ax2, arrowY);
+    ctx.moveTo(ax2 - 8 * Math.cos(0.38), arrowY - 8 * Math.sin(0.38));
+    ctx.lineTo(ax2, arrowY);
+    ctx.stroke();
+    ctx.font = 'bold 8.5px Inter,sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('wave direction →', ax2 + 8, arrowY + 3);
 
-    ctx.font = 'bold 10.5px Inter,sans-serif'; ctx.textAlign = 'left';
-    ctx.fillText('wave / phase velocity  c = ω / k = fλ', wvEnd + 10, wvY + 4);
+    ctx.fillStyle = 'rgba(148,163,184,.6)';
+    ctx.font = '7.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('particles ↔ oscillate along wave direction', CW / 2, CH - 8);
+  }
 
-    /* λ tick marks under the arrow */
-    ctx.strokeStyle = 'rgba(34,211,238,.28)'; ctx.lineWidth = 1;
-    for (let n = 0; n <= N_WAVES; n++) {
-      const tx = LEFT + n * LAM_PX;
-      ctx.beginPath(); ctx.moveTo(tx, wvY - 5); ctx.lineTo(tx, wvY + 6); ctx.stroke();
+  requestAnimationFrame(tick);
+})();
+
+/* ============================================================
+   TRANSVERSE WAVE ANIMATION  —  theory.html
+   Particles oscillate vertically (perpendicular to wave travel).
+   ============================================================ */
+(function () {
+  const canvas = document.getElementById('trans-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width;   /* 380 */
+  const CH = canvas.height;  /* 200 */
+
+  const LEFT = 20, RIGHT = 360, TOP = 20, BOT = 158;
+  const PW = RIGHT - LEFT;   /* 340 */
+  const PH = BOT - TOP;      /* 138 */
+
+  const NX = 18, NY = 5;
+  const dx0 = PW / NX;
+  const dy0 = PH / (NY - 1);
+
+  const N_WAVES = 3;
+  const LAM_PX  = PW / N_WAVES;
+  const K       = 2 * Math.PI / LAM_PX;
+  const A       = 12;
+  const PERIOD  = 130;
+  const OMEGA   = 2 * Math.PI / PERIOD;
+
+  let frame = 0, running = true;
+
+  const btn = document.getElementById('trans-playpause');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      running = !running;
+      btn.innerHTML = running ? '&#9646;&#9646; Pause' : '&#9654; Play';
+      if (running) requestAnimationFrame(tick);
+    });
+  }
+
+  function tick() {
+    if (!running) return;
+    draw();
+    frame++;
+    requestAnimationFrame(tick);
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0d1b2a';
+    ctx.fillRect(0, 0, CW, CH);
+
+    /* Rest-position guide lines */
+    ctx.strokeStyle = 'rgba(100,116,139,.18)';
+    ctx.lineWidth = 1;
+    for (let j = 0; j < NY; j++) {
+      const yRest = TOP + j * dy0;
+      ctx.beginPath();
+      ctx.moveTo(LEFT, yRest);
+      ctx.lineTo(RIGHT, yRest);
+      ctx.stroke();
     }
-    for (let n = 0; n < N_WAVES; n++) {
-      ctx.fillStyle = 'rgba(34,211,238,.50)';
-      ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('λ', LEFT + (n + 0.5) * LAM_PX, wvY + 17);
+
+    /* Particles */
+    for (let j = 0; j < NY; j++) {
+      for (let i = 0; i < NX; i++) {
+        const xRest = LEFT + (i + 0.5) * dx0;
+        const yRest = TOP  + j * dy0;
+        const xr    = xRest - LEFT;
+        const disp  = A * Math.sin(K * xr - OMEGA * frame);
+        const yDraw = yRest + disp;
+
+        /* Color by vertical displacement */
+        const norm = disp / A;
+        let r, g, b;
+        if (norm > 0.12) {
+          r = Math.round(80 + 120 * norm);
+          g = Math.round(200 + 50 * norm);
+          b = 255;
+        } else if (norm < -0.12) {
+          r = 255;
+          g = Math.round(180 + 60 * norm);
+          b = Math.round(120 + 80 * norm);
+        } else {
+          const v = Math.round(160 + 40 * Math.abs(norm));
+          r = g = b = v;
+        }
+
+        ctx.beginPath();
+        ctx.arc(xRest, yDraw, 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fill();
+      }
     }
 
-    /* ---- Bottom caption line ---- */
-    ctx.fillStyle = 'rgba(148,163,184,.65)';
-    ctx.font = '8.5px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(
-      'Each particle oscillates locally (vₚ ↔).  The wave pattern advances at c (→).  vₚ and c are independent quantities.',
-      CW / 2, CH - 7
-    );
+    /* Vertical oscillation arrow on first particle, middle row */
+    const midJ  = Math.floor(NY / 2);
+    const hxRest = LEFT + 0.5 * dx0;
+    const hyRest = TOP  + midJ * dy0;
+    const xr     = hxRest - LEFT;
+    const disp   = A * Math.sin(K * xr - OMEGA * frame);
+    const vel    = -A * OMEGA * Math.cos(K * xr - OMEGA * frame);
+    const velPx  = (vel / (A * OMEGA)) * 20;
+
+    if (Math.abs(velPx) > 1.5) {
+      const y1 = hyRest + disp, y2 = y1 + velPx;
+      ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(hxRest - 12, y1); ctx.lineTo(hxRest - 12, y2);
+      /* arrowhead */
+      const dir = velPx > 0 ? 1 : -1;
+      ctx.moveTo(hxRest - 12 - 4, y2 - dir * 6);
+      ctx.lineTo(hxRest - 12, y2);
+      ctx.lineTo(hxRest - 12 + 4, y2 - dir * 6);
+      ctx.stroke();
+    }
+
+    /* Wave direction arrow */
+    const arrowY = CH - 30;
+    ctx.strokeStyle = '#22d3ee'; ctx.fillStyle = '#22d3ee'; ctx.lineWidth = 2;
+    const ax2 = LEFT + PW * 0.52;
+    ctx.beginPath(); ctx.moveTo(LEFT + 10, arrowY); ctx.lineTo(ax2, arrowY);
+    ctx.moveTo(ax2 - 8 * Math.cos(-0.38), arrowY - 8 * Math.sin(-0.38));
+    ctx.lineTo(ax2, arrowY);
+    ctx.moveTo(ax2 - 8 * Math.cos(0.38), arrowY - 8 * Math.sin(0.38));
+    ctx.lineTo(ax2, arrowY);
+    ctx.stroke();
+    ctx.font = 'bold 8.5px Inter,sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('wave direction →', ax2 + 8, arrowY + 3);
+
+    ctx.fillStyle = 'rgba(148,163,184,.6)';
+    ctx.font = '7.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('particles ↕ oscillate perpendicular to wave direction', CW / 2, CH - 8);
   }
 
   requestAnimationFrame(tick);
