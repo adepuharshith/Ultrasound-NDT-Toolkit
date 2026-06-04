@@ -1135,30 +1135,169 @@
         <div class="theory-section" id="snell">
           <h2>&#128200; Snell's Law &amp; Mode Conversion</h2>
           <p>
-            At an oblique interface between two media, refraction and mode conversion occur.
-            The generalized Snell's law is:
+            When an ultrasonic wave strikes a planar interface at oblique incidence, it simultaneously
+            produces a <strong>refracted P-wave</strong> and a <strong>mode-converted S-wave</strong> in
+            the second medium. Both obey Snell's law independently, each governed by its own wave speed:
           </p>
           <div class="eq-box">
-            sin(&theta;<sub>i</sub>) / c<sub>i</sub> = sin(&theta;<sub>r</sub>) / c<sub>r</sub>
+            sin(&theta;<sub>i</sub>) / c<sub>L1</sub> = sin(&theta;<sub>L</sub>) / c<sub>L2</sub> = sin(&theta;<sub>S</sub>) / c<sub>S2</sub>
+          </div>
+          <p>
+            Because c<sub>L2</sub> &ne; c<sub>S2</sub>, the two transmitted beams diverge in direction.
+            In steel (c<sub>L</sub>&nbsp;=&nbsp;5900&nbsp;m/s, c<sub>S</sub>&nbsp;=&nbsp;3200&nbsp;m/s)
+            the refracted P bends nearly twice as far from the normal as the mode-converted S.
+          </p>
+
+          <!-- SVG: Mode conversion at water–steel interface (θ_i = 20°, between critical angles) -->
+          <div class="scan-svg-wrap">
+            <svg viewBox="0 0 600 236" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="snl-p"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#22d3ee"/></marker>
+                <marker id="snl-rp" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#94a3b8"/></marker>
+                <marker id="snl-s"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#fb923c"/></marker>
+              </defs>
+
+              <!-- Media backgrounds -->
+              <rect x="0" y="0"   width="600" height="112" fill="#0a1628"/>
+              <rect x="0" y="112" width="600" height="124" fill="#0f1e35"/>
+
+              <!-- Medium labels -->
+              <text x="16" y="44"  fill="#7dd3fc" font-size="11" font-weight="700" font-family="Inter,sans-serif">Water / Couplant</text>
+              <text x="16" y="59"  fill="#475569" font-size="9"   font-family="Inter,sans-serif">c&#x2081; = 1480 m/s</text>
+              <text x="16" y="145" fill="#7dd3fc" font-size="11" font-weight="700" font-family="Inter,sans-serif">Steel</text>
+              <text x="16" y="160" fill="#475569" font-size="9"   font-family="Inter,sans-serif">c_L = 5900 m/s  |  c_S = 3200 m/s</text>
+
+              <!-- Interface line -->
+              <line x1="0" y1="112" x2="600" y2="112" stroke="#334155" stroke-width="1.8"/>
+              <text x="488" y="108" fill="#64748b" font-size="8.5" font-family="Inter,sans-serif">Interface</text>
+
+              <!-- Normal (dashed vertical at x=270) -->
+              <line x1="270" y1="12" x2="270" y2="220" stroke="#2d3f55" stroke-width="1.1" stroke-dasharray="5,4"/>
+
+              <!-- INCIDENT P-wave: θ_i = 20° from normal -->
+              <!-- Δx = 90·tan(20°) ≈ 33 → start (237, 22) → end (270, 112) -->
+              <line x1="237" y1="22" x2="268" y2="110" stroke="#22d3ee" stroke-width="2.4" marker-end="url(#snl-p)"/>
+              <text x="148" y="24"  fill="#22d3ee" font-size="11" font-weight="700" font-family="Inter,sans-serif">Incident P</text>
+              <text x="148" y="40"  fill="#64748b" font-size="9"   font-family="Inter,sans-serif">&theta;&#x1D62; = 20°</text>
+
+              <!-- θ_i arc: radius 22 from (270,112), sweep from upward-normal to incident direction -->
+              <!-- Normal-up at r=22: (270, 90). Incident dir unit: (−33,−90)/95.9=(−0.344,−0.939). Point: (262.4, 91.3) -->
+              <path d="M 270 90 A 22 22 0 0 0 262.4 91.3" fill="none" stroke="#22d3ee" stroke-width="1.3"/>
+              <text x="241" y="97" fill="#22d3ee" font-size="10.5" font-family="Inter,sans-serif">&theta;&#x1D62;</text>
+
+              <!-- REFLECTED P-wave: symmetric, θ_r = 20° → (303, 22) -->
+              <line x1="272" y1="110" x2="303" y2="22" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="7,4" marker-end="url(#snl-rp)"/>
+              <text x="308" y="24" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif">Reflected P</text>
+
+              <!-- θ_r arc (CW, symmetric) -->
+              <!-- Reflected dir unit: (33,−90)/95.9=(0.344,−0.939). Point: (277.6, 91.3) -->
+              <path d="M 270 90 A 22 22 0 0 1 277.6 91.3" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+
+              <!-- P-wave TIR annotation (steel side, left of normal) -->
+              <text x="68" y="152" fill="#ef4444" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">P: total reflection</text>
+              <text x="68" y="166" fill="#ef4444" font-size="8.5" font-family="Inter,sans-serif">(&theta;&#x1D62; = 20° &gt; &theta;&#x2C1;&#x2081; = 14.5°)</text>
+
+              <!-- MODE-CONVERTED S-wave: θ_S ≈ 47.7° -->
+              <!-- sin(47.7°)=0.740 → Δx=90·tan(47.7°)=90·(0.740/0.672)=99 → end (369, 202) -->
+              <line x1="272" y1="114" x2="367" y2="202" stroke="#fb923c" stroke-width="2.4" marker-end="url(#snl-s)"/>
+              <text x="348" y="220" fill="#fb923c" font-size="11" font-weight="700" font-family="Inter,sans-serif">Mode-converted S</text>
+              <text x="348" y="233" fill="#64748b" font-size="9"   font-family="Inter,sans-serif">&theta;&#x53; ≈ 47.7°</text>
+
+              <!-- θ_S arc: radius 22 from (270,112), sweep from downward-normal to S-ray direction -->
+              <!-- Normal-down at r=22: (270, 134). S dir unit: (99,90)/133.8=(0.740,0.673). Point: (286.3, 126.8) -->
+              <path d="M 270 134 A 22 22 0 0 1 286.3 126.8" fill="none" stroke="#fb923c" stroke-width="1.3"/>
+              <text x="280" y="144" fill="#fb923c" font-size="10.5" font-family="Inter,sans-serif">&theta;&#x53;</text>
+
+              <!-- Bottom caption -->
+              <text x="16" y="232" fill="#64748b" font-size="8.5" font-family="Inter,sans-serif" font-style="italic">Immersion UT, &theta;&#x1D62; = 20°: between the two critical angles — P undergoes total internal reflection; only mode-converted S (&#x2248;48°) propagates into steel.</text>
+            </svg>
           </div>
 
           <h3>Critical Angles</h3>
+          <p>
+            As &theta;<sub>i</sub> increases, two thresholds mark where a transmitted wave reaches 90° (grazes the interface) and undergoes total internal reflection (TIR):
+          </p>
           <ul>
-            <li><strong>First critical angle:</strong> refracted longitudinal wave travels at 90&deg;; only shear wave transmitted.</li>
-            <li><strong>Second critical angle:</strong> refracted shear wave travels at 90&deg;; total internal reflection (surface/Rayleigh waves generated).</li>
+            <li>
+              <strong>First critical angle (&theta;<sub>c1</sub>):</strong>
+              sin(&theta;<sub>c1</sub>) = c<sub>L1</sub> / c<sub>L2</sub>.
+              The refracted P-wave undergoes TIR; for &theta;<sub>i</sub> &gt; &theta;<sub>c1</sub>, only the mode-converted S transmits into the solid.
+            </li>
+            <li>
+              <strong>Second critical angle (&theta;<sub>c2</sub>):</strong>
+              sin(&theta;<sub>c2</sub>) = c<sub>L1</sub> / c<sub>S2</sub>.
+              The mode-converted S also undergoes TIR; for &theta;<sub>i</sub> &gt; &theta;<sub>c2</sub>, both waves are totally reflected and Rayleigh surface waves can be generated along the interface.
+            </li>
           </ul>
+          <p>
+            Angle-beam probes are designed to operate with the wedge angle strictly between &theta;<sub>c1</sub> and
+            &theta;<sub>c2</sub>, ensuring a single-mode (pure shear) beam enters the test piece.
+          </p>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Interface</th>
+                <th>c<sub>L1</sub> (m/s)</th>
+                <th>c<sub>L2</sub> / c<sub>S2</sub> (m/s)</th>
+                <th>&theta;<sub>c1</sub></th>
+                <th>&theta;<sub>c2</sub></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Water &rarr; Steel</strong></td>
+                <td>1480</td>
+                <td>5900 / 3200</td>
+                <td class="hi">14.5°</td>
+                <td class="hi">27.5°</td>
+              </tr>
+              <tr>
+                <td><strong>Water &rarr; Aluminum</strong></td>
+                <td>1480</td>
+                <td>6320 / 3130</td>
+                <td>13.5°</td>
+                <td>28.2°</td>
+              </tr>
+              <tr>
+                <td><strong>Perspex &rarr; Steel</strong></td>
+                <td>2730</td>
+                <td>5900 / 3200</td>
+                <td>27.6°</td>
+                <td>58.5°</td>
+              </tr>
+              <tr>
+                <td><strong>Perspex &rarr; Aluminum</strong></td>
+                <td>2730</td>
+                <td>6320 / 3130</td>
+                <td>25.6°</td>
+                <td>60.7°</td>
+              </tr>
+            </tbody>
+          </table>
+
           <div class="callout">
-            <strong>Angle beam inspection:</strong> Wedge transducers exploit mode conversion at the wedge–part interface to inject shear waves at a specific angle (e.g., 45&deg;, 60&deg;, 70&deg;) for weld inspection.
+            <strong>NDE example — 45° shear weld probe (Perspex–steel):</strong><br/>
+            Required wedge angle: sin(&theta;<sub>wedge</sub>) = sin(45°) &times; c<sub>Perspex</sub> / c<sub>S-steel</sub>
+            = 0.707 &times; 2730 / 3200 = 0.603 &rarr; &theta;<sub>wedge</sub> &asymp; 37°.<br/>
+            The wide Perspex–steel window (27.6° – 58.5°) means a single wedge material
+            covers 45°, 60°, and 70° shear angles — each cut at a different face angle.
+            For a 25 mm thick plate, one half-skip leg covers a surface distance of
+            T &times; tan(45°) = 25 mm; a full V-path spans 50 mm, directly constraining probe
+            placement during weld-root inspection.
           </div>
 
           <h3>Angle Beam Geometry</h3>
           <div class="eq-box">
-            Depth = x &middot; cos(&theta;<sub>R</sub>) &nbsp;&nbsp;&nbsp;
-            Surface distance = x &middot; sin(&theta;<sub>R</sub>)
+            Depth&nbsp;=&nbsp;beam path &times; cos(&theta;<sub>R</sub>) &nbsp;&nbsp;&nbsp;
+            Surface distance&nbsp;=&nbsp;beam path &times; sin(&theta;<sub>R</sub>)
           </div>
           <p>
-            A <strong>full skip</strong> (V-path) off the back wall covers a beam path of
-            2T / cos(&theta;<sub>R</sub>), where T is the material thickness.
+            A <strong>full skip</strong> (V-path off the back wall) traverses a total beam path of
+            2T&nbsp;/&nbsp;cos(&theta;<sub>R</sub>), where T is the part thickness and &theta;<sub>R</sub>
+            is the shear refraction angle. The quarter-, half-, and three-quarter-skip positions
+            interrogate the near-surface, mid-thickness (back wall), and near-far-surface regions
+            respectively — critical for full volumetric weld coverage per ASME and AWS D1.1.
           </p>
         </div>
 
