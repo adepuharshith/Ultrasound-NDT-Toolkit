@@ -1304,22 +1304,183 @@
         <!-- Signal Processing -->
         <div class="theory-section" id="signal-processing">
           <h2>&#128250; Signal Processing</h2>
+          <p>
+            The raw A-scan is a time-domain RF voltage waveform — a bipolar oscillating signal whose amplitude
+            encodes reflector strength and whose timing encodes depth. Four processing steps convert that raw
+            signal into a displayable, measurable, and imageable result.
+          </p>
 
           <h3>Envelope Detection (Hilbert Transform)</h3>
-          <p>The envelope (magnitude of the analytic signal) is computed via the Hilbert transform and used for display and gating.</p>
+          <p>
+            Gated C-scans sample peak echo amplitude within a depth window. Sampling the raw RF signal
+            directly produces a position-dependent artifact: a reflector sitting at a wave crest reads full
+            amplitude; one at a zero-crossing reads zero — yet both are physically identical. The cure is
+            the <strong>analytic signal</strong>:
+          </p>
+          <div class="eq-box">
+            z(t) = s(t) + j&middot;H{s(t)} &nbsp;&nbsp;&rarr;&nbsp;&nbsp; |z(t)| = envelope
+          </div>
+          <p>
+            The Hilbert transform H{&middot;} phase-shifts every frequency component by 90&deg;, producing
+            a quadrature imaginary part. The magnitude |z(t)| is a smooth, non-negative envelope that tracks
+            peak echo amplitude regardless of RF phase. In practice it is computed via FFT &rarr; zero all
+            negative-frequency bins &rarr; inverse FFT.
+          </p>
+
+          <!-- SVG: RF waveform vs Hilbert envelope -->
+          <div class="scan-svg-wrap">
+            <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background -->
+              <rect width="580" height="160" fill="#0d1b2a"/>
+              <!-- Zero-amplitude axis -->
+              <line x1="30" y1="80" x2="555" y2="80" stroke="#1e3a5f" stroke-width="1"/>
+
+              <!-- RF signal polyline (cyan) -->
+              <polyline fill="none" stroke="#22d3ee" stroke-width="1.4" opacity="0.8"
+                points="
+                  30,80 40,80 45,79 50,81 55,80
+                  60,74 63,67 66,71 69,93 72,116 74,115 76,80 78,47 80,35 82,65 84,93 86,101 88,91 90,80 92,77 94,78 96,80
+                  100,80 110,78 120,82 130,79 140,81 150,78 160,82 170,79 180,81 190,80 200,78 210,82 220,79 230,81 240,80 248,80
+                  250,79 252,76 254,73 257,80 260,95 262,104 264,92 266,68 268,52 270,65 272,80 274,87 276,84 278,81 280,80
+                  290,82 310,78 330,82 350,79 370,81 390,80 410,82 430,80
+                  432,79 434,81 436,80 438,74 440,68 442,72 444,92 446,114 448,114 450,80 452,47 454,38 456,65 458,93 460,101 462,91 464,80 466,77 468,78 470,80
+                  480,80 555,80
+                "
+              />
+
+              <!-- Envelope curve (orange Bezier) -->
+              <path fill="none" stroke="#fb923c" stroke-width="2.4" opacity="0.95"
+                d="M 30,80 L 55,80
+                   Q 65,64 72,50 Q 78,38 80,35 Q 82,40 88,60 Q 94,76 100,78
+                   L 248,78
+                   Q 256,65 263,56 Q 268,52 272,60 Q 278,72 285,78
+                   L 430,78
+                   Q 440,58 447,45 Q 452,38 456,48 Q 464,68 472,78
+                   L 555,78"
+              />
+
+              <!-- Echo peak labels -->
+              <text x="80" y="22" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="Inter,sans-serif">IP</text>
+              <line x1="80" y1="25" x2="80" y2="37" stroke="#7dd3fc" stroke-width="1" stroke-dasharray="3,2"/>
+
+              <text x="268" y="30" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="Inter,sans-serif">Flaw Echo</text>
+              <line x1="268" y1="33" x2="268" y2="54" stroke="#fca5a5" stroke-width="1" stroke-dasharray="3,2"/>
+
+              <text x="452" y="22" text-anchor="middle" fill="#86efac" font-size="10" font-weight="700" font-family="Inter,sans-serif">BW</text>
+              <line x1="452" y1="25" x2="452" y2="40" stroke="#86efac" stroke-width="1" stroke-dasharray="3,2"/>
+
+              <!-- Legend -->
+              <line x1="280" y1="147" x2="310" y2="147" stroke="#22d3ee" stroke-width="1.8" opacity="0.8"/>
+              <text x="315" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">RF signal (bipolar)</text>
+              <line x1="420" y1="147" x2="450" y2="147" stroke="#fb923c" stroke-width="2.4"/>
+              <text x="455" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Hilbert envelope</text>
+
+              <!-- Axis labels -->
+              <text x="292" y="10" text-anchor="middle" fill="#64748b" font-size="9" font-family="Inter,sans-serif">A-scan RF signal and its Hilbert envelope</text>
+              <text x="292" y="100" text-anchor="middle" fill="#475569" font-size="8.5" font-family="Inter,sans-serif">time &#8594;</text>
+            </svg>
+          </div>
+
+          <div class="callout">
+            <strong>NDE example:</strong> Automated immersion UT of aerospace titanium forgings gates on
+            the Hilbert envelope of the back-wall echo to flag embedded porosity. A &minus;6 dB drop in
+            gated amplitude marks a suspect region. Using raw RF instead would produce false positives
+            every time the back wall shifts by a quarter wavelength relative to the gate centre — an
+            artefact that no threshold setting can suppress.
+          </div>
 
           <h3>Time Gain Compensation (TGC)</h3>
-          <p>Depth-dependent amplification applied to compensate for attenuation. A TGC ramp keeps displayed signal level roughly constant with depth.</p>
+          <p>
+            Attenuation decays echo amplitude exponentially with depth, so identical reflectors at
+            different depths return unequal signals. TGC applies a programmable depth-dependent gain
+            matched to the material's attenuation law:
+          </p>
+          <div class="eq-box">
+            G<sub>TGC</sub>(t) = exp(+&alpha;&nbsp;&times;&nbsp;c&nbsp;&times;&nbsp;t / 2)
+            &nbsp;&nbsp;&nbsp; [dB-linear ramp; compensates round-trip path loss]
+          </div>
+          <p>
+            In practice, &alpha; is measured on a step-wedge or DAC block and the ramp is set in
+            dB/&mu;s. A properly compensated A-scan shows equal amplitude for equal-size reflectors at
+            all depths, making the C-scan color scale a direct indicator of reflectivity rather than
+            a convolution of reflectivity and depth.
+          </p>
+          <div class="callout">
+            <strong>NDE example:</strong> Corrosion mapping of a 6–20 mm carbon steel pressure vessel
+            wall at 5 MHz (α ≈ 1 dB/(mm·MHz)). Without TGC the back-wall echo from a 20 mm wall
+            arrives 28 dB below that from a 6 mm wall (2 × 14 mm extra round-trip × 1 dB/mm).
+            TGC recovers that loss; the C-scan then maps actual wall-thinning geometry rather than
+            a depth-weighted echo map.
+          </div>
 
-          <h3>Pulse Compression</h3>
-          <p>Transmitting a long coded pulse (chirp) and applying matched filter at reception increases SNR while maintaining range resolution. Used in air-coupled and low-SNR applications.</p>
+          <h3>Pulse Compression (Chirp / Coded Excitation)</h3>
+          <p>
+            Conventional pulsed UT trades off resolution against SNR: shorter pulse &rarr; finer
+            range resolution, but less energy transmitted &rarr; lower SNR. Pulse compression decouples
+            these. A linear frequency-modulated (LFM) chirp of duration T and bandwidth B is transmitted;
+            a matched filter (cross-correlation with the reference chirp) compresses the received signal
+            to a pulse of length &asymp; 1/B while preserving the full energy of the long transmission:
+          </p>
+          <div class="eq-box">
+            SNR gain = T &times; B &nbsp;&nbsp; (time-bandwidth product)
+          </div>
+          <p>
+            Resolution equals that of a &delta;-pulse at bandwidth B; SNR equals that of a CW burst
+            of duration T. The compressed sidelobe level must be managed (typically with amplitude
+            weighting — Hann, Taylor — at the cost of slight resolution broadening).
+          </p>
+          <div class="callout">
+            <strong>NDE example:</strong> Air-coupled UT of CFRP composites suffers 60–80 dB insertion
+            loss at each air–composite interface, burying conventional pulses in noise. A 50 &mu;s chirp
+            with B = 200 kHz yields T&times;B = 10 (+10 dB) — often the difference between resolving a
+            delamination and noise-floor burial. Pulse compression is also standard in TOFD, where weak
+            diffraction tip signals must be separated from lateral-wave and geometry arrivals.
+          </div>
 
           <h3>SNR &amp; Noise Sources</h3>
-          <ul>
-            <li><strong>Electronic noise:</strong> amplifier Johnson noise floor.</li>
-            <li><strong>Coherent grain noise (grass):</strong> scattering from microstructure; coherent with signal; hardest to suppress.</li>
-            <li><strong>Geometric noise:</strong> surface roughness, part geometry echoes.</li>
-          </ul>
+          <p>Three distinct noise mechanisms compete with flaw echoes and require different mitigation strategies:</p>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Noise type</th>
+                <th>Origin</th>
+                <th>Frequency scaling</th>
+                <th>Mitigation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Electronic noise</strong></td>
+                <td>Amplifier Johnson noise; preamplifier noise figure</td>
+                <td>White (flat spectrum)</td>
+                <td>Low-noise preamp; coherent averaging N shots &rarr; +10log₁₀(N) dB</td>
+              </tr>
+              <tr>
+                <td><strong>Coherent grain noise ("grass")</strong></td>
+                <td>Backscatter from grain boundaries; <em>coherent</em> with transmitted pulse; cannot be averaged away</td>
+                <td>&prop; f&sup2; (stochastic) or f&sup4; (Rayleigh, d &laquo; &lambda;)</td>
+                <td>Lower frequency; spatial compounding; FMC/TFM; frequency-dependent filtering</td>
+              </tr>
+              <tr>
+                <td><strong>Geometric / structural noise</strong></td>
+                <td>Surface roughness, geometry re-entrant echoes, mode-converted arrivals</td>
+                <td>Depends on geometry</td>
+                <td>Time-gating; wedge design; surface preparation; TOFD lateral-wave subtraction</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>NDE example — austenitic weld inspection:</strong> 316L stainless steel welds
+            contain columnar grains 100–500 &mu;m wide. At 5 MHz in this microstructure, coherent
+            grain noise sits only 10–15 dB below a 1 mm side-drilled hole reference — well within
+            typical flaw-detection thresholds. Because grain noise is <em>coherent</em>, waveform
+            averaging does not suppress it. The standard remedies are: (1) drop to 1–2 MHz to shift
+            the stochastic scattering regime (accepting coarser resolution), or (2) use phased-array
+            spatial compounding / FMC-TFM to decorrelate grain noise across apertures while keeping
+            coherent flaw signals in phase.
+          </div>
         </div>
 
         <!-- Phased Arrays -->
