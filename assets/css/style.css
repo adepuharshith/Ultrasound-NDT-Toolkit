@@ -381,14 +381,15 @@ p  { color: var(--text-muted); }
 .eq-box {
   background: #f8fafc;
   border: 1px solid var(--border);
+  border-left: 3px solid var(--brand-cyan);
   border-radius: 8px;
-  padding: .85rem 1.25rem;
-  font-family: 'Courier New', monospace;
-  font-size: .92rem;
-  color: var(--brand-navy);
+  padding: .9rem 1.5rem;
   margin: .75rem 0;
   overflow-x: auto;
+  text-align: center;
 }
+.eq-box .katex-display { margin: 0; }
+.eq-box .katex { font-size: 1.05rem; }
 .callout {
   background: #eff6ff;
   border-left: 4px solid var(--brand-blue);

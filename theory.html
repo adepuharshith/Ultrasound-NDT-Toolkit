@@ -7,33 +7,38 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
   <style>
     /* ---- Wave animation panels ---- */
     .wave-demo {
-      background: #0d1b2a;
+      background: #ffffff;
       border-radius: 10px;
       overflow: hidden;
-      border: 1px solid #1e3a5f;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
     }
     .wave-demo-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: .42rem 1rem;
-      background: rgba(255,255,255,.04);
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border);
     }
     .wave-demo-header span {
       font-size: .73rem;
       font-weight: 700;
-      color: #94a3b8;
+      color: #475569;
       text-transform: uppercase;
       letter-spacing: .08em;
     }
     .wave-demo-btn {
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.15);
-      color: #cbd5e1;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
       border-radius: 5px;
       padding: .25rem .7rem;
       font-size: .76rem;
@@ -41,7 +46,7 @@
       transition: background .15s;
       font-family: var(--font, sans-serif);
     }
-    .wave-demo-btn:hover { background: rgba(255,255,255,.16); }
+    .wave-demo-btn:hover { background: #f1f5f9; }
     .wave-canvas { display: block; width: 100%; height: auto; }
     .wave-caption {
       font-size: .78rem;
@@ -324,7 +329,7 @@
       <!-- SIDEBAR -->
       <aside class="topic-sidebar">
         <h4>Student Path</h4>
-        <a href="#wave-types"><span class="step-dot">1</span>Wave Types</a>
+        <a href="#wave-types"><span class="step-dot">1</span>Sound vs EM Waves</a>
         <a href="#speed-comparison"><span class="step-dot">2</span>Speed in Media</a>
         <a href="#energy-loss"><span class="step-dot">3</span>Energy Loss</a>
         <a href="#why-longitudinal"><span class="step-dot">4</span>Why Longitudinal?</a>
@@ -348,85 +353,96 @@
       <main>
 
         <!-- ══════════════════════════════════════════════
-             SECTION 1 — Longitudinal vs Transverse Waves
+             SECTION 1 — Sound Waves vs Electromagnetic Waves
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="wave-types">
-          <h2><span class="step-n">1</span> Longitudinal vs Transverse Waves</h2>
+          <h2><span class="step-n">1</span> Sound Waves vs Electromagnetic (EM) Waves</h2>
 
           <p>
-            All waves transfer energy through a medium without permanently displacing the material itself.
-            The key difference between wave types is <strong>how the particles in the medium move</strong>
-            relative to the direction the wave is travelling.
+            Before diving into ultrasound, it is essential to understand what makes sound fundamentally
+            different from light and radio waves. The animations below contrast a
+            <strong>longitudinal pressure wave</strong> (sound) with an
+            <strong>electromagnetic wave</strong> (light, radio, X-ray) — two completely different
+            physical phenomena.
           </p>
 
           <div class="wave-pair">
             <div class="wave-demo">
               <div class="wave-demo-header">
-                <span>&#127759; Longitudinal wave — particles oscillate along wave direction</span>
+                <span>&#127759; Sound — longitudinal pressure wave</span>
                 <button class="wave-demo-btn" id="long-playpause">&#9646;&#9646; Pause</button>
               </div>
               <canvas id="long-canvas" class="wave-canvas" width="380" height="200"></canvas>
               <p class="wave-caption">
-                <strong style="color:#67e8f9;">Blue bands</strong> = compression (particles crowded) &ensp;
-                <strong style="color:#fdba74;">Orange bands</strong> = rarefaction (particles spread). &ensp;
-                Particles push and pull <em>in the same direction</em> the wave travels.
+                <strong style="color:#0891b2;">Blue bands</strong> = compression &ensp;
+                <strong style="color:#ea580c;">Orange bands</strong> = rarefaction. &ensp;
+                Medium particles push &amp; pull <em>along</em> the propagation direction — requires a medium.
               </p>
             </div>
 
             <div class="wave-demo">
               <div class="wave-demo-header">
-                <span>&#127774; Transverse wave — particles oscillate perpendicular to wave direction</span>
-                <button class="wave-demo-btn" id="trans-playpause">&#9646;&#9646; Pause</button>
+                <span>&#9889; EM wave — oscillating E &amp; B fields (3D view)</span>
+                <button class="wave-demo-btn" id="em-playpause">&#9646;&#9646; Pause</button>
               </div>
-              <canvas id="trans-canvas" class="wave-canvas" width="380" height="200"></canvas>
+              <canvas id="em-canvas" class="wave-canvas" width="380" height="200"></canvas>
               <p class="wave-caption">
-                <strong style="color:#67e8f9;">Blue particles</strong> = displaced upward &ensp;
-                <strong style="color:#fdba74;">Orange particles</strong> = displaced downward. &ensp;
-                Particles oscillate <em>perpendicular</em> to the wave's travel direction.
+                <strong style="color:#dc2626;">Red = Electric field (E)</strong> &ensp;
+                <strong style="color:#2563eb;">Blue = Magnetic field (B)</strong>. &ensp;
+                E &#8869; B &#8869; propagation — no medium needed; travels in vacuum at <em>c</em>.
               </p>
             </div>
           </div>
 
-          <h3>Key Difference — At a Glance</h3>
+          <h3>Sound vs EM Waves — Fundamental Comparison</h3>
           <table class="compare-table">
             <thead>
               <tr>
                 <th>Property</th>
-                <th>Longitudinal (P-wave)</th>
-                <th>Transverse / Shear (S-wave)</th>
+                <th>Sound Wave (Longitudinal / P-wave)</th>
+                <th>Electromagnetic Wave (Light, X-ray, Microwave)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Particle motion</strong></td>
-                <td>Parallel to wave direction (back &amp; forth)</td>
-                <td>Perpendicular to wave direction (up &amp; down)</td>
+                <td><strong>Physical nature</strong></td>
+                <td>Mechanical pressure oscillation — medium particles vibrate</td>
+                <td>Coupled oscillating electric (E) &amp; magnetic (B) fields</td>
               </tr>
               <tr>
-                <td><strong>Other names</strong></td>
-                <td>Compression wave, P-wave, pressure wave</td>
-                <td>Shear wave, S-wave</td>
+                <td><strong>Requires medium?</strong></td>
+                <td class="hi-orange">Yes — solid, liquid, or gas</td>
+                <td class="hi">No — propagates in vacuum</td>
               </tr>
               <tr>
-                <td><strong>Media it can travel in</strong></td>
-                <td class="hi">Solids, liquids, and gases</td>
-                <td>Solids only (no shear stiffness in fluids)</td>
+                <td><strong>Speed in air</strong></td>
+                <td>~343 m/s</td>
+                <td class="hi">~3 &times; 10<sup>8</sup> m/s &nbsp;(876,000&times; faster)</td>
               </tr>
               <tr>
                 <td><strong>Speed in steel</strong></td>
-                <td>~5,900 m/s</td>
-                <td>~3,200 m/s (about 0.55 &times; longitudinal)</td>
+                <td class="hi">~5,900 m/s (faster in solids!)</td>
+                <td class="hi-orange">Cannot propagate — absorbed by metal</td>
               </tr>
               <tr>
-                <td><strong>Everyday examples</strong></td>
-                <td>Sound, speech, ultrasound, earthquake P-waves</td>
-                <td>Vibrating guitar string, earthquake S-waves</td>
+                <td><strong>Penetrates metals?</strong></td>
+                <td class="hi">Yes — used for flaw detection inside metal</td>
+                <td class="hi-orange">No — reflected or absorbed (hence UT over X-ray for thick parts)</td>
+              </tr>
+              <tr>
+                <td><strong>Polarisation?</strong></td>
+                <td>Not polarised (scalar pressure field)</td>
+                <td>Yes — E and B fields define polarisation plane</td>
               </tr>
             </tbody>
           </table>
 
           <div class="callout">
-            <strong>Simple analogy:</strong> Push and pull a Slinky along its length &rarr; you get a longitudinal wave (compressions travel along it). Shake a rope up and down &rarr; you get a transverse wave. Both carry energy from your hand to the other end, but by very different particle motions.
+            <strong>Why does ultrasound win for metal inspection?</strong>
+            EM waves (X-rays excluded) cannot enter a metal — the free electrons reflect them.
+            Sound travels freely through steel at ~5,900 m/s, and the round-trip time-of-flight for a
+            50 mm thick block (~17 &micro;s) is trivially measurable with standard electronics.
+            That is the physical foundation of every UT inspection.
           </div>
         </div>
 
@@ -471,8 +487,8 @@
             <thead>
               <tr>
                 <th>Medium</th>
-                <th>Sound Speed (longitudinal)</th>
-                <th>EM Wave Speed (light)</th>
+                <th>Sound Speed</th>
+                <th>EM Wave Speed</th>
               </tr>
             </thead>
             <tbody>
@@ -563,7 +579,7 @@
           </div>
 
           <h3>Attenuation Law</h3>
-          <div class="eq-box">A(x) = A<sub>0</sub> &middot; e<sup>&minus;&alpha;&middot;x</sup></div>
+          <div class="eq-box">$$A(x) = A_0 \cdot e^{-\alpha x}$$</div>
           <p>
             where &alpha; is the attenuation coefficient [dB/(mm&middot;MHz)], x is propagation distance,
             and A<sub>0</sub> is the initial amplitude. Attenuation increases with frequency — there is always
@@ -1069,13 +1085,10 @@
             Acoustic impedance <em>Z</em> is a material property that determines how much of an
             incident wave is reflected or transmitted at an interface.
           </p>
-          <div class="eq-box">Z = &rho; &times; c &nbsp;&nbsp; [units: Pa&middot;s/m = Rayl]</div>
+          <div class="eq-box">$$Z = \rho\,c \qquad [\text{Pa·s/m} = \text{Rayl}]$$</div>
 
           <h3>Reflection &amp; Transmission Coefficients (Normal Incidence)</h3>
-          <div class="eq-box">
-            R = [(Z<sub>2</sub> &minus; Z<sub>1</sub>) / (Z<sub>2</sub> + Z<sub>1</sub>)]&sup2; &nbsp;&nbsp;&nbsp; (intensity reflection)<br/>
-            T = 1 &minus; R &nbsp;&nbsp;&nbsp; (intensity transmission)
-          </div>
+          <div class="eq-box">$$R = \left(\frac{Z_2 - Z_1}{Z_2 + Z_1}\right)^{\!2} \quad (\text{intensity reflection}) \qquad T = 1 - R \quad (\text{intensity transmission})$$</div>
 
           <div class="callout">
             <strong>Example:</strong> Steel–air interface: Z<sub>steel</sub> &asymp; 46 MRayl, Z<sub>air</sub> &asymp; 0.0004 MRayl &rarr; R &asymp; 100%. Nearly all energy reflects — this is why couplant is essential.
@@ -1115,17 +1128,14 @@
             In the near field, beam intensity varies irregularly due to constructive/destructive interference.
             The near-field distance (Rayleigh distance) is:
           </p>
-          <div class="eq-box">N = D&sup2; / (4&lambda;) = D&sup2; &middot; f / (4c)</div>
+          <div class="eq-box">$$N = \frac{D^2}{4\lambda} = \frac{D^2 f}{4c}$$</div>
           <p>Inspection is generally more reliable in the far field (beyond N), or at the natural focus.</p>
 
           <h3>Far Field Beam Divergence</h3>
-          <div class="eq-box">
-            sin(&theta;<sub>&frac12;</sub>) &asymp; 0.514 &lambda; / D &nbsp;&nbsp; (&minus;6 dB half-angle)<br/>
-            sin(&theta;) = 1.2 &lambda; / D &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (first-null / Rayleigh criterion)
-          </div>
+          <div class="eq-box">$$\sin\!\left(\theta_{1/2}\right) \approx \frac{0.514\,\lambda}{D} \quad (-6\,\text{dB half-angle}) \qquad \sin\theta \approx \frac{1.2\,\lambda}{D} \quad (\text{Rayleigh criterion})$$</div>
 
           <h3>Focused Transducers</h3>
-          <div class="eq-box">d<sub>spot</sub> &asymp; 1.02 &lambda; F / D = 1.02 F / (f-number)</div>
+          <div class="eq-box">$$d_{\text{spot}} \approx \frac{1.02\,\lambda F}{D} = \frac{1.02\,F}{f\text{-number}}$$</div>
           <div class="callout">
             <strong>Design trade-off:</strong> Tighter focus (smaller f-number) &rarr; better lateral resolution, but shorter depth of field. For thick parts, an unfocused or weakly focused beam may be preferred.
           </div>
@@ -1139,9 +1149,7 @@
             produces a <strong>refracted P-wave</strong> and a <strong>mode-converted S-wave</strong> in
             the second medium. Both obey Snell's law independently, each governed by its own wave speed:
           </p>
-          <div class="eq-box">
-            sin(&theta;<sub>i</sub>) / c<sub>L1</sub> = sin(&theta;<sub>L</sub>) / c<sub>L2</sub> = sin(&theta;<sub>S</sub>) / c<sub>S2</sub>
-          </div>
+          <div class="eq-box">$$\frac{\sin\theta_i}{c_{L1}} = \frac{\sin\theta_L}{c_{L2}} = \frac{\sin\theta_S}{c_{S2}}$$</div>
           <p>
             Because c<sub>L2</sub> &ne; c<sub>S2</sub>, the two transmitted beams diverge in direction.
             In steel (c<sub>L</sub>&nbsp;=&nbsp;5900&nbsp;m/s, c<sub>S</sub>&nbsp;=&nbsp;3200&nbsp;m/s)
@@ -1288,10 +1296,7 @@
           </div>
 
           <h3>Angle Beam Geometry</h3>
-          <div class="eq-box">
-            Depth&nbsp;=&nbsp;beam path &times; cos(&theta;<sub>R</sub>) &nbsp;&nbsp;&nbsp;
-            Surface distance&nbsp;=&nbsp;beam path &times; sin(&theta;<sub>R</sub>)
-          </div>
+          <div class="eq-box">$$\text{Depth} = \ell_{\text{beam}}\cos\theta_R \qquad \text{Surface dist.} = \ell_{\text{beam}}\sin\theta_R$$</div>
           <p>
             A <strong>full skip</strong> (V-path off the back wall) traverses a total beam path of
             2T&nbsp;/&nbsp;cos(&theta;<sub>R</sub>), where T is the part thickness and &theta;<sub>R</sub>
@@ -1317,9 +1322,7 @@
             amplitude; one at a zero-crossing reads zero — yet both are physically identical. The cure is
             the <strong>analytic signal</strong>:
           </p>
-          <div class="eq-box">
-            z(t) = s(t) + j&middot;H{s(t)} &nbsp;&nbsp;&rarr;&nbsp;&nbsp; |z(t)| = envelope
-          </div>
+          <div class="eq-box">$$z(t) = s(t) + j\,\mathcal{H}\!\left\{s(t)\right\} \;\longrightarrow\; \lvert z(t)\rvert = \text{envelope}$$</div>
           <p>
             The Hilbert transform H{&middot;} phase-shifts every frequency component by 90&deg;, producing
             a quadrature imaginary part. The magnitude |z(t)| is a smooth, non-negative envelope that tracks
@@ -1395,10 +1398,7 @@
             different depths return unequal signals. TGC applies a programmable depth-dependent gain
             matched to the material's attenuation law:
           </p>
-          <div class="eq-box">
-            G<sub>TGC</sub>(t) = exp(+&alpha;&nbsp;&times;&nbsp;c&nbsp;&times;&nbsp;t / 2)
-            &nbsp;&nbsp;&nbsp; [dB-linear ramp; compensates round-trip path loss]
-          </div>
+          <div class="eq-box">$$G_{\text{TGC}}(t) = \exp\!\left(+\alpha \cdot c \cdot \tfrac{t}{2}\right) \quad [\text{dB-linear ramp; compensates round-trip path loss}]$$</div>
           <p>
             In practice, &alpha; is measured on a step-wedge or DAC block and the ramp is set in
             dB/&mu;s. A properly compensated A-scan shows equal amplitude for equal-size reflectors at
@@ -1421,9 +1421,7 @@
             a matched filter (cross-correlation with the reference chirp) compresses the received signal
             to a pulse of length &asymp; 1/B while preserving the full energy of the long transmission:
           </p>
-          <div class="eq-box">
-            SNR gain = T &times; B &nbsp;&nbsp; (time-bandwidth product)
-          </div>
+          <div class="eq-box">$$\text{SNR gain} = T \times B \quad (\text{time-bandwidth product})$$</div>
           <p>
             Resolution equals that of a &delta;-pulse at bandwidth B; SNR equals that of a CW burst
             of duration T. The compressed sidelobe level must be managed (typically with amplitude
@@ -1492,7 +1490,7 @@
           </p>
 
           <h3>Beam Steering</h3>
-          <div class="eq-box">t<sub>n</sub> = (n &middot; d &middot; sin&theta;) / c</div>
+          <div class="eq-box">$$t_n = \frac{n \cdot d \cdot \sin\theta}{c}$$</div>
           <p>Applying delay <em>t<sub>n</sub></em> to element <em>n</em> steers the beam to angle &theta;.
           Pitch <em>d</em> must be &le; &lambda;/2 to avoid grating lobes.</p>
 
@@ -1516,7 +1514,7 @@
           </p>
 
           <h3>Decibel Scale</h3>
-          <div class="eq-box">&Delta;I (dB) = 20 log<sub>10</sub>(P<sub>2</sub> / P<sub>1</sub>)</div>
+          <div class="eq-box">$$\Delta I\;(\text{dB}) = 20\log_{10}\!\!\left(\frac{P_2}{P_1}\right)$$</div>
           <div class="callout">
             <strong>Quick conversions:</strong>
             +6 dB = &times;2 amplitude &nbsp;|&nbsp;
@@ -1606,7 +1604,7 @@
   }
 
   function draw() {
-    ctx.fillStyle = '#0d1b2a';
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, CW, CH);
 
     /* Compression / rarefaction band tint */
@@ -1615,10 +1613,10 @@
       const prs = -A * K * Math.cos(K * xr - OMEGA * frame);
       const n   = prs / (A * K);
       if (n > 0.05) {
-        ctx.fillStyle = `rgba(8,145,178,${Math.min(0.30, n * 0.30).toFixed(3)})`;
+        ctx.fillStyle = `rgba(8,145,178,${Math.min(0.22, n * 0.22).toFixed(3)})`;
         ctx.fillRect(px, TOP, 1, PH);
       } else if (n < -0.05) {
-        ctx.fillStyle = `rgba(251,146,60,${Math.min(0.24, -n * 0.24).toFixed(3)})`;
+        ctx.fillStyle = `rgba(234,88,12,${Math.min(0.18, -n * 0.18).toFixed(3)})`;
         ctx.fillRect(px, TOP, 1, PH);
       }
     }
@@ -1636,13 +1634,15 @@
         const norm = Math.max(-1, Math.min(1, prs / (A * K)));
         let r, g, b;
         if (norm > 0.12) {
-          r = Math.round(120 + 130 * norm);
-          g = Math.round(200 + 55 * norm);
-          b = 255;
+          r = Math.round(8  + 60 * (1 - norm));
+          g = Math.round(120 + 20 * norm);
+          b = Math.round(180 + 50 * norm);
         } else if (norm < -0.12) {
-          r = 255; g = Math.round(200 + 55 * norm); b = Math.round(200 + 55 * norm);
+          r = Math.round(200 + 35 * (-norm));
+          g = Math.round(80 - 50 * (-norm));
+          b = Math.round(12 + 30 * (-norm));
         } else {
-          const v = Math.round(150 + 50 * Math.abs(norm));
+          const v = Math.round(80 + 60 * Math.abs(norm));
           r = g = b = v;
         }
         ctx.beginPath();
@@ -1657,19 +1657,19 @@
     for (let n = -1; n <= N_WAVES + 1; n++) {
       const xC = (OMEGA * frame + Math.PI + 2 * Math.PI * n) / K + LEFT;
       if (xC > LEFT + 25 && xC < RIGHT - 25) {
-        ctx.fillStyle = '#67e8f9'; ctx.textAlign = 'center';
+        ctx.fillStyle = '#0891b2'; ctx.textAlign = 'center';
         ctx.fillText('compress', xC, TOP - 5);
       }
       const xR = (OMEGA * frame + 2 * Math.PI * n) / K + LEFT;
       if (xR > LEFT + 30 && xR < RIGHT - 30) {
-        ctx.fillStyle = '#fdba74';
+        ctx.fillStyle = '#ea580c';
         ctx.fillText('rarefy', xR, TOP - 5);
       }
     }
 
     /* Wave direction arrow */
     const arrowY = CH - 30;
-    ctx.strokeStyle = '#22d3ee'; ctx.fillStyle = '#22d3ee'; ctx.lineWidth = 2;
+    ctx.strokeStyle = '#0891b2'; ctx.fillStyle = '#0891b2'; ctx.lineWidth = 2;
     const ax2 = LEFT + PW * 0.52;
     ctx.beginPath(); ctx.moveTo(LEFT + 10, arrowY); ctx.lineTo(ax2, arrowY);
     ctx.moveTo(ax2 - 8 * Math.cos(-0.38), arrowY - 8 * Math.sin(-0.38));
@@ -1680,7 +1680,7 @@
     ctx.font = 'bold 8.5px Inter,sans-serif'; ctx.textAlign = 'left';
     ctx.fillText('wave direction →', ax2 + 8, arrowY + 3);
 
-    ctx.fillStyle = 'rgba(148,163,184,.6)';
+    ctx.fillStyle = 'rgba(71,85,105,.7)';
     ctx.font = '7.5px Inter,sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('particles ↔ oscillate along wave direction', CW / 2, CH - 8);
   }
@@ -1689,34 +1689,42 @@
 })();
 
 /* ============================================================
-   TRANSVERSE WAVE ANIMATION  —  theory.html
-   Particles oscillate vertically (perpendicular to wave travel).
+   ELECTROMAGNETIC WAVE ANIMATION  —  theory.html
+   Pseudo-3D: wave propagates along Z (right), E oscillates in
+   Y (vertical), B oscillates in X (oblique into-screen axis).
    ============================================================ */
 (function () {
-  const canvas = document.getElementById('trans-canvas');
+  const canvas = document.getElementById('em-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const CW = canvas.width;   /* 380 */
   const CH = canvas.height;  /* 200 */
 
-  const LEFT = 20, RIGHT = 360, TOP = 20, BOT = 158;
-  const PW = RIGHT - LEFT;   /* 340 */
-  const PH = BOT - TOP;      /* 138 */
+  /* ── 3-D oblique projection ──────────────────────────────
+     World axes:  Z → right (propagation)
+                  Y → up (E field)
+                  X → lower-left (B field, into-screen)
+     project(wx, wy, wz) → canvas (cx, cy)                  */
+  const OX = 48, OY = 118;
+  const SZ = 272;   /* Z scale: full canvas width minus margins */
+  const SY = 50;    /* E-field amplitude in px */
+  const SX = 50;    /* B-field amplitude in px */
+  const XprojX = -0.56, XprojY = 0.33;  /* B-axis oblique unit vector */
 
-  const NX = 18, NY = 5;
-  const dx0 = PW / NX;
-  const dy0 = PH / (NY - 1);
+  const project = (wx, wy, wz) => ({
+    cx: OX + wz * SZ + wx * XprojX * SX,
+    cy: OY - wy * SY + wx * XprojY * SX
+  });
 
-  const N_WAVES = 3;
-  const LAM_PX  = PW / N_WAVES;
-  const K       = 2 * Math.PI / LAM_PX;
-  const A       = 12;
-  const PERIOD  = 130;
-  const OMEGA   = 2 * Math.PI / PERIOD;
+  const N_WAVES = 2;
+  const K = 2 * Math.PI * N_WAVES;
+  const PERIOD = 140;
+  const OMEGA  = 2 * Math.PI / PERIOD;
+  const NPTS   = 90;
 
   let frame = 0, running = true;
 
-  const btn = document.getElementById('trans-playpause');
+  const btn = document.getElementById('em-playpause');
   if (btn) {
     btn.addEventListener('click', () => {
       running = !running;
@@ -1732,90 +1740,104 @@
     requestAnimationFrame(tick);
   }
 
+  function arrow(x1, y1, x2, y2, color, lw) {
+    ctx.strokeStyle = color; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - 7 * Math.cos(ang - 0.4), y2 - 7 * Math.sin(ang - 0.4));
+    ctx.lineTo(x2 - 7 * Math.cos(ang + 0.4), y2 - 7 * Math.sin(ang + 0.4));
+    ctx.closePath(); ctx.fill();
+  }
+
   function draw() {
-    ctx.fillStyle = '#0d1b2a';
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, CW, CH);
 
-    /* Rest-position guide lines */
-    ctx.strokeStyle = 'rgba(100,116,139,.18)';
-    ctx.lineWidth = 1;
-    for (let j = 0; j < NY; j++) {
-      const yRest = TOP + j * dy0;
-      ctx.beginPath();
-      ctx.moveTo(LEFT, yRest);
-      ctx.lineTo(RIGHT, yRest);
-      ctx.stroke();
+    /* ── Propagation axis (dashed) ── */
+    const zO = project(0, 0, 0), zE = project(0, 0, 1.04);
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.2;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.moveTo(zO.cx, zO.cy); ctx.lineTo(zE.cx, zE.cy); ctx.stroke();
+    ctx.setLineDash([]);
+    /* arrow tip */
+    const zAng = Math.atan2(zE.cy - zO.cy, zE.cx - zO.cx);
+    ctx.fillStyle = '#94a3b8';
+    ctx.beginPath();
+    ctx.moveTo(zE.cx, zE.cy);
+    ctx.lineTo(zE.cx - 8 * Math.cos(zAng - 0.4), zE.cy - 8 * Math.sin(zAng - 0.4));
+    ctx.lineTo(zE.cx - 8 * Math.cos(zAng + 0.4), zE.cy - 8 * Math.sin(zAng + 0.4));
+    ctx.closePath(); ctx.fill();
+
+    /* ── B-field field vectors (blue, behind E) ── */
+    for (let i = 0; i <= NPTS; i += 2) {
+      const z  = i / NPTS;
+      const bx = Math.sin(K * z - OMEGA * frame);
+      const mag = Math.abs(bx);
+      if (mag < 0.06) continue;
+      const p0 = project(0, 0, z), p1 = project(bx, 0, z);
+      ctx.strokeStyle = `rgba(37,99,235,${(0.22 + 0.60 * mag).toFixed(2)})`;
+      ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(p0.cx, p0.cy); ctx.lineTo(p1.cx, p1.cy); ctx.stroke();
     }
-
-    /* Particles */
-    for (let j = 0; j < NY; j++) {
-      for (let i = 0; i < NX; i++) {
-        const xRest = LEFT + (i + 0.5) * dx0;
-        const yRest = TOP  + j * dy0;
-        const xr    = xRest - LEFT;
-        const disp  = A * Math.sin(K * xr - OMEGA * frame);
-        const yDraw = yRest + disp;
-
-        /* Color by vertical displacement */
-        const norm = disp / A;
-        let r, g, b;
-        if (norm > 0.12) {
-          r = Math.round(80 + 120 * norm);
-          g = Math.round(200 + 50 * norm);
-          b = 255;
-        } else if (norm < -0.12) {
-          r = 255;
-          g = Math.round(180 + 60 * norm);
-          b = Math.round(120 + 80 * norm);
-        } else {
-          const v = Math.round(160 + 40 * Math.abs(norm));
-          r = g = b = v;
-        }
-
-        ctx.beginPath();
-        ctx.arc(xRest, yDraw, 3.2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgb(${r},${g},${b})`;
-        ctx.fill();
-      }
+    /* B-field sine curve */
+    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    for (let i = 0; i <= NPTS; i++) {
+      const z = i / NPTS;
+      const p = project(Math.sin(K * z - OMEGA * frame), 0, z);
+      i === 0 ? ctx.moveTo(p.cx, p.cy) : ctx.lineTo(p.cx, p.cy);
     }
-
-    /* Vertical oscillation arrow on first particle, middle row */
-    const midJ  = Math.floor(NY / 2);
-    const hxRest = LEFT + 0.5 * dx0;
-    const hyRest = TOP  + midJ * dy0;
-    const xr     = hxRest - LEFT;
-    const disp   = A * Math.sin(K * xr - OMEGA * frame);
-    const vel    = -A * OMEGA * Math.cos(K * xr - OMEGA * frame);
-    const velPx  = (vel / (A * OMEGA)) * 20;
-
-    if (Math.abs(velPx) > 1.5) {
-      const y1 = hyRest + disp, y2 = y1 + velPx;
-      ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 1.8;
-      ctx.beginPath(); ctx.moveTo(hxRest - 12, y1); ctx.lineTo(hxRest - 12, y2);
-      /* arrowhead */
-      const dir = velPx > 0 ? 1 : -1;
-      ctx.moveTo(hxRest - 12 - 4, y2 - dir * 6);
-      ctx.lineTo(hxRest - 12, y2);
-      ctx.lineTo(hxRest - 12 + 4, y2 - dir * 6);
-      ctx.stroke();
-    }
-
-    /* Wave direction arrow */
-    const arrowY = CH - 30;
-    ctx.strokeStyle = '#22d3ee'; ctx.fillStyle = '#22d3ee'; ctx.lineWidth = 2;
-    const ax2 = LEFT + PW * 0.52;
-    ctx.beginPath(); ctx.moveTo(LEFT + 10, arrowY); ctx.lineTo(ax2, arrowY);
-    ctx.moveTo(ax2 - 8 * Math.cos(-0.38), arrowY - 8 * Math.sin(-0.38));
-    ctx.lineTo(ax2, arrowY);
-    ctx.moveTo(ax2 - 8 * Math.cos(0.38), arrowY - 8 * Math.sin(0.38));
-    ctx.lineTo(ax2, arrowY);
     ctx.stroke();
-    ctx.font = 'bold 8.5px Inter,sans-serif'; ctx.textAlign = 'left';
-    ctx.fillText('wave direction →', ax2 + 8, arrowY + 3);
 
-    ctx.fillStyle = 'rgba(148,163,184,.6)';
+    /* ── E-field field vectors (red, in front) ── */
+    for (let i = 0; i <= NPTS; i += 2) {
+      const z  = i / NPTS;
+      const ey = Math.sin(K * z - OMEGA * frame);
+      const mag = Math.abs(ey);
+      if (mag < 0.06) continue;
+      const p0 = project(0, 0, z), p1 = project(0, ey, z);
+      ctx.strokeStyle = `rgba(220,38,38,${(0.22 + 0.60 * mag).toFixed(2)})`;
+      ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(p0.cx, p0.cy); ctx.lineTo(p1.cx, p1.cy); ctx.stroke();
+    }
+    /* E-field sine curve */
+    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    for (let i = 0; i <= NPTS; i++) {
+      const z = i / NPTS;
+      const p = project(0, Math.sin(K * z - OMEGA * frame), z);
+      i === 0 ? ctx.moveTo(p.cx, p.cy) : ctx.lineTo(p.cx, p.cy);
+    }
+    ctx.stroke();
+
+    /* ── Axis legend (bottom-left) ── */
+    const legX = 14, legY = CH - 34, legLen = 18;
+    /* E axis — vertical */
+    arrow(legX, legY, legX, legY - legLen, '#dc2626', 1.6);
+    ctx.fillStyle = '#dc2626'; ctx.font = 'bold 9px Inter,sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('E', legX + 3, legY - legLen - 3);
+    /* B axis — oblique */
+    const bUX = XprojX * legLen, bUY = XprojY * legLen;
+    arrow(legX, legY, legX + bUX, legY + bUY, '#2563eb', 1.6);
+    ctx.fillStyle = '#2563eb';
+    ctx.fillText('B', legX + bUX + 3, legY + bUY + 10);
+    /* Z axis — horizontal */
+    arrow(legX, legY, legX + legLen, legY, '#64748b', 1.4);
+    ctx.fillStyle = '#64748b'; ctx.font = '8px Inter,sans-serif';
+    ctx.fillText('z', legX + legLen + 3, legY + 3);
+
+    /* ── Propagation label ── */
+    ctx.fillStyle = '#64748b'; ctx.font = 'bold 8px Inter,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('→ propagation', zE.cx - 4, zE.cy + 13);
+
+    /* ── Bottom caption ── */
+    ctx.fillStyle = 'rgba(71,85,105,.7)';
     ctx.font = '7.5px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('particles ↕ oscillate perpendicular to wave direction', CW / 2, CH - 8);
+    ctx.fillText('E ⊥ B ⊥ propagation — no medium required', CW / 2, CH - 8);
   }
 
   requestAnimationFrame(tick);
