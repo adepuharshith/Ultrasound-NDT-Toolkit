@@ -494,6 +494,56 @@
         </div>
       </div>
 
+      <!-- Wave Velocity from Material Properties -->
+      <div class="calc-box" id="wavevelocity">
+        <h3>&#9881; Wave Velocity from Material Properties</h3>
+        <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1rem;">
+          Calculates longitudinal (c<sub>L</sub>) and shear (c<sub>S</sub>) wave speeds from elastic constants.
+          Useful when measuring new alloys or composites where tabulated values are unavailable.
+        </p>
+        <div class="calc-layout">
+          <div class="calc-inputs">
+            <label class="inp-label">Young's Modulus E (GPa)</label>
+            <input type="number" id="wv-E" value="207" min="0.1" step="1" oninput="calcWaveVel()" />
+            <label class="inp-label">Poisson's Ratio &nu;</label>
+            <input type="number" id="wv-nu" value="0.29" min="0.01" max="0.49" step="0.01" oninput="calcWaveVel()" />
+            <label class="inp-label">Density &rho; (kg/m&sup3;)</label>
+            <input type="number" id="wv-rho" value="7800" min="100" step="10" oninput="calcWaveVel()" />
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem;">
+              <div class="calc-result" id="wv-cL">—</div>
+              <div class="calc-result" id="wv-cS">—</div>
+            </div>
+            <div class="calc-result" id="wv-ratio" style="margin-top:.5rem;font-size:.85rem;">—</div>
+          </div>
+          <div class="calc-visual">
+            <canvas id="wv-canvas" width="380" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOFD Crack Sizing -->
+      <div class="calc-box" id="tofd-calc">
+        <h3>&#128400; TOFD Crack Height Sizing</h3>
+        <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1rem;">
+          Computes crack height from the time difference between tip and base diffraction signals.
+          Based on: <em>a = cos&theta; &times; (&Delta;t &times; v) / 2</em>
+        </p>
+        <div class="calc-layout">
+          <div class="calc-inputs">
+            <label class="inp-label">Probe Half-Angle &theta; (degrees)</label>
+            <input type="number" id="tofd-angle" value="60" min="1" max="85" step="0.5" oninput="calcTOFD()" />
+            <label class="inp-label">Time Difference &Delta;t (&micro;s)</label>
+            <input type="number" id="tofd-dt" value="1.2" min="0.001" step="0.01" oninput="calcTOFD()" />
+            <label class="inp-label">Wave Velocity v (m/s)</label>
+            <input type="number" id="tofd-vel" value="3200" min="100" step="10" oninput="calcTOFD()" />
+            <div class="calc-result" id="tofd-result" style="margin-top:.5rem;">—</div>
+          </div>
+          <div class="calc-visual">
+            <canvas id="tofd-canvas" width="320" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /calc-grid -->
 
     <!-- ── MATERIAL REFERENCE TABLE ───────────────────── -->

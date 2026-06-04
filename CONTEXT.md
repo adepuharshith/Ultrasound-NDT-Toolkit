@@ -13,8 +13,9 @@ GitHub Pages: `https://adepuharshith.github.io/ultrasound-ndt-toolkit/`
 ## File map
 ```
 index.html          Landing page — hero, pathway strip, 3 section cards
-theory.html         11 theory sections — sticky sidebar scroll-spy
-calculators.html    8 live calculators — single-column, input-left + canvas-right
+theory.html         Full theory guide — 9-step student flow + 10 advanced topics
+transducers.html    Transducer types page — piezo, anatomy, 7 transducer types
+calculators.html    10 live calculators — single-column, input-left + canvas-right
 resources.html      Filterable resource library (type buttons + search input)
 assets/css/style.css  Global tokens, nav, hero, cards, calc components
 assets/js/main.js     All calculator logic + canvas animations
@@ -32,6 +33,11 @@ CONTEXT.md          ← this file
 | `--bg` | `#f8fafc` | Page background |
 | `--border` | `#e2e8f0` | Card borders |
 | `--radius` | `10px` | Card corners |
+
+---
+
+## Navigation (all pages)
+All 5 pages share the same nav: Home → Theory → Transducers → Calculators → Resources
 
 ---
 
@@ -56,6 +62,8 @@ CONTEXT.md          ← this file
 | Snell's Law | `sn-angle`, `sn-v1`, `sn-v2` | `sn-result` | `sn-canvas` 420×220 | `calcSnell()` + `_drawSnellViz()` |
 | Impedance | `z-rho1`, `z-v1`, `z-rho2`, `z-v2` | `z-z1/z2/r/t` | `z-canvas` 440×200 | `calcImpedance()` + `_drawZViz()` |
 | Beam Divergence | `bd-diam`, `bd-freq`, `bd-vel` | `bd-res1`, `bd-res2` | `bd-canvas` 500×200 | `calcBeamDiv()` + `_drawBeamDivViz()` |
+| Wave Velocity | `wv-E`, `wv-nu`, `wv-rho` | `wv-cL`, `wv-cS`, `wv-ratio` | `wv-canvas` 380×200 | `calcWaveVel()` |
+| TOFD Sizing | `tofd-angle`, `tofd-dt`, `tofd-vel` | `tofd-result` | `tofd-canvas` 320×200 | `calcTOFD()` |
 
 ---
 
@@ -76,48 +84,67 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 
 ---
 
+## theory.html — structure
+
+### 9-step student flow (sidebar "Student Path")
+1. Sound Waves vs EM Waves (`#wave-types`) — light canvas animations + EM 3D wave
+2. Speed in Media (`#speed-comparison`)
+3. Energy Loss / Attenuation (`#energy-loss`)
+4. Why Longitudinal? (`#why-longitudinal`)
+5. Ultrasound Spectrum (`#ultrasound-spectrum`)
+6. Generating Ultrasound / Piezoelectric (`#generating-ultrasound`)
+7. A-scan (`#a-scan`)
+8. B-scan (`#b-scan`)
+9. C-scan (`#c-scan`)
+
+### Advanced topics (sidebar "Advanced Topics")
+- Acoustic Impedance (`#acoustic-impedance`) — Z = ρc, R and T formulas
+- Attenuation — Detailed (`#attenuation`) — frequency dependence, Rayleigh/stochastic
+- Beam Physics (`#beam-physics`) — wave velocity from material props (V_L, V_S), near field, divergence, focus
+- Snell's Law & Mode Conversion (`#snell`) — critical angle table, SVG mode-conversion diagram
+- Signal Processing (`#signal-processing`) — Hilbert, TGC, pulse compression, SNR table
+- Phased Arrays (`#phased-arrays`) — steering, S-scan, FMC/TFM
+- Calibration & DAC (`#calibration`) — dB scale, DAC curve, IIW blocks
+- Pulser-Receiver (`#pulser-receiver`) — pulser settings, receiver settings, rectification modes canvas
+- TOFD (`#tofd`) — crack tip diffraction, geometry SVG, a = cosθ·Δt·v/2
+- Weld Inspection (`#weld-inspection`) — 2-stage approach, defect table, stainless note
+
+### Canvas animations in theory.html (inline `<script>` at bottom)
+- `#long-canvas` — longitudinal wave, light background
+- `#em-canvas` — 3D EM wave (E/B fields, pseudo-3D oblique projection)
+- `#rect-canvas` 680×260 — 4-panel rectification modes (RF, +HW, -HW, Full wave)
+
+### KaTeX
+All 13 `eq-box` elements use `$$...$$` KaTeX syntax. CDN loaded in `<head>` with auto-render.
+
+---
+
 ## Water path formula
 `WP = f − mp × (cs / cw)`
 - f = focal length (mm), mp = desired focus depth in material (mm)
 - cs = wave speed in material (m/s), cw = wave speed in water (m/s, default 1495)
-- Result: distance transducer face should be from material surface
-
----
-
-## theory.html — sections (IDs for sidebar links)
-`wave-propagation`, `acoustic-impedance`, `attenuation`, `transducers`,
-`beam-physics`, `snell`, `imaging`, `signal-processing`, `phased-arrays`, `calibration`, `advanced`
-
-### Particle animation (wave-propagation section)
-- Canvas: `#particle-canvas` 720×270, inline `<script>` at bottom of theory.html
-- Self-contained IIFE — no dependency on main.js
-- Physics: longitudinal wave u = A·sin(kx − ωt), NX=22 cols, NY=6 rows
-- Highlights one particle (#4,2) with orange particle-velocity arrow
-- Dynamic compression/rarefaction labels follow wave crests
-- Cyan wave-velocity arrow at bottom; pause/play via `#particle-playpause`
-- All animation state is local (`frame`, `running`, `arrowAt()` helper)
 
 ---
 
 ## resources.html — filter logic
 JS `setFilter(type, btn)` + `applyFilters()` — filters `.resource-item` by `data-type`
 attribute (`textbook | paper | software | standard | online`) and search query against
-`data-text` + `innerText`. All items start `.visible`; toggled via classList.
+`data-text` + `innerText`.
 
 ---
 
-## Git log (recent)
+## Git log (recent — as of 2026-06-04)
 ```
-9dcce90  Add NDE-ED content: beam divergence calc + theory expansions
-97b1dfb  Fix calc-box width: remove 540px max-width cap
-b66ae4a  Fix calc layout width; add particle wave animation to theory
-746699b  Fix layout width + calc init; add CONTEXT.md
+5d3ee12  Overhaul theory: KaTeX equations, 3D EM wave, light animations, Transducers nav
+b8c35c1  Expand Signal Processing section
+7d5fbb9  Expand Snell's Law section: SVG mode-conversion diagram
+5be75da  Restructure theory page with 9-step student flow; add transducers page
 ```
 
 ---
 
 ## Known issues / next steps
-- Add more theory content (user's own PhD material)
+- GitHub push requires PAT token (HTTPS remote); SSH not yet configured
 - Add calculators: focal spot size, SNR estimator, dispersion curves
-- Add Lab Techniques page
-- GitHub Pages not yet enabled (push → Settings → Pages → main branch)
+- GitHub Pages: Settings → Pages → main branch (not yet enabled)
+- Content sourced from NDE-ED (nde-ed.org) + Purdue lab experience

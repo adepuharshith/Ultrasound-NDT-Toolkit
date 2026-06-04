@@ -321,6 +321,34 @@
   <p>A student-friendly guide — from fundamental wave physics to inspection methods</p>
 </div>
 
+<!-- UT QUICK-REFERENCE BANNER -->
+<div class="container" style="padding-top:0;padding-bottom:0;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.5rem 0 1.5rem;max-width:860px;">
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-left:4px solid #16a34a;border-radius:8px;padding:.85rem 1.1rem;">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#15803d;margin-bottom:.5rem;">&#10003; UT Advantages</div>
+      <ul style="margin:0;padding-left:1.2rem;font-size:.83rem;color:#166534;line-height:1.7;">
+        <li>Detects both surface <em>and</em> subsurface flaws</li>
+        <li>Single-sided access sufficient (pulse-echo)</li>
+        <li>High depth accuracy — timing resolves &micro;m</li>
+        <li>Penetrates thick metal sections (&gt;500 mm steel)</li>
+        <li>No radiation hazard; real-time electronic output</li>
+        <li>Works on metals, plastics, ceramics, composites</li>
+      </ul>
+    </div>
+    <div style="background:#fff7ed;border:1px solid #fdba74;border-left:4px solid #ea580c;border-radius:8px;padding:.85rem 1.1rem;">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#c2410c;margin-bottom:.5rem;">&#9888; UT Limitations</div>
+      <ul style="margin:0;padding-left:1.2rem;font-size:.83rem;color:#9a3412;line-height:1.7;">
+        <li>Requires liquid couplant (or immersion) for contact</li>
+        <li>Coarse-grained or porous materials scatter the beam</li>
+        <li>Cracks parallel to the beam may go undetected</li>
+        <li>Rough or irregular surfaces degrade coupling</li>
+        <li>Extensive operator training required</li>
+        <li>Near-surface dead zone (ring-down) limits shallow detection</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <!-- CONTENT -->
 <section class="section">
   <div class="container">
@@ -347,6 +375,9 @@
         <a href="#signal-processing">Signal Processing</a>
         <a href="#phased-arrays">Phased Arrays</a>
         <a href="#calibration">Calibration &amp; DAC</a>
+        <a href="#pulser-receiver">Pulser-Receiver</a>
+        <a href="#tofd">TOFD</a>
+        <a href="#weld-inspection">Weld Inspection</a>
       </aside>
 
       <!-- MAIN CONTENT -->
@@ -1123,6 +1154,39 @@
         <div class="theory-section" id="beam-physics">
           <h2>&#128301; Beam Physics</h2>
 
+          <h3>Wave Velocity from Material Properties</h3>
+          <p>
+            Sound speed is not a universal constant — it depends on the elastic stiffness and density
+            of the host material. For isotropic solids the two fundamental velocities are:
+          </p>
+          <div class="eq-box">$$c_L = \sqrt{\frac{E\,(1-\nu)}{\rho\,(1+\nu)(1-2\nu)}} \qquad c_S = \sqrt{\frac{G}{\rho}} = \sqrt{\frac{E}{2\rho\,(1+\nu)}}$$</div>
+          <p>
+            where <em>E</em> is Young's modulus, <em>G</em> the shear modulus,
+            <em>&nu;</em> Poisson's ratio, and <em>&rho;</em> density.
+            Because steel has <em>&nu;</em> &asymp; 0.29, the ratio
+            c<sub>S</sub>/c<sub>L</sub> &asymp; 0.55 — shear waves travel at roughly half the
+            longitudinal speed, directly explaining the critical-angle geometry in Snell's law.
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Material</th><th>E (GPa)</th><th>&nu;</th><th>&rho; (kg/m&sup3;)</th><th>c<sub>L</sub> (m/s)</th><th>c<sub>S</sub> (m/s)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Steel (low-alloy)</strong></td><td>207</td><td>0.29</td><td>7 800</td><td class="hi">5 900</td><td>3 200</td></tr>
+              <tr><td><strong>Aluminium</strong></td><td>70</td><td>0.33</td><td>2 700</td><td class="hi">6 320</td><td>3 130</td></tr>
+              <tr><td><strong>Titanium</strong></td><td>116</td><td>0.32</td><td>4 510</td><td class="hi">6 100</td><td>3 120</td></tr>
+              <tr><td><strong>Copper</strong></td><td>130</td><td>0.34</td><td>8 960</td><td>4 700</td><td>2 260</td></tr>
+              <tr><td><strong>CFRP (0&deg; ply)</strong></td><td>~140</td><td>~0.30</td><td>~1 600</td><td>~7 000–9 000</td><td>~2 500–3 500</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <strong>Why this matters for inspection design:</strong> A higher c<sub>L</sub> shortens
+            the wavelength at a given frequency (&lambda; = c/f), improving axial resolution.
+            Conversely, CFRP composites have directional velocities that vary with fibre orientation —
+            a constant velocity assumption introduces depth errors that can exceed 10 % in multi-ply
+            layups. Always verify velocity on a reference block of the same material and lay-up.
+          </div>
+
           <h3>Near Field (Fresnel Zone)</h3>
           <p>
             In the near field, beam intensity varies irregularly due to constructive/destructive interference.
@@ -1541,6 +1605,199 @@
           </ul>
         </div>
 
+        <!-- Pulser-Receiver -->
+        <div class="theory-section" id="pulser-receiver">
+          <h2>&#9889; Pulser-Receiver &amp; the Signal Chain</h2>
+          <p>
+            Every UT system revolves around a <strong>pulser-receiver</strong>: the instrument that
+            fires the transducer and amplifies the returning echoes. Understanding its settings is
+            essential for optimising sensitivity, resolution, and noise rejection.
+          </p>
+
+          <h3>Pulser Settings</h3>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Setting</th><th>Typical Range</th><th>Effect on Signal</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Pulse Energy (Voltage)</strong></td>
+                <td>100 – 800 V</td>
+                <td>Higher voltage &rarr; greater acoustic energy transmitted &rarr; deeper penetration, but also more ringing (longer pulse) and potential saturation on strong reflectors.</td>
+              </tr>
+              <tr>
+                <td><strong>Damping (Impedance)</strong></td>
+                <td>50 &Omega; – 1 k&Omega;</td>
+                <td>Higher damping shortens the pulse, improving axial resolution at the cost of lower amplitude. Low damping = high energy, longer ring-down. Match to application: thin-wall = high damping; deep penetration = low damping.</td>
+              </tr>
+              <tr>
+                <td><strong>Pulse Repetition Frequency (PRF)</strong></td>
+                <td>10 Hz – 20 kHz</td>
+                <td>Must be low enough that all echoes return before the next pulse fires. Too high a PRF causes "ghost echoes" from the previous pulse. Rule: PRF &lt; c / (2 &times; max depth).</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Receiver Settings</h3>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Setting</th><th>Function</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Gain / Amplification (dB)</strong></td><td>Scales the entire A-scan. Every +6 dB doubles the displayed amplitude. Used to bring the reference echo to a standard level (e.g., 80% full-screen height).</td></tr>
+              <tr><td><strong>Rectification Mode</strong></td><td>Selects how the bipolar RF signal is processed before display — see animation below.</td></tr>
+              <tr><td><strong>Filter (Bandpass)</strong></td><td>Removes out-of-band electronic noise. Centre frequency should match the transducer's centre frequency; narrow bandwidth improves SNR but can broaden the pulse in time.</td></tr>
+              <tr><td><strong>Reject (Suppression)</strong></td><td>Clips all signals below a threshold level. Removes grass/noise floor but can hide real low-amplitude indications — use with caution.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Rectification Modes — Animated</h3>
+          <p>
+            The raw A-scan is a bipolar RF voltage. Rectification converts it for easier visual interpretation:
+          </p>
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:1rem 0;">
+            <canvas id="rect-canvas" width="680" height="260" style="display:block;width:100%;height:auto;"></canvas>
+          </div>
+          <div class="callout">
+            <strong>Which mode to use?</strong>
+            <strong>RF</strong> is essential for TOFD and precise pulse-width measurement.
+            <strong>Full-wave</strong> is the most common field choice — it preserves symmetry and is
+            easiest to gate. Half-wave modes are occasionally used to distinguish the polarity of a
+            reflection (positive &rarr; hard reflection from higher-Z material;
+            negative &rarr; soft reflection from lower-Z material).
+          </div>
+        </div>
+
+        <!-- TOFD -->
+        <div class="theory-section" id="tofd">
+          <h2>&#128400; TOFD — Time-of-Flight Diffraction</h2>
+          <p>
+            Conventional pulse-echo measures <em>reflection amplitude</em> to size flaws — but amplitude
+            depends on crack orientation, roughness, and coupling, making accurate sizing unreliable.
+            <strong>TOFD</strong> instead measures the <em>time difference</em> between diffracted
+            signals from the crack tip and crack base, giving a direct geometric measurement of
+            crack height independent of amplitude.
+          </p>
+
+          <!-- TOFD SVG diagram -->
+          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);">
+            <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+              <!-- Material block -->
+              <rect x="60" y="80" width="480" height="120" fill="#e2e8f0" rx="4"/>
+              <text x="300" y="210" text-anchor="middle" fill="#64748b" font-size="10">Test Piece (thickness T)</text>
+
+              <!-- Crack -->
+              <line x1="300" y1="100" x2="300" y2="170" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+              <text x="310" y="108" fill="#dc2626" font-size="10" font-weight="700">Crack tip</text>
+              <text x="310" y="175" fill="#dc2626" font-size="10" font-weight="700">Crack base</text>
+              <text x="310" y="141" fill="#dc2626" font-size="11" font-weight="800">a</text>
+              <line x1="303" y1="100" x2="308" y2="175" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,2"/>
+
+              <!-- Transmitter T -->
+              <rect x="90" y="45" width="60" height="28" rx="5" fill="#0f2d5e"/>
+              <text x="120" y="63" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">TX</text>
+
+              <!-- Receiver R -->
+              <rect x="450" y="45" width="60" height="28" rx="5" fill="#0e7490"/>
+              <text x="480" y="63" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">RX</text>
+
+              <!-- Lateral wave -->
+              <path d="M150,58 Q300,20 450,58" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,3"/>
+              <text x="300" y="22" text-anchor="middle" fill="#94a3b8" font-size="9">lateral wave (surface)</text>
+
+              <!-- TX to crack tip -->
+              <line x1="150" y1="73" x2="300" y2="100" stroke="#0891b2" stroke-width="1.8"/>
+              <!-- Crack tip to RX -->
+              <line x1="300" y1="100" x2="450" y2="73" stroke="#0891b2" stroke-width="1.8"/>
+              <text x="210" y="87" fill="#0891b2" font-size="9" font-weight="600">tip signal (shorter path, arrives first)</text>
+
+              <!-- TX to crack base -->
+              <line x1="150" y1="73" x2="300" y2="170" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2"/>
+              <line x1="300" y1="170" x2="450" y2="73" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2"/>
+              <text x="215" y="162" fill="#7c3aed" font-size="9" font-weight="600">base signal (longer path)</text>
+
+              <!-- θ angle label -->
+              <text x="162" y="93" fill="#475569" font-size="10">&theta;</text>
+            </svg>
+          </div>
+
+          <p>
+            From the geometry of the two right triangles, the crack height is:
+          </p>
+          <div class="eq-box">$$a = \cos\theta \times \frac{(t_{\text{base}} - t_{\text{tip}})\; v}{2}$$</div>
+          <p>
+            where &theta; is the probe half-angle, <em>v</em> is the wave velocity in the material,
+            and the time difference <em>&Delta;t = t<sub>base</sub> &minus; t<sub>tip</sub></em> is read
+            directly from the TOFD B-scan display. Division by 2 converts round-trip time to
+            one-way path length.
+          </p>
+
+          <table class="compare-table">
+            <thead><tr><th>Property</th><th>Pulse-Echo</th><th>TOFD</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Sizing principle</strong></td><td>Echo amplitude (qualitative)</td><td>Time difference (quantitative)</td></tr>
+              <tr><td><strong>Probes needed</strong></td><td>1</td><td>2 (TX and RX straddle weld)</td></tr>
+              <tr><td><strong>Near-surface dead zone</strong></td><td>Small (with delay line)</td><td>Larger — lateral wave masks near-surface region</td></tr>
+              <tr><td><strong>Sizing accuracy</strong></td><td>&plusmn;2–4 mm (orientation dependent)</td><td class="hi">&plusmn;0.5–1 mm (geometry based)</td></tr>
+              <tr><td><strong>Standards</strong></td><td>ASME, AWS, EN 1712</td><td>EN 583-6, ASME Code Case 2235</td></tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>Practical note:</strong> TOFD is paired with pulse-echo in modern weld inspections
+            (TOFD gives crack height; pulse-echo gives lateral position). The combination, known as
+            "TOFD + PA", is now standard in nuclear and pressure-vessel inspections per ASME Section V.
+          </div>
+        </div>
+
+        <!-- Weld Inspection -->
+        <div class="theory-section" id="weld-inspection">
+          <h2>&#128295; Application — Weld Inspection</h2>
+          <p>
+            Weld inspection is the largest single application of contact UT.
+            A complete weld examination uses a <strong>two-stage approach</strong> mandated by
+            codes such as AWS D1.1 and ASME Section V.
+          </p>
+
+          <h3>Stage 1 — Straight-Beam Lamination Scan</h3>
+          <p>
+            A <em>normal-incidence</em> (0&deg;) longitudinal transducer scans the base metal
+            on either side of the weld — the <strong>heat-affected zone (HAZ)</strong>.
+            This detects laminations that would otherwise deflect or absorb the angle beam
+            and cause missed indications in Stage 2.
+          </p>
+
+          <h3>Stage 2 — Angle-Beam Weld Volume Scan</h3>
+          <p>
+            Refracted shear waves at 45&deg;, 60&deg;, or 70&deg; sweep through the weld cross-section.
+            The inspector scans longitudinally (along the weld) and transversely, moving the probe
+            between the <em>quarter-skip</em>, <em>half-skip</em>, and <em>three-quarter-skip</em>
+            positions to achieve full volumetric coverage.
+          </p>
+
+          <h3>Common Weld Defects Detectable by UT</h3>
+          <table class="compare-table">
+            <thead><tr><th>Defect</th><th>Location</th><th>Best Detection Angle</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Porosity (gas pores)</strong></td><td>Throughout weld bead</td><td>Normal or 45&deg; (cluster detection; single pores often missed)</td></tr>
+              <tr><td><strong>Slag inclusions</strong></td><td>Between weld passes</td><td>45&deg;–70&deg;</td></tr>
+              <tr><td><strong>Lack of sidewall fusion</strong></td><td>Fusion boundary</td><td>60&deg;–70&deg; aimed at sidewall</td></tr>
+              <tr><td><strong>Lack of root penetration</strong></td><td>Root region</td><td>45&deg; from both sides</td></tr>
+              <tr><td><strong>Longitudinal cracks</strong></td><td>Crown, root, or bead</td><td>Transverse scan at 45&deg;</td></tr>
+              <tr><td><strong>Transverse cracks</strong></td><td>Across weld</td><td>Parallel scan along weld axis</td></tr>
+              <tr><td><strong>Undercutting</strong></td><td>Weld toes</td><td>Straight beam or 70&deg;</td></tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>Stainless steel and coarse-grained alloys:</strong>
+            Coarse austenitic grain structure causes high scattering attenuation, making standard
+            shear waves unreliable above 2 MHz. Refracted <em>longitudinal</em> waves at lower
+            frequencies (1–2.5 MHz) are used instead, or phased-array TFM with grain-noise
+            compensation models.
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -1838,6 +2095,105 @@
     ctx.fillStyle = 'rgba(71,85,105,.7)';
     ctx.font = '7.5px Inter,sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('E ⊥ B ⊥ propagation — no medium required', CW / 2, CH - 8);
+  }
+
+  requestAnimationFrame(tick);
+})();
+
+/* ============================================================
+   RECTIFICATION MODES ANIMATION  —  theory.html
+   Shows RF, +HW, -HW, and Full-Wave rectification side by side.
+   ============================================================ */
+(function () {
+  const canvas = document.getElementById('rect-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width;   /* 680 */
+  const CH = canvas.height;  /* 260 */
+
+  const LABELS = ['RF (Unrectified)', '+Half Wave', '−Half Wave', 'Full Wave'];
+  const COLORS = ['#0891b2', '#16a34a', '#dc2626', '#7c3aed'];
+  const COLS = 2, ROWS = 2;
+  const PW = CW / COLS, PH = CH / ROWS;
+
+  const PERIOD = 200, OMEGA = 2 * Math.PI / PERIOD;
+  const N_CYCLES = 3, LAM_PX = 100, K = 2 * Math.PI / LAM_PX;
+  const A = PH * 0.30;
+
+  let frame = 0, running = true;
+
+  function sampleRF(x) {
+    /* Gaussian-enveloped burst to look like a real echo */
+    const cx = PW * 0.50;
+    const env = Math.exp(-Math.pow((x - cx) / (PW * 0.18), 2));
+    return env * Math.sin(K * x - OMEGA * frame);
+  }
+
+  function drawPanel(col, row, mode) {
+    const ox = col * PW, oy = row * PH;
+    const midY = oy + PH * 0.54;
+    const color = COLORS[row * COLS + col];
+
+    /* Panel background */
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(ox, oy, PW, PH);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(ox, oy, PW, PH);
+
+    /* Zero-axis */
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.8;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(ox + 8, midY); ctx.lineTo(ox + PW - 8, midY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* Waveform */
+    ctx.strokeStyle = color; ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    let started = false;
+    for (let x = 4; x < PW - 4; x++) {
+      const rf = sampleRF(x);
+      let y;
+      if      (mode === 0) y = midY - A * rf;          /* RF */
+      else if (mode === 1) y = midY - A * Math.max(0, rf);  /* +HW */
+      else if (mode === 2) y = midY - A * Math.min(0, rf);  /* -HW */
+      else                 y = midY - A * Math.abs(rf);     /* Full */
+      if (!started) { ctx.moveTo(ox + x, y); started = true; }
+      else ctx.lineTo(ox + x, y);
+    }
+    ctx.stroke();
+
+    /* Label */
+    ctx.fillStyle = color;
+    ctx.font = 'bold 10px Inter,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(LABELS[row * COLS + col], ox + 8, oy + 14);
+
+    /* Polarity indicator for +HW / -HW */
+    if (mode === 1) {
+      ctx.fillStyle = 'rgba(22,163,74,.12)';
+      ctx.fillRect(ox + 4, oy + 20, PW - 8, midY - oy - 20);
+    }
+    if (mode === 2) {
+      ctx.fillStyle = 'rgba(220,38,38,.10)';
+      ctx.fillRect(ox + 4, midY, PW - 8, oy + PH - midY - 4);
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, CW, CH);
+    /* [col, row, mode] */
+    drawPanel(0, 0, 0);  /* RF */
+    drawPanel(1, 0, 1);  /* +HW */
+    drawPanel(0, 1, 2);  /* -HW */
+    drawPanel(1, 1, 3);  /* Full wave */
+  }
+
+  function tick() {
+    if (!running) return;
+    draw(); frame++;
+    requestAnimationFrame(tick);
   }
 
   requestAnimationFrame(tick);

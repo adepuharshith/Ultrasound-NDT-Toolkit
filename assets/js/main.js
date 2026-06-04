@@ -901,3 +901,133 @@ function _wpDraw() {
   ctx.fillStyle = '#bae6fd'; ctx.font = 'bold 8px Inter,sans-serif'; ctx.textAlign = 'center';
   ctx.fillText('TRANSDUCER', cx, transY0 + 13);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   WAVE VELOCITY FROM MATERIAL PROPERTIES  —  calculators.html
+   c_L = sqrt( E(1-nu) / [rho(1+nu)(1-2nu)] )
+   c_S = sqrt( E / [2*rho*(1+nu)] )
+   ───────────────────────────────────────────────────────────── */
+function calcWaveVel() {
+  const E_GPa = parseFloat(document.getElementById('wv-E').value)   || 0;
+  const nu    = parseFloat(document.getElementById('wv-nu').value)   || 0;
+  const rho   = parseFloat(document.getElementById('wv-rho').value)  || 0;
+
+  const resL  = document.getElementById('wv-cL');
+  const resS  = document.getElementById('wv-cS');
+  const resR  = document.getElementById('wv-ratio');
+
+  if (!E_GPa || !rho || nu <= 0 || nu >= 0.5) {
+    resL.innerHTML = resS.innerHTML = '—';
+    resR.innerHTML = 'Enter valid E, &nu;, &rho;';
+    return;
+  }
+
+  const E = E_GPa * 1e9;  /* Pa */
+  const cL = Math.sqrt(E * (1 - nu) / (rho * (1 + nu) * (1 - 2 * nu)));
+  const cS = Math.sqrt(E / (2 * rho * (1 + nu)));
+  const ratio = cS / cL;
+
+  resL.innerHTML = `<span style="font-size:.78rem;color:var(--text-muted);">c<sub>L</sub></span><br><strong>${cL.toFixed(0)} m/s</strong>`;
+  resS.innerHTML = `<span style="font-size:.78rem;color:var(--text-muted);">c<sub>S</sub></span><br><strong>${cS.toFixed(0)} m/s</strong>`;
+  resR.innerHTML = `c<sub>S</sub>/c<sub>L</sub> = <strong>${ratio.toFixed(3)}</strong> &nbsp;|&nbsp; &lambda;<sub>L</sub> at 5 MHz = <strong>${(cL/5e6*1e3).toFixed(2)} mm</strong>`;
+
+  /* ── Canvas bar chart ── */
+  const canvas = document.getElementById('wv-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
+
+  const maxVal = Math.max(cL, cS, 1000);
+  const barData = [
+    { label: `c_L = ${cL.toFixed(0)} m/s`, val: cL, color: '#0891b2' },
+    { label: `c_S = ${cS.toFixed(0)} m/s`, val: cS, color: '#7c3aed' }
+  ];
+  const BAR_H = 38, GAP = 18, LEFT = 130, TOP = 40;
+  ctx.font = '11px Inter,sans-serif';
+
+  barData.forEach((d, i) => {
+    const y = TOP + i * (BAR_H + GAP);
+    const w = Math.max(4, (d.val / maxVal) * (CW - LEFT - 20));
+    ctx.fillStyle = d.color + '22';
+    ctx.fillRect(LEFT, y, CW - LEFT - 20, BAR_H);
+    ctx.fillStyle = d.color;
+    ctx.fillRect(LEFT, y, w, BAR_H);
+    ctx.fillStyle = '#1e293b'; ctx.textAlign = 'right';
+    ctx.fillText(d.label.split('=')[0].trim(), LEFT - 8, y + BAR_H / 2 + 4);
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+    if (w > 60) ctx.fillText(d.label.split('=')[1].trim(), LEFT + w - 70, y + BAR_H / 2 + 4);
+    else { ctx.fillStyle = d.color; ctx.textAlign = 'left'; ctx.fillText(d.label.split('=')[1].trim(), LEFT + w + 4, y + BAR_H / 2 + 4); }
+  });
+
+  /* Ratio bar */
+  const ry = TOP + 2 * (BAR_H + GAP) + 8;
+  ctx.fillStyle = '#475569'; ctx.textAlign = 'left';
+  ctx.font = '10px Inter,sans-serif';
+  ctx.fillText(`c_S/c_L = ${ratio.toFixed(3)}  (Poisson ratio ${nu.toFixed(2)})`, LEFT, ry);
+}
+calcWaveVel();
+
+/* ─────────────────────────────────────────────────────────────
+   TOFD CRACK SIZING  —  calculators.html
+   a = cos(theta) * (dt * v) / 2
+   ───────────────────────────────────────────────────────────── */
+function calcTOFD() {
+  const theta_deg = parseFloat(document.getElementById('tofd-angle').value) || 0;
+  const dt_us     = parseFloat(document.getElementById('tofd-dt').value)    || 0;
+  const v         = parseFloat(document.getElementById('tofd-vel').value)   || 0;
+  const res       = document.getElementById('tofd-result');
+
+  if (!theta_deg || !dt_us || !v) { res.innerHTML = '—'; return; }
+
+  const theta = theta_deg * Math.PI / 180;
+  const a_m   = Math.cos(theta) * (dt_us * 1e-6 * v) / 2;
+  const a_mm  = a_m * 1000;
+
+  res.innerHTML = `Crack height <em>a</em> = <strong style="font-size:1.2rem;">${a_mm.toFixed(2)} mm</strong>`;
+
+  /* ── Canvas: TOFD geometry diagram ── */
+  const canvas = document.getElementById('tofd-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH); ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
+
+  const MAT_TOP = 60, MAT_H = 110, CX = CW / 2;
+  /* Material */
+  ctx.fillStyle = '#e2e8f0'; ctx.fillRect(20, MAT_TOP, CW - 40, MAT_H);
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
+  ctx.strokeRect(20, MAT_TOP, CW - 40, MAT_H);
+
+  /* Crack (vertical red line at center) */
+  const crackTop = MAT_TOP + 10;
+  const crackBot = crackTop + Math.max(8, Math.min(MAT_H - 20, a_mm * 2.5));
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(CX, crackTop); ctx.lineTo(CX, crackBot); ctx.stroke();
+  /* 'a' annotation */
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(CX + 8, crackTop); ctx.lineTo(CX + 8, crackBot); ctx.stroke();
+  ctx.fillStyle = '#dc2626'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText(`a=${a_mm.toFixed(1)}mm`, CX + 12, (crackTop + crackBot) / 2 + 4);
+
+  /* TX and RX blocks */
+  const TX_X = 40, RX_X = CW - 40;
+  [[TX_X, 'TX', '#0f2d5e'], [RX_X, 'RX', '#0e7490']].forEach(([bx, lbl, col]) => {
+    ctx.fillStyle = col; ctx.fillRect(bx - 18, MAT_TOP - 26, 36, 22);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 9px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(lbl, bx, MAT_TOP - 11);
+  });
+
+  /* Tip path (solid cyan) */
+  ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.8; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(TX_X, MAT_TOP); ctx.lineTo(CX, crackTop); ctx.lineTo(RX_X, MAT_TOP); ctx.stroke();
+  /* Base path (dashed purple) */
+  ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(TX_X, MAT_TOP); ctx.lineTo(CX, crackBot); ctx.lineTo(RX_X, MAT_TOP); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#64748b'; ctx.font = '8.5px Inter,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(`θ=${theta_deg}°  Δt=${dt_us}μs  v=${v}m/s`, CW / 2, CH - 8);
+}
+calcTOFD();
