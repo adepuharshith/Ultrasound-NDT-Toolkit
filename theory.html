@@ -1550,24 +1550,196 @@
         <div class="theory-section" id="phased-arrays">
           <h2>&#128264; Phased Arrays</h2>
           <p>
-            A phased array transducer contains many small elements (typically 16–256) excited with programmable
-            time delays, enabling electronic beam steering and focusing without physical movement.
+            A phased array transducer contains many small elements (typically 16–256) excited with
+            individually programmable time delays, enabling electronic beam steering and focusing without
+            physical movement of the probe. The delay law that produces steering is derived from the
+            condition that wave crests from all elements arrive simultaneously at the desired focal point.
           </p>
 
-          <h3>Beam Steering</h3>
+          <h3>Beam Steering — Delay Law</h3>
+          <p>
+            For a linear aperture with element pitch <em>d</em> and longitudinal wave speed <em>c</em>,
+            the delay applied to element <em>n</em> (zero-indexed) to steer the beam to angle &theta; is:
+          </p>
           <div class="eq-box">$$t_n = \frac{n \cdot d \cdot \sin\theta}{c}$$</div>
-          <p>Applying delay <em>t<sub>n</sub></em> to element <em>n</em> steers the beam to angle &theta;.
-          Pitch <em>d</em> must be &le; &lambda;/2 to avoid grating lobes.</p>
+          <p>
+            Elements on the side toward the desired angle fire last; the progressive delay tilts the
+            plane wavefront. To add a focal depth <em>F</em>, a quadratic term is superimposed:
+          </p>
+          <div class="eq-box">$$t_n = \frac{n \cdot d \cdot \sin\theta}{c} \;-\; \frac{1}{c}\!\left(\sqrt{F^2 + (n\,d)^2} - F\right)$$</div>
+          <p>
+            The pitch constraint <em>d</em> &le; &lambda;/2 is critical: violating it produces
+            <strong>grating lobes</strong> — spurious coherent secondary beams at angles
+            sin&theta;<sub>g</sub> = sin&theta; &plusmn; &lambda;/d that generate false indications.
+            For a 5 MHz shear-wave array in steel (c<sub>S</sub>&nbsp;=&nbsp;3200&nbsp;m/s,
+            &lambda;&nbsp;=&nbsp;0.64&nbsp;mm), the pitch must be &le;&nbsp;0.32&nbsp;mm — a significant
+            manufacturing constraint that limits aperture size for a given element count.
+          </p>
+
+          <!-- SVG: Phased array delay-law beam steering diagram -->
+          <div class="scan-svg-wrap">
+            <svg viewBox="0 0 580 230" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+              <defs>
+                <marker id="pa-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0, 6 3, 0 6" fill="#22d3ee"/>
+                </marker>
+                <marker id="pa-arr-o" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0, 6 3, 0 6" fill="#fb923c"/>
+                </marker>
+                <marker id="pa-arr-w" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0, 6 3, 0 6" fill="#a3e635"/>
+                </marker>
+              </defs>
+
+              <!-- Background -->
+              <rect width="580" height="230" fill="#0a1628"/>
+
+              <!-- Test piece surface -->
+              <line x1="30" y1="78" x2="550" y2="78" stroke="#334155" stroke-width="1.5"/>
+
+              <!-- Array housing -->
+              <rect x="70" y="10" width="260" height="28" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+              <text x="200" y="28" text-anchor="middle" fill="#64748b" font-size="9.5" font-weight="600">Phased Array Probe (8 elements shown)</text>
+
+              <!-- 8 elements with progressive delay shading -->
+              <!-- Element 0 (left, fires first — longest delay for θ>0) -->
+              <rect x="78"  y="40" width="22" height="36" rx="2" fill="#0e7490" stroke="#22d3ee" stroke-width="1.2"/>
+              <rect x="108" y="44" width="22" height="32" rx="2" fill="#0c6577" stroke="#0891b2" stroke-width="1"/>
+              <rect x="138" y="49" width="22" height="27" rx="2" fill="#0a556a" stroke="#0891b2" stroke-width="1"/>
+              <rect x="168" y="54" width="22" height="22" rx="2" fill="#084a5d" stroke="#0891b2" stroke-width="0.8"/>
+              <rect x="198" y="59" width="22" height="17" rx="2" fill="#063e50" stroke="#475569" stroke-width="0.7"/>
+              <rect x="228" y="64" width="22" height="12" rx="2" fill="#042d3a" stroke="#334155" stroke-width="0.7"/>
+              <rect x="258" y="68" width="22" height="8"  rx="2" fill="#031e28" stroke="#334155" stroke-width="0.7"/>
+              <rect x="288" y="71" width="22" height="5"  rx="2" fill="#011420" stroke="#1e3a5f" stroke-width="0.7"/>
+
+              <!-- Delay annotation arrow (left = large delay fires first conceptually, but delay lines shown as height above surface) -->
+              <text x="62" y="48" text-anchor="end" fill="#22d3ee" font-size="9" font-weight="700">t₀</text>
+              <text x="320" y="74" fill="#475569" font-size="9">t₇≈0</text>
+              <line x1="75" y1="52" x2="298" y2="72" stroke="#22d3ee" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+              <text x="190" y="37" text-anchor="middle" fill="#22d3ee" font-size="8.5" font-style="italic">progressive delay →</text>
+
+              <!-- Wavefront line (tilted plane at surface) -->
+              <line x1="78" y1="78" x2="300" y2="78" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+
+              <!-- Steered beam (θ ≈ 45°) emerging from array centre ~x=195 -->
+              <!-- Beam path from surface ~(195,78) to focal point ~(340,170) -->
+              <line x1="195" y1="78" x2="350" y2="190" stroke="#22d3ee" stroke-width="2.5" marker-end="url(#pa-arr)" opacity="0.9"/>
+
+              <!-- Beam edges (cone) -->
+              <line x1="155" y1="78" x2="310" y2="190" stroke="#22d3ee" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.35"/>
+              <line x1="235" y1="78" x2="390" y2="190" stroke="#22d3ee" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.35"/>
+
+              <!-- Focal spot -->
+              <circle cx="350" cy="190" r="7" fill="#fbbf24" opacity="0.85"/>
+              <text x="365" y="194" fill="#fbbf24" font-size="9.5" font-weight="700">F (focal point)</text>
+
+              <!-- θ angle arc and label -->
+              <line x1="195" y1="78" x2="195" y2="190" stroke="#475569" stroke-width="1" stroke-dasharray="4,3"/>
+              <path d="M 195 105 A 27 27 0 0 1 212 114" fill="none" stroke="#fb923c" stroke-width="1.3"/>
+              <text x="217" y="117" fill="#fb923c" font-size="10.5" font-weight="700">&theta;</text>
+
+              <!-- Normal (0°) beam from element 8 side for comparison -->
+              <line x1="430" y1="40" x2="430" y2="78" stroke="#334155" stroke-width="1" stroke-dasharray="3,2"/>
+              <rect x="415" y="12" width="30" height="26" rx="3" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+              <text x="430" y="28" text-anchor="middle" fill="#475569" font-size="8.5">0°</text>
+              <line x1="430" y1="78" x2="430" y2="175" stroke="#475569" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.5" marker-end="url(#pa-arr)"/>
+              <text x="438" y="130" fill="#475569" font-size="8.5" font-style="italic">no delay</text>
+              <text x="438" y="141" fill="#475569" font-size="8.5" font-style="italic">(normal beam)</text>
+
+              <!-- Test piece block -->
+              <rect x="30" y="78" width="520" height="120" rx="3" fill="#0f1e35" stroke="#1e3a5f" stroke-width="1"/>
+
+              <!-- Grating lobe warning line (spurious, dashed red) -->
+              <line x1="195" y1="78" x2="90" y2="170" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.55"/>
+              <text x="42" y="178" fill="#ef4444" font-size="8.5">grating lobe</text>
+              <text x="42" y="190" fill="#ef4444" font-size="8">(if d &gt; λ/2)</text>
+
+              <!-- Labels -->
+              <text x="63" y="72" fill="#94a3b8" font-size="8.5">d</text>
+              <line x1="78" y1="74" x2="100" y2="74" stroke="#475569" stroke-width="0.8"/>
+              <line x1="78" y1="70" x2="78" y2="78" stroke="#475569" stroke-width="0.8"/>
+              <line x1="100" y1="70" x2="100" y2="78" stroke="#475569" stroke-width="0.8"/>
+
+              <text x="290" y="220" text-anchor="middle" fill="#64748b" font-size="9" font-style="italic">Delay-and-sum beam steering: element height above surface represents applied delay (t₀ &gt; t₇). Grating lobe appears if pitch d &gt; λ/2.</text>
+            </svg>
+          </div>
 
           <h3>Sectorial Scan (S-scan)</h3>
-          <p>The beam is electronically swept over a range of angles (e.g., 40&deg;–70&deg;) at a fixed focal depth, creating a fan-shaped image — extensively used for weld inspection.</p>
+          <p>
+            The beam is stepped electronically through a range of steering angles — typically 40&deg;–70&deg;
+            for weld inspection — at a fixed focal depth or with a depth-corrected focus, producing a
+            fan-shaped cross-sectional image. Each angular step requires recomputing the delay law and
+            firing the array; modern instruments execute this in microseconds, reconstructing a full
+            S-scan image in real time at PRFs above 1 kHz.
+          </p>
+          <p>
+            In a typical 25 mm butt-weld inspection, a 64-element 5 MHz linear array on a Perspex
+            wedge steps from 40&deg; to 70&deg; shear in 1&deg; increments. A single probe placement
+            interrogates the entire weld cross-section that would previously require three separate
+            contact probes (45&deg;, 60&deg;, 70&deg;). The resulting image directly shows flaw depth
+            and lateral position, substantially reducing inspection time and operator dependency relative
+            to manual A-scan methods.
+          </p>
 
           <h3>Full Matrix Capture / Total Focusing Method (FMC/TFM)</h3>
-          <p>Every transmit–receive element combination is recorded. TFM delay-and-sums this data to focus at every pixel in the image, achieving near-optimal resolution everywhere — the current gold standard for advanced array imaging.</p>
+          <p>
+            In FMC every element transmits in turn while all N elements receive, capturing the full
+            N&times;N inter-element response matrix. TFM then constructs an image by coherently
+            delay-and-summing that matrix at every pixel (x, z):
+          </p>
+          <div class="eq-box">$$I(x,z) = \left|\sum_{i=1}^{N}\sum_{j=1}^{N} A_{ij}\!\left(t_{ij}(x,z)\right)\right|^2 \qquad t_{ij} = \frac{r_i(x,z) + r_j(x,z)}{c}$$</div>
+          <p>
+            where r<sub>i</sub> and r<sub>j</sub> are the distances from transmitter <em>i</em> and
+            receiver <em>j</em> to the image pixel. Because the focal law is computed post-acquisition,
+            the image is optimally focused at every depth simultaneously — unlike conventional phased-array
+            where focus is fixed at one depth per firing. The penalty is data volume: a 64-element array
+            captures 64&times;64 = 4,096 A-scans per image frame. Real-time TFM requires GPU acceleration
+            or dedicated FPGA pipelines.
+          </p>
 
           <div class="callout">
-            <strong>Key advantage:</strong> Electronic scanning is orders of magnitude faster than mechanical scanning, enables rapid volumetric coverage, and allows real-time image reconstruction at inspection speed.
+            <strong>NDE example — additive manufacturing inspection:</strong> Laser powder bed fusion
+            (L-PBF) Ti-6Al-4V parts contain sub-millimetre lack-of-fusion pores aligned with the build
+            layers. A 128-element 10 MHz linear array in FMC/TFM mode achieves lateral resolution
+            &asymp; &lambda;/2 &asymp; 0.15 mm in water immersion, resolving individual pores that are
+            invisible to conventional pulse-echo at the same frequency. The full-aperture focusing also
+            suppresses coherent grain noise from the columnar &beta;-grain microstructure by 8–12 dB
+            relative to a single-focal-depth S-scan, directly improving the probability of detection
+            for sub-critical defects.
           </div>
+
+          <h3>Key Array Parameters at a Glance</h3>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Typical Range</th>
+                <th>Effect on Inspection</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Element count N</strong></td>
+                <td>16 – 256</td>
+                <td>More elements → wider aperture, better lateral resolution and steering range; higher data volume for FMC.</td>
+              </tr>
+              <tr>
+                <td><strong>Pitch d</strong></td>
+                <td>0.2 – 1.0 mm</td>
+                <td>Must be ≤ λ/2 to suppress grating lobes; finer pitch → smaller elements → lower element sensitivity.</td>
+              </tr>
+              <tr>
+                <td><strong>Centre frequency f</strong></td>
+                <td>1 – 15 MHz</td>
+                <td>Higher f → better resolution (λ = c/f), but more attenuation and tighter pitch tolerance.</td>
+              </tr>
+              <tr>
+                <td><strong>Active aperture D</strong></td>
+                <td>N × d</td>
+                <td>Determines near-field length N = D²f/(4c) and far-field divergence. Larger aperture = narrower beam but longer near-field dead zone.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- Calibration & DAC -->
