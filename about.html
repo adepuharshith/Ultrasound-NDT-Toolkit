@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .about-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+    /* Profile card */
+    .profile-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 2.5rem 2.5rem 2rem;
+      margin: 2.5rem 0;
+      display: flex;
+      gap: 2.5rem;
+      align-items: flex-start;
+    }
+    .profile-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-cyan) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.02em;
+    }
+    .profile-info h1 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: .2rem;
+    }
+    .profile-info .profile-title {
+      font-size: 1rem;
+      color: var(--brand-cyan);
+      font-weight: 600;
+      margin-bottom: .3rem;
+    }
+    .profile-info .profile-dept {
+      font-size: .9rem;
+      color: var(--text-muted);
+      margin-bottom: .9rem;
+    }
+    .profile-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+    .profile-tag {
+      background: var(--accent-light);
+      color: var(--brand-blue);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .22rem .65rem;
+      border-radius: 999px;
+    }
+    .profile-links {
+      display: flex;
+      gap: .75rem;
+      margin-top: 1.1rem;
+      flex-wrap: wrap;
+    }
+    .profile-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .4rem 1rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      text-decoration: none !important;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+      color: var(--text);
+      transition: all .15s;
+    }
+    .profile-link:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--brand-blue); }
+
+    /* About sections */
+    .about-section {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 2rem 2.5rem;
+      margin-bottom: 1.75rem;
+    }
+    .about-section h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .about-section p { color: var(--text-muted); font-size: .95rem; margin-bottom: .75rem; line-height: 1.7; }
+    .about-section p:last-child { margin-bottom: 0; }
+
+    /* Tech stack grid */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: .75rem;
+      margin-top: .75rem;
+    }
+    .tech-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .tech-item .ti-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .tech-item span { font-size: .85rem; font-weight: 600; color: var(--text); }
+
+    /* Research areas */
+    .research-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: .75rem;
+    }
+    .research-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--brand-cyan);
+      border-radius: 0 10px 10px 0;
+      padding: .85rem 1.1rem;
+    }
+    .research-item h4 { font-size: .92rem; font-weight: 700; color: var(--text); margin-bottom: .25rem; }
+    .research-item p { font-size: .83rem; color: var(--text-muted); margin: 0; }
+
+    /* Acknowledgment card */
+    .ack-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: .75rem;
+    }
+    .ack-item:last-child { margin-bottom: 0; }
+    .ack-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .ack-item h4 { font-size: .93rem; font-weight: 700; color: var(--text); margin-bottom: .15rem; }
+    .ack-item p { font-size: .84rem; color: var(--text-muted); margin: 0; }
+
+    @media (max-width: 680px) {
+      .profile-card { flex-direction: column; gap: 1.5rem; }
+      .research-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="theory.html">Theory</a></li>
+    <li><a href="transducers.html">Transducers</a></li>
+    <li><a href="calculators.html">Calculators</a></li>
+    <li><a href="resources.html">Resources</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>About</h1>
+  <p>The researcher behind this toolkit and the motivation for building it</p>
+</div>
+
+<div class="about-wrap">
+
+  <!-- PROFILE CARD -->
+  <div class="profile-card">
+    <div class="profile-avatar">HA</div>
+    <div class="profile-info">
+      <h1>Harshith Adepuu</h1>
+      <div class="profile-title">Ph.D. Researcher · Nondestructive Evaluation</div>
+      <div class="profile-dept">School of Engineering · Purdue University, West Lafayette, IN</div>
+      <div class="profile-tags">
+        <span class="profile-tag">Ultrasonic NDE</span>
+        <span class="profile-tag">Signal Processing</span>
+        <span class="profile-tag">Phased Array UT</span>
+        <span class="profile-tag">Structural Health Monitoring</span>
+        <span class="profile-tag">Composites Inspection</span>
+      </div>
+      <div class="profile-links">
+        <a href="mailto:adepuharshithkumar@gmail.com" class="profile-link">✉ Email</a>
+        <a href="https://github.com/adepuharshith" class="profile-link" target="_blank" rel="noopener">⎇ GitHub</a>
+        <a href="https://github.com/adepuharshith/ultrasound-ndt-toolkit" class="profile-link" target="_blank" rel="noopener">📂 Toolkit Repo</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT THE TOOLKIT -->
+  <div class="about-section">
+    <h2>About This Toolkit</h2>
+    <p>
+      The <strong>Ultrasound &amp; NDT Toolkit</strong> is an open, browser-based educational and practical reference
+      for ultrasonic nondestructive evaluation. It was built to bridge the gap between dense textbook theory
+      and day-to-day lab practice — giving students and practitioners quick access to interactive calculators,
+      visual theory explanations, and curated resources, all in one place.
+    </p>
+    <p>
+      Every calculator and diagram on this site reflects real inspection scenarios encountered in the Purdue NDT
+      Research Lab — from setting water paths for immersion transducers to sizing cracks with TOFD and calibrating
+      phased array setups. The goal is a living reference that grows alongside active research.
+    </p>
+    <p>
+      All content is freely available. If you use this toolkit in your research or teaching, a mention or link back
+      is appreciated but not required.
+    </p>
+  </div>
+
+  <!-- RESEARCH AREAS -->
+  <div class="about-section">
+    <h2>Research Focus</h2>
+    <p>My doctoral research sits at the intersection of advanced ultrasonic sensing and data-driven signal analysis, with applications to aerospace and infrastructure inspection.</p>
+    <div class="research-grid">
+      <div class="research-item">
+        <h4>Phased Array Ultrasound</h4>
+        <p>Delay-law optimisation, S-scan reconstruction, and FMC/TFM imaging for complex geometry inspection.</p>
+      </div>
+      <div class="research-item">
+        <h4>Composite NDE</h4>
+        <p>Detection of delaminations, impact damage, and manufacturing voids in CFRP and GFRP structures.</p>
+      </div>
+      <div class="research-item">
+        <h4>Signal Processing</h4>
+        <p>Hilbert transforms, time-gain compensation, pulse compression, and machine-learning assisted flaw classification.</p>
+      </div>
+      <div class="research-item">
+        <h4>Transducer Characterisation</h4>
+        <p>Beam profiling, near-field mapping, impedance analysis, and wideband calibration methods.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLKIT CONTENTS -->
+  <div class="about-section">
+    <h2>What's Inside</h2>
+    <p>The toolkit currently includes the following modules:</p>
+    <div class="tech-grid">
+      <div class="tech-item"><div class="ti-icon">📐</div><span>10 Calculators</span></div>
+      <div class="tech-item"><div class="ti-icon">📖</div><span>Theory Guide</span></div>
+      <div class="tech-item"><div class="ti-icon">🔊</div><span>Transducer Types</span></div>
+      <div class="tech-item"><div class="ti-icon">📚</div><span>Resource Library</span></div>
+      <div class="tech-item"><div class="ti-icon">🎞</div><span>Canvas Animations</span></div>
+      <div class="tech-item"><div class="ti-icon">🧮</div><span>KaTeX Equations</span></div>
+    </div>
+    <p style="margin-top:1rem;">Calculators include: Wavelength, Water Path, Near-Field Distance, TOF Depth, Attenuation, Snell's Law, Acoustic Impedance, Beam Divergence, Wave Velocity from Material Properties, and TOFD Crack Sizing.</p>
+  </div>
+
+  <!-- BUILT WITH -->
+  <div class="about-section">
+    <h2>Built With</h2>
+    <p>The toolkit is intentionally dependency-free — pure HTML, CSS, and JavaScript so it runs entirely in a browser with no build step and no server required.</p>
+    <div class="tech-grid">
+      <div class="tech-item"><div class="ti-icon">🌐</div><span>HTML5</span></div>
+      <div class="tech-item"><div class="ti-icon">🎨</div><span>CSS3 / Tokens</span></div>
+      <div class="tech-item"><div class="ti-icon">⚙️</div><span>Vanilla JS</span></div>
+      <div class="tech-item"><div class="ti-icon">🖼</div><span>Canvas 2D API</span></div>
+      <div class="tech-item"><div class="ti-icon">∑</div><span>KaTeX v0.16</span></div>
+      <div class="tech-item"><div class="ti-icon">✏️</div><span>Inline SVG</span></div>
+    </div>
+  </div>
+
+  <!-- ACKNOWLEDGMENTS -->
+  <div class="about-section">
+    <h2>Acknowledgments</h2>
+    <div class="ack-item">
+      <div class="ack-icon">🏛</div>
+      <div>
+        <h4>Purdue University — NDT Research Lab</h4>
+        <p>For providing the research environment, equipment, and collaborative expertise that grounds every calculation and diagram on this site.</p>
+      </div>
+    </div>
+    <div class="ack-item">
+      <div class="ack-icon">📘</div>
+      <div>
+        <h4>NDE-ED — Iowa State University &amp; FAA</h4>
+        <p>The NDT Resource Center at nde-ed.org served as a primary reference for theory content, inspection techniques, and practical applications. Freely available to the NDT community.</p>
+      </div>
+    </div>
+    <div class="ack-item">
+      <div class="ack-icon">📗</div>
+      <div>
+        <h4>Olympus NDT / Evident — Application Notes</h4>
+        <p>Manufacturer application notes and transducer datasheets were referenced to ensure technical accuracy in the transducer specifications and frequency guidance.</p>
+      </div>
+    </div>
+    <div class="ack-item">
+      <div class="ack-icon">🤝</div>
+      <div>
+        <h4>ASNT — Standards and References</h4>
+        <p>American Society for Nondestructive Testing standards and educational materials informed the calibration, DAC, and inspection procedure content.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT / FEEDBACK -->
+  <div class="about-section" style="background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);border-color:#bae6fd;">
+    <h2 style="border-color:#bae6fd;">Get in Touch</h2>
+    <p>
+      Questions, corrections, or suggestions for new calculators and content are welcome.
+      Reach out by email or open an issue on GitHub — contributions and feedback help make this a better resource for everyone in the NDT community.
+    </p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;">
+      <a href="mailto:adepuharshithkumar@gmail.com" class="btn btn-primary" style="text-decoration:none;">✉ Send Email</a>
+      <a href="https://github.com/adepuharshith/ultrasound-ndt-toolkit/issues" class="btn btn-outline" style="color:var(--brand-navy);border-color:var(--brand-cyan);" target="_blank" rel="noopener">Open GitHub Issue</a>
+    </div>
+  </div>
+
+</div><!-- /about-wrap -->
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="transducers.html">Transducers</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="resources.html">Resources</a>
+    <a href="about.html">About</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
