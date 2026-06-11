@@ -133,8 +133,9 @@ attribute (`textbook | paper | software | standard | online`) and search query a
 
 ---
 
-## Git log (recent — as of 2026-06-04)
+## Git log (recent — as of 2026-06-05)
 ```
+1525046  Expand Phased Arrays section: delay-law SVG, FMC/TFM math, AM inspection example, key params table
 5d3ee12  Overhaul theory: KaTeX equations, 3D EM wave, light animations, Transducers nav
 b8c35c1  Expand Signal Processing section
 7d5fbb9  Expand Snell's Law section: SVG mode-conversion diagram
