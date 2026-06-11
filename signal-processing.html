@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signal Processing — Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ── Page layout ── */
+    .sp-wrap { max-width: 1050px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+    /* ── Section nav ── */
+    .sec-nav {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: .7rem 2rem;
+      position: sticky;
+      top: var(--nav-h);
+      z-index: 80;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .sec-nav-inner { display: inline-flex; gap: .5rem; }
+    .sec-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .28rem .85rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--brand-blue); text-decoration: none; }
+
+    /* ── Block cards ── */
+    .sp-block {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      scroll-margin-top: calc(var(--nav-h) + 56px);
+    }
+    .sp-block h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: .35rem;
+    }
+    .sp-block .sp-subtitle {
+      font-size: .9rem;
+      color: var(--brand-cyan);
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+    .sp-block p {
+      font-size: .95rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: .85rem;
+    }
+    .sp-block p:last-child { margin-bottom: 0; }
+
+    /* ── Concept chips ── */
+    .concept-row { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
+    .concept-chip {
+      background: var(--accent-light);
+      color: var(--brand-blue);
+      font-size: .76rem;
+      font-weight: 700;
+      padding: .22rem .75rem;
+      border-radius: 999px;
+      letter-spacing: .01em;
+    }
+    .concept-chip.orange { background: #fff7ed; color: #c2410c; }
+    .concept-chip.purple { background: #f5f3ff; color: #6d28d9; }
+    .concept-chip.green  { background: #f0fdf4; color: #15803d; }
+
+    /* ── Split layout (text | canvas) ── */
+    .sp-split {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+      align-items: start;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 720px) { .sp-split { grid-template-columns: 1fr; } }
+
+    /* ── Canvas container ── */
+    .canvas-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .canvas-box canvas { display: block; width: 100%; }
+    .canvas-label {
+      position: absolute;
+      top: .5rem;
+      left: .75rem;
+      font-size: .7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Control row ── */
+    .ctrl-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      align-items: center;
+      margin: 1.1rem 0;
+    }
+    .ctrl-btn {
+      padding: .4rem 1.1rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+      font-size: .84rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .ctrl-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--brand-blue); }
+    .ctrl-btn.primary { background: var(--brand-cyan); border-color: var(--brand-cyan); color: #fff; }
+    .ctrl-btn.primary:hover { background: var(--brand-blue); border-color: var(--brand-blue); }
+    .ctrl-label { font-size: .84rem; font-weight: 600; color: var(--text-muted); }
+    .ctrl-slider { accent-color: var(--brand-cyan); cursor: pointer; }
+
+    /* ── Formula box ── */
+    .formula-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--brand-cyan);
+      border-radius: 0 10px 10px 0;
+      padding: .85rem 1.2rem;
+      margin: 1rem 0;
+      font-family: 'Georgia', serif;
+      font-size: 1.05rem;
+      color: var(--text);
+      line-height: 1.8;
+    }
+    .formula-box .f-note { font-family: var(--font); font-size: .8rem; color: var(--text-muted); margin-top: .4rem; }
+
+    /* ── Step boxes ── */
+    .steps { display: flex; flex-direction: column; gap: .6rem; margin: 1rem 0; }
+    .step {
+      display: flex;
+      gap: .85rem;
+      align-items: flex-start;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+    }
+    .step-num {
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--brand-cyan);
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: .05rem;
+    }
+    .step-text { font-size: .87rem; color: var(--text-muted); line-height: 1.6; }
+    .step-text strong { color: var(--text); }
+
+    /* ── Insight callout ── */
+    .insight {
+      display: flex;
+      gap: .85rem;
+      align-items: flex-start;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: .9rem 1.1rem;
+      margin: 1rem 0;
+    }
+    .insight-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .insight p { font-size: .88rem; color: #166534; margin: 0; line-height: 1.65; }
+    .insight.blue { background: #eff6ff; border-color: #bfdbfe; }
+    .insight.blue p { color: #1e3a8a; }
+    .insight.purple { background: #faf5ff; border-color: #ddd6fe; }
+    .insight.purple p { color: #5b21b6; }
+
+    /* ── Full-width canvas plots ── */
+    .plot-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.2rem 0;
+    }
+    @media (max-width: 680px) { .plot-row { grid-template-columns: 1fr; } }
+
+    /* ── Section divider ── */
+    .sp-divider {
+      border: none;
+      border-top: 1px dashed var(--border);
+      margin: 1.75rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="theory.html">Theory</a></li>
+    <li><a href="transducers.html">Transducers</a></li>
+    <li><a href="calculators.html">Calculators</a></li>
+    <li><a href="signal-processing.html" class="active">Signal Processing</a></li>
+    <li><a href="resources.html">Resources</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- SECTION NAV -->
+<div class="sec-nav">
+  <div class="sec-nav-inner">
+    <a href="#xcorr"   class="sec-nav-btn">⟨⟩ Cross-Correlation</a>
+    <a href="#wavelet" class="sec-nav-btn">〜 Wavelet Transform</a>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Signal Processing</h1>
+  <p>Core techniques for extracting meaning from ultrasonic waveforms</p>
+</div>
+
+<div class="sp-wrap">
+
+<!-- ══════════════════════════════════════════════════════════
+     BLOCK 1 — CROSS-CORRELATION
+══════════════════════════════════════════════════════════ -->
+<div class="sp-block" id="xcorr">
+  <div class="sp-subtitle">Technique 01</div>
+  <h2>Cross-Correlation</h2>
+
+  <div class="concept-row">
+    <span class="concept-chip">Time-of-Flight</span>
+    <span class="concept-chip">Pulse-Echo</span>
+    <span class="concept-chip orange">TOFD</span>
+    <span class="concept-chip purple">Matched Filter</span>
+  </div>
+
+  <div class="sp-split">
+    <div>
+      <p>
+        In pulse-echo UT you often receive two echoes — a <strong>reference (front wall) pulse</strong>
+        and a <strong>back wall (or defect) pulse</strong> — and need to measure the time delay Δt
+        between them precisely to size the reflector.
+      </p>
+      <p>
+        Simply reading the peak positions works for clean signals, but noise and waveform distortion
+        make that unreliable. <strong>Cross-correlation</strong> slides one pulse over the other,
+        computes their overlap (inner product) at every lag, and returns a correlation function whose
+        peak sits exactly at Δt — even for noisy, clipped, or overlapping echoes.
+      </p>
+
+      <div class="formula-box">
+        R<sub>xy</sub>(τ) = ∫ x(t) · y(t + τ) dt
+        <div class="f-note">τ = lag; peak of R<sub>xy</sub> gives Δt → depth = v·Δt / 2</div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Capture</strong> the A-scan with two separated echoes (FW = reference, BW = target).</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>Window</strong> the back-wall echo as the search template y(t).</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Slide</strong> y(t) across the full signal x(t), computing the overlap at each lag τ.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Find peak</strong> of R<sub>xy</sub>(τ) — its position is the best estimate of Δt.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-text"><strong>Compute depth</strong>: d = v · Δt / 2 (factor of 2 for round-trip).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signal canvas -->
+    <div>
+      <div class="canvas-box" style="margin-bottom:.75rem;">
+        <span class="canvas-label">A-scan signal</span>
+        <canvas id="xcorrSignalCanvas" height="180"></canvas>
+      </div>
+      <div class="canvas-box">
+        <span class="canvas-label">Correlation R(τ)</span>
+        <canvas id="xcorrCorrCanvas" height="130"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="ctrl-row">
+    <button class="ctrl-btn primary" id="xcorrPlayBtn">▶ Animate</button>
+    <button class="ctrl-btn" id="xcorrResetBtn">↺ Reset</button>
+    <span class="ctrl-label">Δt offset:</span>
+    <input type="range" id="xcorrOffset" class="ctrl-slider" min="40" max="180" value="110" style="width:120px;">
+    <span id="xcorrOffsetLabel" class="ctrl-label">110 samples</span>
+    <span class="ctrl-label" style="margin-left:auto;">Noise:</span>
+    <input type="range" id="xcorrNoise" class="ctrl-slider" min="0" max="60" value="15" style="width:90px;">
+    <span id="xcorrNoiseLabel" class="ctrl-label">15%</span>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">💡</div>
+    <p>
+      <strong>Why correlation beats peak-picking:</strong> Noise shifts an individual peak unpredictably.
+      The correlation sums contributions over the entire pulse shape — making the peak location
+      robust even at SNR &lt; 10 dB. In TOFD, where lateral-wave and tip-diffraction echoes overlap,
+      cross-correlation is essential for sub-sample Δt accuracy.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <p style="margin:0; font-size:.88rem; color:var(--text-muted);">
+    <strong>In practice:</strong> cross-correlation can be computed efficiently via FFT as
+    R<sub>xy</sub> = IFFT( FFT(x)* · FFT(y) ), turning an O(N²) sliding-dot-product into O(N log N).
+    Most UT instruments and MATLAB's <code>xcorr()</code> / Python's <code>scipy.signal.correlate()</code>
+    implement exactly this.
+  </p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     BLOCK 2 — WAVELET TRANSFORM
+══════════════════════════════════════════════════════════ -->
+<div class="sp-block" id="wavelet">
+  <div class="sp-subtitle">Technique 02</div>
+  <h2>Wavelet Transform &amp; Time–Frequency Analysis</h2>
+
+  <div class="concept-row">
+    <span class="concept-chip purple">CWT</span>
+    <span class="concept-chip orange">Morlet Wavelet</span>
+    <span class="concept-chip">Spectrogram</span>
+    <span class="concept-chip green">Dispersion</span>
+  </div>
+
+  <p>
+    A raw A-scan tells you <em>what</em> frequencies are present (via FFT) but not <em>when</em>
+    they arrive. For broadband pulses, dispersive media (plates, composites), or overlapping
+    modes, that distinction matters enormously.
+  </p>
+
+  <!-- Row 1: time signal + FFT -->
+  <div class="plot-row">
+    <div>
+      <div class="canvas-box">
+        <span class="canvas-label">Time-domain pulse</span>
+        <canvas id="wvTimeDomainCanvas" height="160"></canvas>
+      </div>
+    </div>
+    <div>
+      <div class="canvas-box">
+        <span class="canvas-label">FFT — amplitude spectrum</span>
+        <canvas id="wvFFTCanvas" height="160"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight blue" style="margin:.75rem 0 1.25rem;">
+    <div class="insight-icon">⚠️</div>
+    <p>
+      The FFT gives global frequency content — a flat average over the whole signal window.
+      It cannot tell you that <strong>low frequencies arrived early and high frequencies arrived late</strong>,
+      which is exactly what happens in dispersive Lamb wave propagation.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.5rem; color:var(--text);">Enter the Wavelet Transform</h3>
+  <p>
+    Instead of sines (which extend to ±∞), the <strong>Continuous Wavelet Transform (CWT)</strong>
+    uses a <em>mother wavelet</em> — a short, localized oscillating function — and slides it
+    across the signal at every time position and every scale (∝ 1/frequency).
+    The result is a 2-D map: time on one axis, frequency on the other.
+  </p>
+
+  <div class="formula-box">
+    W(a, b) = (1/√a) ∫ x(t) · ψ*((t − b)/a) dt
+    <div class="f-note">a = scale (∝ 1/f), b = time shift, ψ = mother wavelet (Morlet used here)</div>
+  </div>
+
+  <p>
+    The <strong>Morlet wavelet</strong> is a Gaussian-windowed complex sinusoid — ideal for UT
+    because its shape closely matches a bandlimited ultrasonic pulse, giving excellent
+    time–frequency resolution balance.
+  </p>
+
+  <!-- Chirp controls -->
+  <div class="ctrl-row">
+    <span class="ctrl-label">Signal type:</span>
+    <button class="ctrl-btn primary" id="wvSigPulse">Single pulse</button>
+    <button class="ctrl-btn" id="wvSigChirp">Linear chirp (dispersive)</button>
+    <button class="ctrl-btn" id="wvSigMulti">Two-mode (Lamb)</button>
+  </div>
+
+  <!-- Spectrogram canvas -->
+  <div class="canvas-box" style="margin:.5rem 0 .75rem;">
+    <span class="canvas-label">CWT Spectrogram (Morlet) — brighter = higher |W(a,b)|</span>
+    <canvas id="wvSpectroCanvas" height="220"></canvas>
+  </div>
+
+  <!-- Time domain underneath spectrogram -->
+  <div class="canvas-box" style="margin-bottom:1rem;">
+    <span class="canvas-label">Signal overlaid</span>
+    <canvas id="wvSigCanvas" height="90"></canvas>
+  </div>
+
+  <div class="ctrl-row">
+    <span class="ctrl-label">Morlet ω₀:</span>
+    <input type="range" id="wvOmega" class="ctrl-slider" min="3" max="10" value="6" step="0.5" style="width:110px;">
+    <span id="wvOmegaLabel" class="ctrl-label">6</span>
+    <span class="ctrl-label" style="margin-left:1rem;">Center freq:</span>
+    <input type="range" id="wvFreq" class="ctrl-slider" min="1" max="8" value="4" step="0.5" style="width:100px;">
+    <span id="wvFreqLabel" class="ctrl-label">4 MHz</span>
+  </div>
+
+  <div class="insight purple" style="margin-top:.5rem;">
+    <div class="insight-icon">🔍</div>
+    <p>
+      <strong>Dispersive Lamb waves:</strong> Switch to "Two-mode (Lamb)" to see two wave packets
+      with different group velocities. The FFT shows overlapping frequency bands — indistinguishable.
+      The CWT spectrogram cleanly separates them in time, enabling individual mode analysis
+      and group velocity measurement.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.75rem; color:var(--text);">FFT vs. Wavelet — When to use which</h3>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+    <div class="step" style="flex-direction:column; gap:.4rem; align-items:flex-start;">
+      <span style="font-weight:700; font-size:.92rem; color:var(--brand-blue);">FFT</span>
+      <div class="step-text">Best for <strong>stationary signals</strong> where frequency content doesn't change over time. Fast (O(N log N)), gives exact frequency values. Use for: bandwidth characterization, transducer spectrum, pulse spectrum.</div>
+    </div>
+    <div class="step" style="flex-direction:column; gap:.4rem; align-items:flex-start;">
+      <span style="font-weight:700; font-size:.92rem; color:#7c3aed;">Wavelet CWT</span>
+      <div class="step-text">Best for <strong>non-stationary signals</strong>: dispersive waves, multi-mode Lamb, AE transients. Reveals <em>when</em> each frequency arrives. Use for: Lamb wave mode separation, dispersion curve extraction, AE source characterization.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /sp-wrap -->
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="transducers.html">Transducers</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="signal-processing.html">Signal Processing</a>
+    <a href="resources.html">Resources</a>
+    <a href="about.html">About</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab &mdash; Built with curiosity and caffeine.</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+/* ================================================================
+   SIGNAL PROCESSING PAGE — Interactive Visualizations
+   ================================================================ */
+
+/* ── Utilities ── */
+const π = Math.PI;
+function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
+
+/* Gaussian-modulated sinusoidal pulse */
+function gaussPulse(t, t0, freq, sigma=0.25){
+  return Math.exp(-((t-t0)**2)/(2*sigma**2)) * Math.cos(2*π*freq*(t-t0));
+}
+
+/* Add noise to array */
+function addNoise(arr, level){
+  return arr.map(v => v + level*(Math.random()*2-1));
+}
+
+/* ================================================================
+   BLOCK 1 — CROSS-CORRELATION
+   ================================================================ */
+(function(){
+  const signalCanvas = document.getElementById('xcorrSignalCanvas');
+  const corrCanvas   = document.getElementById('xcorrCorrCanvas');
+  const sCtx = signalCanvas.getContext('2d');
+  const cCtx = corrCanvas.getContext('2d');
+
+  const offsetSlider = document.getElementById('xcorrOffset');
+  const noiseSlider  = document.getElementById('xcorrNoise');
+  const offsetLabel  = document.getElementById('xcorrOffsetLabel');
+  const noiseLabel   = document.getElementById('xcorrNoiseLabel');
+  const playBtn      = document.getElementById('xcorrPlayBtn');
+  const resetBtn     = document.getElementById('xcorrResetBtn');
+
+  const N = 512;
+  let animFrame = null;
+  let lagPos = 0;       // current animated lag position (px)
+  let isPlaying = false;
+  let animDir = 1;
+
+  function resize(){
+    signalCanvas.width = signalCanvas.offsetWidth * devicePixelRatio;
+    signalCanvas.height = 180 * devicePixelRatio;
+    signalCanvas.style.height = '180px';
+    corrCanvas.width = corrCanvas.offsetWidth * devicePixelRatio;
+    corrCanvas.height = 130 * devicePixelRatio;
+    corrCanvas.style.height = '130px';
+  }
+  resize();
+  window.addEventListener('resize', ()=>{ resize(); render(); });
+
+  /* Build signal: two gaussian pulses at positions t1, t2 */
+  function buildSignal(offset, noiseLevel){
+    const n = N;
+    const t1 = 80;
+    const t2 = t1 + offset;
+    const sig = new Float32Array(n);
+    for(let i=0;i<n;i++){
+      const t = i;
+      sig[i] = gaussPulse(t, t1, 0.06) + gaussPulse(t, t2, 0.06);
+    }
+    const noiseAmp = (noiseLevel/100)*0.4;
+    const noisy = new Float32Array(n);
+    for(let i=0;i<n;i++) noisy[i] = sig[i] + noiseAmp*(Math.random()*2-1);
+    return { clean:sig, noisy, t1, t2 };
+  }
+
+  /* Cross-correlation between template (pulse around t2) and full signal */
+  function crossCorrelate(sig, template, tStart, tLen){
+    const maxLag = N;
+    const corr = new Float32Array(maxLag*2+1);
+    for(let lag=-maxLag; lag<=maxLag; lag++){
+      let sum=0;
+      for(let k=0;k<tLen;k++){
+        const si = tStart + k + lag;
+        if(si>=0 && si<N) sum += sig[si]*template[k];
+      }
+      corr[lag+maxLag]=sum;
+    }
+    return corr;
+  }
+
+  /* Extract template around back-wall pulse */
+  function extractTemplate(sig, t2, hw=30){
+    const tmpl = new Float32Array(hw*2+1);
+    for(let k=0;k<tmpl.length;k++) tmpl[k] = sig[clamp(t2-hw+k,0,N-1)];
+    return tmpl;
+  }
+
+  function drawSignal(ctx, sig, templateStart, templateLen, lagOffset, noisy, t1, t2){
+    const W = ctx.canvas.width, H = ctx.canvas.height;
+    const dpr = devicePixelRatio;
+    ctx.clearRect(0,0,W,H);
+
+    /* background */
+    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
+
+    /* grid lines */
+    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
+    for(let y=H*.25;y<H;y+=H*.25){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+
+    const xScale = W/N;
+    const mid = H*0.5;
+    const amp = H*0.38;
+
+    /* shade template region sliding */
+    const shadeX = (templateStart + lagOffset)*xScale;
+    const shadeW = templateLen*xScale;
+    ctx.fillStyle='rgba(8,145,178,0.12)';
+    ctx.fillRect(shadeX,0,shadeW,H);
+
+    /* draw noisy signal */
+    ctx.beginPath();
+    ctx.strokeStyle='#475569'; ctx.lineWidth=1;
+    for(let i=0;i<N;i++){
+      const x=i*xScale, y=mid - noisy[i]*amp;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    /* draw clean signal */
+    ctx.beginPath();
+    ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2;
+    for(let i=0;i<N;i++){
+      const x=i*xScale, y=mid - sig[i]*amp;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    /* FW pulse label */
+    const fw_x = t1*xScale;
+    ctx.fillStyle='#fbbf24'; ctx.font=`bold ${11*dpr}px Inter`; ctx.textAlign='center';
+    ctx.fillText('FW pulse', fw_x, H*0.12);
+    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(fw_x,H*.16); ctx.lineTo(fw_x,mid-amp*0.75); ctx.stroke();
+
+    /* BW pulse label */
+    const bw_x = t2*xScale;
+    ctx.fillStyle='#a78bfa';
+    ctx.fillText('BW pulse', bw_x, H*0.12);
+    ctx.strokeStyle='#a78bfa';
+    ctx.beginPath(); ctx.moveTo(bw_x,H*.16); ctx.lineTo(bw_x,mid-amp*0.75); ctx.stroke();
+
+    /* sliding template outline */
+    const tmx = shadeX;
+    ctx.strokeStyle='rgba(8,145,178,0.9)'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
+    ctx.strokeRect(tmx, H*.1, shadeW, H*.8);
+    ctx.setLineDash([]);
+
+    /* axes labels */
+    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`; ctx.textAlign='left';
+    ctx.fillText('t →', W-30, H-4);
+    ctx.fillText('Amp', 4, 14);
+  }
+
+  function drawCorrelation(ctx, corrArr, lagAtPeak, animLag, W2){
+    const W=ctx.canvas.width, H=ctx.canvas.height;
+    const dpr=devicePixelRatio;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
+
+    /* grid */
+    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(0,H*0.5); ctx.lineTo(W,H*0.5); ctx.stroke();
+
+    /* find max for normalization */
+    let maxC=1e-9;
+    for(let i=0;i<corrArr.length;i++) if(Math.abs(corrArr[i])>maxC) maxC=Math.abs(corrArr[i]);
+
+    const mid=H*0.5, amp=H*0.42;
+    const corrCenter=Math.floor(corrArr.length/2);
+
+    /* draw correlation up to current animated lag */
+    const totalLags=corrArr.length;
+    const animIdx=clamp(Math.round(animLag*totalLags/N+corrCenter), 0, totalLags-1);
+
+    ctx.beginPath();
+    ctx.strokeStyle='#34d399'; ctx.lineWidth=2;
+    for(let i=0;i<=animIdx;i++){
+      const x=i*W/totalLags;
+      const y=mid - (corrArr[i]/maxC)*amp;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    /* peak marker */
+    const peakIdx = lagAtPeak + corrCenter;
+    if(peakIdx < animIdx){
+      const px = peakIdx*W/totalLags;
+      const py = mid - (corrArr[peakIdx]/maxC)*amp;
+      ctx.fillStyle='#fbbf24';
+      ctx.beginPath(); ctx.arc(px,py,4,0,2*π); ctx.fill();
+      ctx.fillStyle='#fbbf24'; ctx.font=`bold ${10*dpr}px Inter`;
+      ctx.textAlign='center';
+      ctx.fillText(`peak → Δt = ${lagAtPeak} samples`, px, py-10);
+    }
+
+    /* axis labels */
+    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`;
+    ctx.textAlign='center';
+    ctx.fillText('lag τ', W*0.5, H-3);
+    ctx.textAlign='left';
+    ctx.fillText('R(τ)', 4, 14);
+  }
+
+  function render(){
+    const offset = parseInt(offsetSlider.value);
+    const noise  = parseInt(noiseSlider.value);
+    offsetLabel.textContent = offset + ' samples';
+    noiseLabel.textContent  = noise + '%';
+
+    const { clean, noisy, t1, t2 } = buildSignal(offset, noise);
+    const hw = 30;
+    const tmpl = extractTemplate(clean, t2, hw);
+
+    /* Compute full correlation once */
+    const corrArr = crossCorrelate(noisy, tmpl, t2-hw, tmpl.length);
+    const corrCenter = Math.floor(corrArr.length/2);
+
+    /* Find peak lag */
+    let maxVal=-1e9, peakLag=0;
+    for(let i=0;i<corrArr.length;i++){
+      if(corrArr[i]>maxVal){ maxVal=corrArr[i]; peakLag=i-corrCenter; }
+    }
+
+    const currentLag = isPlaying ? lagPos - t2 + hw : 0;
+
+    drawSignal(sCtx, clean, t2-hw, tmpl.length, lagPos - (t2-hw), noisy, t1, t2);
+    drawCorrelation(cCtx, corrArr, peakLag, lagPos, N);
+  }
+
+  function animate(){
+    if(!isPlaying) return;
+    lagPos += 2 * animDir;
+    if(lagPos >= N-5){ animDir=-1; }
+    if(lagPos <= 0){ lagPos=0; animDir=1; isPlaying=false; playBtn.textContent='▶ Animate'; }
+    render();
+    animFrame = requestAnimationFrame(animate);
+  }
+
+  playBtn.addEventListener('click', ()=>{
+    if(isPlaying){ isPlaying=false; cancelAnimationFrame(animFrame); playBtn.textContent='▶ Animate'; }
+    else{
+      lagPos=0; animDir=1; isPlaying=true; playBtn.textContent='⏸ Pause';
+      animate();
+    }
+  });
+
+  resetBtn.addEventListener('click', ()=>{
+    isPlaying=false; cancelAnimationFrame(animFrame);
+    lagPos=0; playBtn.textContent='▶ Animate'; render();
+  });
+
+  offsetSlider.addEventListener('input', ()=>{ if(!isPlaying) render(); });
+  noiseSlider.addEventListener('input',  ()=>{ if(!isPlaying) render(); });
+
+  render();
+})();
+
+
+/* ================================================================
+   BLOCK 2 — WAVELET TRANSFORM
+   ================================================================ */
+(function(){
+  const timeDomCanvas  = document.getElementById('wvTimeDomainCanvas');
+  const fftCanvas      = document.getElementById('wvFFTCanvas');
+  const spectroCanvas  = document.getElementById('wvSpectroCanvas');
+  const sigCanvas      = document.getElementById('wvSigCanvas');
+
+  const tdCtx = timeDomCanvas.getContext('2d');
+  const ffCtx = fftCanvas.getContext('2d');
+  const spCtx = spectroCanvas.getContext('2d');
+  const sgCtx = sigCanvas.getContext('2d');
+
+  const btnPulse = document.getElementById('wvSigPulse');
+  const btnChirp = document.getElementById('wvSigChirp');
+  const btnMulti = document.getElementById('wvSigMulti');
+  const omegaSlider = document.getElementById('wvOmega');
+  const freqSlider  = document.getElementById('wvFreq');
+  const omegaLabel  = document.getElementById('wvOmegaLabel');
+  const freqLabel   = document.getElementById('wvFreqLabel');
+
+  let sigType = 'pulse';
+  const N = 512;
+  const Fs = 20; /* normalized sample rate (MHz) */
+
+  function resize(){
+    [timeDomCanvas, fftCanvas].forEach(c=>{
+      c.width = c.offsetWidth * devicePixelRatio;
+      c.height = 160 * devicePixelRatio;
+      c.style.height = '160px';
+    });
+    spectroCanvas.width = spectroCanvas.offsetWidth * devicePixelRatio;
+    spectroCanvas.height = 220 * devicePixelRatio;
+    spectroCanvas.style.height = '220px';
+    sigCanvas.width = sigCanvas.offsetWidth * devicePixelRatio;
+    sigCanvas.height = 90 * devicePixelRatio;
+    sigCanvas.style.height = '90px';
+  }
+  resize();
+  window.addEventListener('resize', ()=>{ resize(); renderAll(); });
+
+  /* ── Signal generators ── */
+  function makePulse(fc){
+    const sig = new Float32Array(N);
+    const t0 = N*0.45, sigma=N*0.04;
+    for(let i=0;i<N;i++){
+      const t=(i-t0)/N;
+      sig[i] = Math.exp(-(i-t0)**2/(2*sigma**2)) * Math.cos(2*π*(fc/Fs)*(i-t0));
+    }
+    return sig;
+  }
+
+  /* Linear chirp: sweeps from f1 to f2 */
+  function makeChirp(f1=1, f2=8){
+    const sig = new Float32Array(N);
+    const env_sigma = N*0.28;
+    const env_center = N*0.5;
+    for(let i=0;i<N;i++){
+      const t=i/N;
+      const fi = f1+(f2-f1)*t;
+      const env=Math.exp(-((i-env_center)**2)/(2*env_sigma**2));
+      sig[i]=env*Math.cos(2*π*(fi/Fs)*i);
+    }
+    return sig;
+  }
+
+  /* Two modes: slower low-freq + faster high-freq (Lamb-like) */
+  function makeMultiMode(fc){
+    const sig = new Float32Array(N);
+    /* Mode A: 2 MHz, arrives early */
+    const tA=N*0.28, sA=N*0.06, fA=2;
+    /* Mode B: 6 MHz, arrives late */
+    const tB=N*0.62, sB=N*0.05, fB=6;
+    for(let i=0;i<N;i++){
+      const mA = Math.exp(-(i-tA)**2/(2*sA**2)) * Math.cos(2*π*(fA/Fs)*(i-tA));
+      const mB = Math.exp(-(i-tB)**2/(2*sB**2)) * 0.7*Math.cos(2*π*(fB/Fs)*(i-tB));
+      sig[i]=mA+mB;
+    }
+    return sig;
+  }
+
+  function getSignal(){
+    const fc = parseFloat(freqSlider.value);
+    if(sigType==='pulse')  return makePulse(fc);
+    if(sigType==='chirp')  return makeChirp(1,8);
+    return makeMultiMode(fc);
+  }
+
+  /* ── Simple DFT magnitude (real FFT via Cooley-Tukey not implemented; use DFT of first 256) ── */
+  function computeFFT(sig){
+    const M = 256;
+    const re = new Float32Array(M), im = new Float32Array(M);
+    for(let k=0;k<M;k++){
+      let r=0,im_=0;
+      for(let n=0;n<N;n++){
+        const angle = 2*π*k*n/N;
+        r  += sig[n]*Math.cos(angle);
+        im_ -= sig[n]*Math.sin(angle);
+      }
+      re[k]=r; im[k]=im_;
+    }
+    const mag = new Float32Array(M);
+    for(let k=0;k<M;k++) mag[k]=Math.sqrt(re[k]**2+im[k]**2);
+    return mag;
+  }
+
+  /* ── CWT with Morlet wavelet (real part computed, magnitude used) ── */
+  function computeCWT(sig, omega0, freqSteps=80){
+    const freqMin=0.3, freqMax=9.5; /* in MHz */
+    const result = [];
+    for(let fi=0;fi<freqSteps;fi++){
+      const freq = freqMin + (freqMax-freqMin)*fi/freqSteps;
+      const scale = omega0/(2*π*freq/Fs);
+      const row = new Float32Array(N);
+      for(let b=0;b<N;b++){
+        let wr=0,wi=0;
+        for(let t=0;t<N;t++){
+          const tau=(t-b)/scale;
+          const gauss=Math.exp(-0.5*tau**2);
+          const cosPart=Math.cos(omega0*tau);
+          const sinPart=Math.sin(omega0*tau);
+          wr += sig[t]*gauss*cosPart;
+          wi += sig[t]*gauss*sinPart;
+        }
+        row[b]=Math.sqrt(wr**2+wi**2)/(Math.sqrt(scale)+1e-9);
+      }
+      result.push(row);
+    }
+    return result;
+  }
+
+  /* ── Draw helpers ── */
+  function drawTimeDomain(ctx, sig){
+    const W=ctx.canvas.width, H=ctx.canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
+
+    /* grid */
+    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
+    [0.25,0.5,0.75].forEach(fy=>{
+      ctx.beginPath(); ctx.moveTo(0,H*fy); ctx.lineTo(W,H*fy); ctx.stroke();
+    });
+
+    const mid=H*0.5, amp=H*0.42;
+    ctx.beginPath(); ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2;
+    for(let i=0;i<N;i++){
+      const x=i*W/N, y=mid-sig[i]*amp;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    const dpr=devicePixelRatio;
+    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`;
+    ctx.textAlign='left'; ctx.fillText('Amplitude (V)', 4, 14);
+    ctx.textAlign='right'; ctx.fillText('time (μs) →', W-4, H-4);
+    ctx.fillStyle='#38bdf8'; ctx.font=`bold ${10*dpr}px Inter`;
+    ctx.textAlign='left'; ctx.fillText('v(t)', 4, H-4);
+  }
+
+  function drawFFT(ctx, sig){
+    const W=ctx.canvas.width, H=ctx.canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
+
+    /* naive DFT for visualization (faster approx) */
+    const freqBins=128;
+    const mag = new Float32Array(freqBins);
+    for(let k=0;k<freqBins;k++){
+      let r=0,im=0;
+      for(let n=0;n<N;n++){
+        const angle=2*π*k*n/N;
+        r+=sig[n]*Math.cos(angle);
+        im-=sig[n]*Math.sin(angle);
+      }
+      mag[k]=Math.sqrt(r**2+im**2);
+    }
+    let maxM=1e-9; for(let k=0;k<freqBins;k++) if(mag[k]>maxM) maxM=mag[k];
+
+    /* grid */
+    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
+    [0.25,0.5,0.75].forEach(fy=>{
+      ctx.beginPath(); ctx.moveTo(0,H*fy); ctx.lineTo(W,H*fy); ctx.stroke();
+    });
+
+    const dpr=devicePixelRatio;
+
+    /* bars */
+    const bw = W/freqBins;
+    for(let k=0;k<freqBins;k++){
+      const bh=(mag[k]/maxM)*(H*0.85);
+      const hue = 180 + (mag[k]/maxM)*60;
+      ctx.fillStyle=`hsl(${hue},80%,60%)`;
+      ctx.fillRect(k*bw, H-bh, bw-1, bh);
+    }
+
+    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`;
+    ctx.textAlign='left'; ctx.fillText('|X(f)|', 4, 14);
+    ctx.textAlign='right'; ctx.fillText('frequency (MHz) →', W-4, H-4);
+    ctx.fillStyle='#34d399'; ctx.font=`bold ${10*dpr}px Inter`;
+    ctx.textAlign='left'; ctx.fillText('FFT', 4, H-4);
+  }
+
+  function heatmapColor(v){
+    /* v in [0,1]; navy→cyan→yellow→white */
+    if(v<0.33){ const t=v/0.33; return [lerp(15,8,t), lerp(23,145,t), lerp(94,178,t)]; }
+    if(v<0.66){ const t=(v-0.33)/0.33; return [lerp(8,250,t), lerp(145,200,t), lerp(178,50,t)]; }
+    const t=(v-0.66)/0.34; return [lerp(250,255,t),lerp(200,255,t),lerp(50,255,t)];
+  }
+  function lerp(a,b,t){ return Math.round(a+(b-a)*t); }
+
+  function drawSpectrogram(ctx, cwt){
+    const W=ctx.canvas.width, H=ctx.canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0a0f1a'; ctx.fillRect(0,0,W,H);
+
+    const freqSteps=cwt.length;
+    let maxVal=1e-9;
+    cwt.forEach(row=>{ for(let i=0;i<row.length;i++) if(row[i]>maxVal) maxVal=row[i]; });
+
+    const cellW = W/N;
+    const cellH = H/freqSteps;
+
+    for(let fi=0;fi<freqSteps;fi++){
+      const row=cwt[fi];
+      const y=H - (fi+1)*cellH; /* low freq at bottom */
+      for(let t=0;t<N;t++){
+        const v=clamp(row[t]/maxVal,0,1);
+        const [r,g,b]=heatmapColor(v);
+        ctx.fillStyle=`rgb(${r},${g},${b})`;
+        ctx.fillRect(t*cellW, y, Math.ceil(cellW)+1, Math.ceil(cellH)+1);
+      }
+    }
+
+    /* axis labels */
+    const dpr=devicePixelRatio;
+    ctx.fillStyle='rgba(148,163,184,0.9)';
+    ctx.font=`${10*dpr}px Inter`;
+    ctx.textAlign='left';  ctx.fillText('freq (MHz) ↑', 6, 16);
+    ctx.textAlign='right'; ctx.fillText('time →', W-6, H-6);
+
+    /* freq tick labels */
+    [2,4,6,8].forEach(f=>{
+      const fy = H - (f-0.3)/(9.5-0.3)*H;
+      ctx.fillStyle='rgba(100,116,139,0.8)';
+      ctx.font=`${9*dpr}px Inter`;
+      ctx.textAlign='left'; ctx.fillText(f+' MHz', 4, fy);
+      ctx.strokeStyle='rgba(100,116,139,0.25)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(50*dpr, fy); ctx.lineTo(W,fy); ctx.stroke();
+    });
+  }
+
+  function drawSigOverlay(ctx, sig){
+    const W=ctx.canvas.width, H=ctx.canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
+    const mid=H*0.5, amp=H*0.4;
+    ctx.beginPath(); ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2;
+    for(let i=0;i<N;i++){
+      const x=i*W/N, y=mid-sig[i]*amp;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    const dpr=devicePixelRatio;
+    ctx.fillStyle='#475569'; ctx.font=`${9*dpr}px Inter`;
+    ctx.textAlign='right'; ctx.fillText('time →', W-4, H-4);
+  }
+
+  /* ── Render all ── */
+  let renderPending=false;
+  function renderAll(){
+    if(renderPending) return;
+    renderPending=true;
+    requestAnimationFrame(()=>{
+      renderPending=false;
+      const sig = getSignal();
+      const omega0 = parseFloat(omegaSlider.value);
+      omegaLabel.textContent = omega0;
+      freqLabel.textContent  = freqSlider.value + ' MHz';
+
+      drawTimeDomain(tdCtx, sig);
+      drawFFT(ffCtx, sig);
+
+      /* CWT is expensive — run async-ish in chunks via setTimeout to avoid blocking */
+      const cwt = computeCWT(sig, omega0, 60);
+      drawSpectrogram(spCtx, cwt);
+      drawSigOverlay(sgCtx, sig);
+    });
+  }
+
+  /* ── Button switching ── */
+  function setActive(btn){
+    [btnPulse,btnChirp,btnMulti].forEach(b=>b.classList.remove('primary'));
+    btn.classList.add('primary');
+  }
+  btnPulse.addEventListener('click', ()=>{ sigType='pulse'; setActive(btnPulse); renderAll(); });
+  btnChirp.addEventListener('click', ()=>{ sigType='chirp'; setActive(btnChirp); renderAll(); });
+  btnMulti.addEventListener('click', ()=>{ sigType='multi'; setActive(btnMulti); renderAll(); });
+  omegaSlider.addEventListener('input', renderAll);
+  freqSlider.addEventListener('input', renderAll);
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
