@@ -98,7 +98,7 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 9. C-scan (`#c-scan`)
 
 ### Advanced topics (sidebar "Advanced Topics")
-- Acoustic Impedance (`#acoustic-impedance`) — Z = ρc, R and T formulas
+- Acoustic Impedance (`#acoustic-impedance`) — Z = ρc, R and T formulas, interface SVG, Z table for 7 NDE materials, immersion-Al worked example, phase-inversion diagnostic callout
 - Attenuation — Detailed (`#attenuation`) — frequency dependence, Rayleigh/stochastic
 - Beam Physics (`#beam-physics`) — wave velocity from material props (V_L, V_S), near field, divergence, focus
 - Snell's Law & Mode Conversion (`#snell`) — critical angle table, SVG mode-conversion diagram
@@ -135,6 +135,7 @@ attribute (`textbook | paper | software | standard | online`) and search query a
 
 ## Git log (recent — as of 2026-06-05)
 ```
+Expand Acoustic Impedance section: interface SVG, Z table for 7 NDE materials, immersion-Al worked example, phase-inversion callout
 1525046  Expand Phased Arrays section: delay-law SVG, FMC/TFM math, AM inspection example, key params table
 5d3ee12  Overhaul theory: KaTeX equations, 3D EM wave, light animations, Transducers nav
 b8c35c1  Expand Signal Processing section

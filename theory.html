@@ -1115,24 +1115,128 @@
         <div class="theory-section" id="acoustic-impedance">
           <h2>&#128260; Acoustic Impedance</h2>
           <p>
-            Acoustic impedance <em>Z</em> is a material property that determines how much of an
-            incident wave is reflected or transmitted at an interface.
+            Acoustic impedance <em>Z</em> characterises how a material resists the propagation of
+            pressure waves. At any interface between two media with different <em>Z</em> values, the
+            wave splits into a reflected wave and a transmitted wave — the greater the mismatch, the
+            more energy is reflected and the less penetrates. This principle governs everything from
+            couplant selection to echo amplitude interpretation.
           </p>
           <div class="eq-box">$$Z = \rho\,c \qquad [\text{Pa·s/m} = \text{Rayl}]$$</div>
 
-          <h3>Reflection &amp; Transmission Coefficients (Normal Incidence)</h3>
-          <div class="eq-box">$$R = \left(\frac{Z_2 - Z_1}{Z_2 + Z_1}\right)^{\!2} \quad (\text{intensity reflection}) \qquad T = 1 - R \quad (\text{intensity transmission})$$</div>
+          <!-- Interface diagram — normal incidence -->
+          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);padding:0;">
+            <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif" font-size="11">
+              <!-- Medium 1 background -->
+              <rect x="0" y="0" width="280" height="200" fill="#e0f2fe" opacity="0.55"/>
+              <text x="140" y="22" text-anchor="middle" fill="#0369a1" font-weight="700" font-size="12">Medium 1 (Z₁)</text>
 
-          <div class="callout">
-            <strong>Example:</strong> Steel–air interface: Z<sub>steel</sub> &asymp; 46 MRayl, Z<sub>air</sub> &asymp; 0.0004 MRayl &rarr; R &asymp; 100%. Nearly all energy reflects — this is why couplant is essential.
+              <!-- Medium 2 background -->
+              <rect x="280" y="0" width="280" height="200" fill="#fef3c7" opacity="0.55"/>
+              <text x="420" y="22" text-anchor="middle" fill="#92400e" font-weight="700" font-size="12">Medium 2 (Z₂)</text>
+
+              <!-- Interface line -->
+              <line x1="280" y1="0" x2="280" y2="200" stroke="#475569" stroke-width="2" stroke-dasharray="6,3"/>
+              <text x="280" y="198" text-anchor="middle" fill="#475569" font-size="9">interface</text>
+
+              <!-- Incident wave arrow -->
+              <line x1="80" y1="100" x2="265" y2="100" stroke="#0891b2" stroke-width="2.2" marker-end="url(#ai-arr-cyan)"/>
+              <text x="158" y="92" text-anchor="middle" fill="#0891b2" font-weight="600">Incident (I)</text>
+
+              <!-- Reflected wave arrow -->
+              <line x1="265" y1="100" x2="80" y2="130" stroke="#dc2626" stroke-width="2" marker-end="url(#ai-arr-red)"/>
+              <text x="140" y="152" fill="#dc2626" font-weight="600">Reflected (R)</text>
+
+              <!-- Transmitted wave arrow -->
+              <line x1="295" y1="100" x2="470" y2="100" stroke="#16a34a" stroke-width="2" marker-end="url(#ai-arr-green)"/>
+              <text x="382" y="92" text-anchor="middle" fill="#16a34a" font-weight="600">Transmitted (T)</text>
+
+              <!-- R and T labels -->
+              <text x="140" y="76" text-anchor="middle" fill="#0891b2" font-size="10">amplitude ∝ I</text>
+              <rect x="60" y="162" width="190" height="26" rx="4" fill="#fee2e2"/>
+              <text x="155" y="179" text-anchor="middle" fill="#991b1b" font-size="10">R = [(Z₂−Z₁)/(Z₂+Z₁)]² (intensity)</text>
+              <rect x="300" y="162" width="180" height="26" rx="4" fill="#dcfce7"/>
+              <text x="390" y="179" text-anchor="middle" fill="#166534" font-size="10">T = 1 − R (energy conservation)</text>
+
+              <!-- Arrow markers -->
+              <defs>
+                <marker id="ai-arr-cyan"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0891b2"/></marker>
+                <marker id="ai-arr-red"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#dc2626"/></marker>
+                <marker id="ai-arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#16a34a"/></marker>
+              </defs>
+            </svg>
           </div>
+
+          <h3>Reflection &amp; Transmission Coefficients (Normal Incidence)</h3>
+          <p>
+            For a wave striking an interface at normal incidence, the intensity reflection and
+            transmission coefficients are:
+          </p>
+          <div class="eq-box">$$R = \left(\frac{Z_2 - Z_1}{Z_2 + Z_1}\right)^{\!2} \quad (\text{intensity reflection}) \qquad T = 1 - R \quad (\text{intensity transmission})$$</div>
+          <p>
+            Note that <em>R</em> here is the <em>intensity</em> (power) reflection coefficient.
+            The pressure-amplitude reflection coefficient is the signed quantity
+            <em>r = (Z<sub>2</sub> &minus; Z<sub>1</sub>)/(Z<sub>2</sub> + Z<sub>1</sub>)</em>,
+            which is negative when Z<sub>2</sub> &lt; Z<sub>1</sub> (a &ldquo;soft&rdquo; reflection with phase inversion) —
+            a sign change visible in RF-mode A-scans and exploited in half-wave rectification to distinguish
+            crack faces from back-wall echoes.
+          </p>
+
+          <h3>Acoustic Impedance of NDE-Relevant Materials</h3>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>&rho; (kg/m&sup3;)</th>
+                <th>c<sub>L</sub> (m/s)</th>
+                <th>Z (MRayl)</th>
+                <th>NDE relevance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Steel (low-alloy)</strong></td><td>7 800</td><td>5 900</td><td class="hi">46.0</td><td>Primary inspection target</td></tr>
+              <tr><td><strong>Aluminium</strong></td><td>2 700</td><td>6 320</td><td>17.1</td><td>Aerospace structures, AM Ti parts</td></tr>
+              <tr><td><strong>Titanium</strong></td><td>4 510</td><td>6 100</td><td>27.5</td><td>Additive-manufactured components</td></tr>
+              <tr><td><strong>CFRP (through-thickness)</strong></td><td>~1 600</td><td>~2 800</td><td>~4.5</td><td>Low Z &rarr; large mismatch with steel tooling</td></tr>
+              <tr><td><strong>Water (20 &deg;C)</strong></td><td>998</td><td>1 480</td><td>1.48</td><td>Immersion couplant</td></tr>
+              <tr><td><strong>Ultrasonic gel</strong></td><td>~1 000</td><td>~1 500</td><td>~1.5</td><td>Contact couplant — closely matches water</td></tr>
+              <tr><td><strong>Air</strong></td><td>1.2</td><td>343</td><td class="hi-orange">0.0004</td><td>Near-total reflection at any solid–air gap</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Worked NDE Example — Immersion Inspection of Aluminium</h3>
+          <p>
+            In immersion UT, a transducer fires through a water path into an aluminium plate.
+            At the water–aluminium entry surface (Z<sub>1</sub> = 1.48 MRayl, Z<sub>2</sub> = 17.1 MRayl):
+          </p>
+          <div class="eq-box">$$R = \left(\frac{17.1 - 1.48}{17.1 + 1.48}\right)^{\!2} = \left(\frac{15.62}{18.58}\right)^{\!2} \approx 0.71 \quad (71\,\% \text{ of intensity reflected})$$</div>
+          <p>
+            Only 29 % of the incident intensity enters the part. On exit through the back wall
+            (aluminium–water), the same mismatch applies — roughly 29 % of the remaining intensity
+            exits into the water where it produces the back-wall echo. This 71 % entry-surface
+            reflection is why the initial-pulse echo is so dominant in an immersion A-scan.
+            Any indication amplitude must be compared against the back-wall echo, not the entry
+            surface, to account for this transmission loss.
+          </p>
 
           <h3>Importance of Couplant</h3>
           <p>
-            A thin liquid couplant (water, gel, oil) between the transducer and test piece eliminates the
-            air gap, enabling energy transmission. Without couplant, the transducer–air–solid interface
-            reflects nearly all acoustic energy back.
+            A thin liquid couplant eliminates the transducer–air–solid interface
+            (R &asymp; 100 % for steel–air) by substituting a medium whose impedance bridges the gap.
+            Water gel (Z &asymp; 1.5 MRayl) is not perfectly matched to steel (Z = 46 MRayl), but it
+            reduces the air-gap reflection from ~100 % to ~71 % — a ~12 dB improvement in transmitted
+            amplitude. Specialised impedance-matching layers bonded to the transducer face can
+            increase transmission further by introducing an intermediate Z layer of thickness &lambda;/4,
+            acting as an acoustic transformer.
           </p>
+
+          <div class="callout">
+            <strong>Phase inversion diagnostic:</strong> In RF mode, a reflection from a lower-Z
+            material (e.g. the far face of a steel plate into water, or a gas pore within metal)
+            appears as a polarity-inverted echo relative to the entry surface. This sign flip is a
+            direct consequence of <em>r</em> &lt; 0 and can distinguish an open crack (gas-filled,
+            soft reflection) from a bonded inclusion (hard reflection) — a technique used in
+            diffusion-bonded and brazed-joint inspection.
+          </div>
         </div>
 
         <!-- Attenuation (Advanced) -->
