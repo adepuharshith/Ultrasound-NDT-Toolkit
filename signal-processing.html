@@ -509,569 +509,404 @@
 <script>
 /* ================================================================
    SIGNAL PROCESSING PAGE — Interactive Visualizations
+   Fixes: (1) gaussPulse sigma in sample units, (2) CWT support
+   cutoff for performance, (3) deferred init via window.load
    ================================================================ */
-
-/* ── Utilities ── */
-const π = Math.PI;
-function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
-
-/* Gaussian-modulated sinusoidal pulse */
-function gaussPulse(t, t0, freq, sigma=0.25){
-  return Math.exp(-((t-t0)**2)/(2*sigma**2)) * Math.cos(2*π*freq*(t-t0));
-}
-
-/* Add noise to array */
-function addNoise(arr, level){
-  return arr.map(v => v + level*(Math.random()*2-1));
-}
-
-/* ================================================================
-   BLOCK 1 — CROSS-CORRELATION
-   ================================================================ */
-(function(){
-  const signalCanvas = document.getElementById('xcorrSignalCanvas');
-  const corrCanvas   = document.getElementById('xcorrCorrCanvas');
-  const sCtx = signalCanvas.getContext('2d');
-  const cCtx = corrCanvas.getContext('2d');
-
-  const offsetSlider = document.getElementById('xcorrOffset');
-  const noiseSlider  = document.getElementById('xcorrNoise');
-  const offsetLabel  = document.getElementById('xcorrOffsetLabel');
-  const noiseLabel   = document.getElementById('xcorrNoiseLabel');
-  const playBtn      = document.getElementById('xcorrPlayBtn');
-  const resetBtn     = document.getElementById('xcorrResetBtn');
-
-  const N = 512;
-  let animFrame = null;
-  let lagPos = 0;       // current animated lag position (px)
-  let isPlaying = false;
-  let animDir = 1;
-
-  function resize(){
-    signalCanvas.width = signalCanvas.offsetWidth * devicePixelRatio;
-    signalCanvas.height = 180 * devicePixelRatio;
-    signalCanvas.style.height = '180px';
-    corrCanvas.width = corrCanvas.offsetWidth * devicePixelRatio;
-    corrCanvas.height = 130 * devicePixelRatio;
-    corrCanvas.style.height = '130px';
-  }
-  resize();
-  window.addEventListener('resize', ()=>{ resize(); render(); });
-
-  /* Build signal: two gaussian pulses at positions t1, t2 */
-  function buildSignal(offset, noiseLevel){
-    const n = N;
-    const t1 = 80;
-    const t2 = t1 + offset;
-    const sig = new Float32Array(n);
-    for(let i=0;i<n;i++){
-      const t = i;
-      sig[i] = gaussPulse(t, t1, 0.06) + gaussPulse(t, t2, 0.06);
-    }
-    const noiseAmp = (noiseLevel/100)*0.4;
-    const noisy = new Float32Array(n);
-    for(let i=0;i<n;i++) noisy[i] = sig[i] + noiseAmp*(Math.random()*2-1);
-    return { clean:sig, noisy, t1, t2 };
-  }
-
-  /* Cross-correlation between template (pulse around t2) and full signal */
-  function crossCorrelate(sig, template, tStart, tLen){
-    const maxLag = N;
-    const corr = new Float32Array(maxLag*2+1);
-    for(let lag=-maxLag; lag<=maxLag; lag++){
-      let sum=0;
-      for(let k=0;k<tLen;k++){
-        const si = tStart + k + lag;
-        if(si>=0 && si<N) sum += sig[si]*template[k];
-      }
-      corr[lag+maxLag]=sum;
-    }
-    return corr;
-  }
-
-  /* Extract template around back-wall pulse */
-  function extractTemplate(sig, t2, hw=30){
-    const tmpl = new Float32Array(hw*2+1);
-    for(let k=0;k<tmpl.length;k++) tmpl[k] = sig[clamp(t2-hw+k,0,N-1)];
-    return tmpl;
-  }
-
-  function drawSignal(ctx, sig, templateStart, templateLen, lagOffset, noisy, t1, t2){
-    const W = ctx.canvas.width, H = ctx.canvas.height;
-    const dpr = devicePixelRatio;
-    ctx.clearRect(0,0,W,H);
-
-    /* background */
-    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
-
-    /* grid lines */
-    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
-    for(let y=H*.25;y<H;y+=H*.25){
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
-    }
-
-    const xScale = W/N;
-    const mid = H*0.5;
-    const amp = H*0.38;
-
-    /* shade template region sliding */
-    const shadeX = (templateStart + lagOffset)*xScale;
-    const shadeW = templateLen*xScale;
-    ctx.fillStyle='rgba(8,145,178,0.12)';
-    ctx.fillRect(shadeX,0,shadeW,H);
-
-    /* draw noisy signal */
-    ctx.beginPath();
-    ctx.strokeStyle='#475569'; ctx.lineWidth=1;
-    for(let i=0;i<N;i++){
-      const x=i*xScale, y=mid - noisy[i]*amp;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-
-    /* draw clean signal */
-    ctx.beginPath();
-    ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2;
-    for(let i=0;i<N;i++){
-      const x=i*xScale, y=mid - sig[i]*amp;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-
-    /* FW pulse label */
-    const fw_x = t1*xScale;
-    ctx.fillStyle='#fbbf24'; ctx.font=`bold ${11*dpr}px Inter`; ctx.textAlign='center';
-    ctx.fillText('FW pulse', fw_x, H*0.12);
-    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(fw_x,H*.16); ctx.lineTo(fw_x,mid-amp*0.75); ctx.stroke();
-
-    /* BW pulse label */
-    const bw_x = t2*xScale;
-    ctx.fillStyle='#a78bfa';
-    ctx.fillText('BW pulse', bw_x, H*0.12);
-    ctx.strokeStyle='#a78bfa';
-    ctx.beginPath(); ctx.moveTo(bw_x,H*.16); ctx.lineTo(bw_x,mid-amp*0.75); ctx.stroke();
-
-    /* sliding template outline */
-    const tmx = shadeX;
-    ctx.strokeStyle='rgba(8,145,178,0.9)'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
-    ctx.strokeRect(tmx, H*.1, shadeW, H*.8);
-    ctx.setLineDash([]);
-
-    /* axes labels */
-    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`; ctx.textAlign='left';
-    ctx.fillText('t →', W-30, H-4);
-    ctx.fillText('Amp', 4, 14);
-  }
-
-  function drawCorrelation(ctx, corrArr, lagAtPeak, animLag, W2){
-    const W=ctx.canvas.width, H=ctx.canvas.height;
-    const dpr=devicePixelRatio;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
-
-    /* grid */
-    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(0,H*0.5); ctx.lineTo(W,H*0.5); ctx.stroke();
-
-    /* find max for normalization */
-    let maxC=1e-9;
-    for(let i=0;i<corrArr.length;i++) if(Math.abs(corrArr[i])>maxC) maxC=Math.abs(corrArr[i]);
-
-    const mid=H*0.5, amp=H*0.42;
-    const corrCenter=Math.floor(corrArr.length/2);
-
-    /* draw correlation up to current animated lag */
-    const totalLags=corrArr.length;
-    const animIdx=clamp(Math.round(animLag*totalLags/N+corrCenter), 0, totalLags-1);
-
-    ctx.beginPath();
-    ctx.strokeStyle='#34d399'; ctx.lineWidth=2;
-    for(let i=0;i<=animIdx;i++){
-      const x=i*W/totalLags;
-      const y=mid - (corrArr[i]/maxC)*amp;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-
-    /* peak marker */
-    const peakIdx = lagAtPeak + corrCenter;
-    if(peakIdx < animIdx){
-      const px = peakIdx*W/totalLags;
-      const py = mid - (corrArr[peakIdx]/maxC)*amp;
-      ctx.fillStyle='#fbbf24';
-      ctx.beginPath(); ctx.arc(px,py,4,0,2*π); ctx.fill();
-      ctx.fillStyle='#fbbf24'; ctx.font=`bold ${10*dpr}px Inter`;
-      ctx.textAlign='center';
-      ctx.fillText(`peak → Δt = ${lagAtPeak} samples`, px, py-10);
-    }
-
-    /* axis labels */
-    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`;
-    ctx.textAlign='center';
-    ctx.fillText('lag τ', W*0.5, H-3);
-    ctx.textAlign='left';
-    ctx.fillText('R(τ)', 4, 14);
-  }
-
-  function render(){
-    const offset = parseInt(offsetSlider.value);
-    const noise  = parseInt(noiseSlider.value);
-    offsetLabel.textContent = offset + ' samples';
-    noiseLabel.textContent  = noise + '%';
-
-    const { clean, noisy, t1, t2 } = buildSignal(offset, noise);
-    const hw = 30;
-    const tmpl = extractTemplate(clean, t2, hw);
-
-    /* Compute full correlation once */
-    const corrArr = crossCorrelate(noisy, tmpl, t2-hw, tmpl.length);
-    const corrCenter = Math.floor(corrArr.length/2);
-
-    /* Find peak lag */
-    let maxVal=-1e9, peakLag=0;
-    for(let i=0;i<corrArr.length;i++){
-      if(corrArr[i]>maxVal){ maxVal=corrArr[i]; peakLag=i-corrCenter; }
-    }
-
-    const currentLag = isPlaying ? lagPos - t2 + hw : 0;
-
-    drawSignal(sCtx, clean, t2-hw, tmpl.length, lagPos - (t2-hw), noisy, t1, t2);
-    drawCorrelation(cCtx, corrArr, peakLag, lagPos, N);
-  }
-
-  function animate(){
-    if(!isPlaying) return;
-    lagPos += 2 * animDir;
-    if(lagPos >= N-5){ animDir=-1; }
-    if(lagPos <= 0){ lagPos=0; animDir=1; isPlaying=false; playBtn.textContent='▶ Animate'; }
-    render();
-    animFrame = requestAnimationFrame(animate);
-  }
-
-  playBtn.addEventListener('click', ()=>{
-    if(isPlaying){ isPlaying=false; cancelAnimationFrame(animFrame); playBtn.textContent='▶ Animate'; }
-    else{
-      lagPos=0; animDir=1; isPlaying=true; playBtn.textContent='⏸ Pause';
-      animate();
-    }
-  });
-
-  resetBtn.addEventListener('click', ()=>{
-    isPlaying=false; cancelAnimationFrame(animFrame);
-    lagPos=0; playBtn.textContent='▶ Animate'; render();
-  });
-
-  offsetSlider.addEventListener('input', ()=>{ if(!isPlaying) render(); });
-  noiseSlider.addEventListener('input',  ()=>{ if(!isPlaying) render(); });
-
-  render();
-})();
-
-
-/* ================================================================
-   BLOCK 2 — WAVELET TRANSFORM
-   ================================================================ */
-(function(){
-  const timeDomCanvas  = document.getElementById('wvTimeDomainCanvas');
-  const fftCanvas      = document.getElementById('wvFFTCanvas');
-  const spectroCanvas  = document.getElementById('wvSpectroCanvas');
-  const sigCanvas      = document.getElementById('wvSigCanvas');
-
-  const tdCtx = timeDomCanvas.getContext('2d');
-  const ffCtx = fftCanvas.getContext('2d');
-  const spCtx = spectroCanvas.getContext('2d');
-  const sgCtx = sigCanvas.getContext('2d');
-
-  const btnPulse = document.getElementById('wvSigPulse');
-  const btnChirp = document.getElementById('wvSigChirp');
-  const btnMulti = document.getElementById('wvSigMulti');
-  const omegaSlider = document.getElementById('wvOmega');
-  const freqSlider  = document.getElementById('wvFreq');
-  const omegaLabel  = document.getElementById('wvOmegaLabel');
-  const freqLabel   = document.getElementById('wvFreqLabel');
-
-  let sigType = 'pulse';
-  const N = 512;
-  const Fs = 20; /* normalized sample rate (MHz) */
-
-  function resize(){
-    [timeDomCanvas, fftCanvas].forEach(c=>{
-      c.width = c.offsetWidth * devicePixelRatio;
-      c.height = 160 * devicePixelRatio;
-      c.style.height = '160px';
-    });
-    spectroCanvas.width = spectroCanvas.offsetWidth * devicePixelRatio;
-    spectroCanvas.height = 220 * devicePixelRatio;
-    spectroCanvas.style.height = '220px';
-    sigCanvas.width = sigCanvas.offsetWidth * devicePixelRatio;
-    sigCanvas.height = 90 * devicePixelRatio;
-    sigCanvas.style.height = '90px';
-  }
-  resize();
-  window.addEventListener('resize', ()=>{ resize(); renderAll(); });
-
-  /* ── Signal generators ── */
-  function makePulse(fc){
-    const sig = new Float32Array(N);
-    const t0 = N*0.45, sigma=N*0.04;
-    for(let i=0;i<N;i++){
-      const t=(i-t0)/N;
-      sig[i] = Math.exp(-(i-t0)**2/(2*sigma**2)) * Math.cos(2*π*(fc/Fs)*(i-t0));
-    }
-    return sig;
-  }
-
-  /* Linear chirp: sweeps from f1 to f2 */
-  function makeChirp(f1=1, f2=8){
-    const sig = new Float32Array(N);
-    const env_sigma = N*0.28;
-    const env_center = N*0.5;
-    for(let i=0;i<N;i++){
-      const t=i/N;
-      const fi = f1+(f2-f1)*t;
-      const env=Math.exp(-((i-env_center)**2)/(2*env_sigma**2));
-      sig[i]=env*Math.cos(2*π*(fi/Fs)*i);
-    }
-    return sig;
-  }
-
-  /* Two modes: slower low-freq + faster high-freq (Lamb-like) */
-  function makeMultiMode(fc){
-    const sig = new Float32Array(N);
-    /* Mode A: 2 MHz, arrives early */
-    const tA=N*0.28, sA=N*0.06, fA=2;
-    /* Mode B: 6 MHz, arrives late */
-    const tB=N*0.62, sB=N*0.05, fB=6;
-    for(let i=0;i<N;i++){
-      const mA = Math.exp(-(i-tA)**2/(2*sA**2)) * Math.cos(2*π*(fA/Fs)*(i-tA));
-      const mB = Math.exp(-(i-tB)**2/(2*sB**2)) * 0.7*Math.cos(2*π*(fB/Fs)*(i-tB));
-      sig[i]=mA+mB;
-    }
-    return sig;
-  }
-
-  function getSignal(){
-    const fc = parseFloat(freqSlider.value);
-    if(sigType==='pulse')  return makePulse(fc);
-    if(sigType==='chirp')  return makeChirp(1,8);
-    return makeMultiMode(fc);
-  }
-
-  /* ── Simple DFT magnitude (real FFT via Cooley-Tukey not implemented; use DFT of first 256) ── */
-  function computeFFT(sig){
-    const M = 256;
-    const re = new Float32Array(M), im = new Float32Array(M);
-    for(let k=0;k<M;k++){
-      let r=0,im_=0;
-      for(let n=0;n<N;n++){
-        const angle = 2*π*k*n/N;
-        r  += sig[n]*Math.cos(angle);
-        im_ -= sig[n]*Math.sin(angle);
-      }
-      re[k]=r; im[k]=im_;
-    }
-    const mag = new Float32Array(M);
-    for(let k=0;k<M;k++) mag[k]=Math.sqrt(re[k]**2+im[k]**2);
-    return mag;
-  }
-
-  /* ── CWT with Morlet wavelet (real part computed, magnitude used) ── */
-  function computeCWT(sig, omega0, freqSteps=80){
-    const freqMin=0.3, freqMax=9.5; /* in MHz */
-    const result = [];
-    for(let fi=0;fi<freqSteps;fi++){
-      const freq = freqMin + (freqMax-freqMin)*fi/freqSteps;
-      const scale = omega0/(2*π*freq/Fs);
-      const row = new Float32Array(N);
-      for(let b=0;b<N;b++){
-        let wr=0,wi=0;
-        for(let t=0;t<N;t++){
-          const tau=(t-b)/scale;
-          const gauss=Math.exp(-0.5*tau**2);
-          const cosPart=Math.cos(omega0*tau);
-          const sinPart=Math.sin(omega0*tau);
-          wr += sig[t]*gauss*cosPart;
-          wi += sig[t]*gauss*sinPart;
-        }
-        row[b]=Math.sqrt(wr**2+wi**2)/(Math.sqrt(scale)+1e-9);
-      }
-      result.push(row);
-    }
-    return result;
-  }
-
-  /* ── Draw helpers ── */
-  function drawTimeDomain(ctx, sig){
-    const W=ctx.canvas.width, H=ctx.canvas.height;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
-
-    /* grid */
-    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
-    [0.25,0.5,0.75].forEach(fy=>{
-      ctx.beginPath(); ctx.moveTo(0,H*fy); ctx.lineTo(W,H*fy); ctx.stroke();
-    });
-
-    const mid=H*0.5, amp=H*0.42;
-    ctx.beginPath(); ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2;
-    for(let i=0;i<N;i++){
-      const x=i*W/N, y=mid-sig[i]*amp;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-
-    const dpr=devicePixelRatio;
-    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`;
-    ctx.textAlign='left'; ctx.fillText('Amplitude (V)', 4, 14);
-    ctx.textAlign='right'; ctx.fillText('time (μs) →', W-4, H-4);
-    ctx.fillStyle='#38bdf8'; ctx.font=`bold ${10*dpr}px Inter`;
-    ctx.textAlign='left'; ctx.fillText('v(t)', 4, H-4);
-  }
-
-  function drawFFT(ctx, sig){
-    const W=ctx.canvas.width, H=ctx.canvas.height;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
-
-    /* naive DFT for visualization (faster approx) */
-    const freqBins=128;
-    const mag = new Float32Array(freqBins);
-    for(let k=0;k<freqBins;k++){
-      let r=0,im=0;
-      for(let n=0;n<N;n++){
-        const angle=2*π*k*n/N;
-        r+=sig[n]*Math.cos(angle);
-        im-=sig[n]*Math.sin(angle);
-      }
-      mag[k]=Math.sqrt(r**2+im**2);
-    }
-    let maxM=1e-9; for(let k=0;k<freqBins;k++) if(mag[k]>maxM) maxM=mag[k];
-
-    /* grid */
-    ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
-    [0.25,0.5,0.75].forEach(fy=>{
-      ctx.beginPath(); ctx.moveTo(0,H*fy); ctx.lineTo(W,H*fy); ctx.stroke();
-    });
-
-    const dpr=devicePixelRatio;
-
-    /* bars */
-    const bw = W/freqBins;
-    for(let k=0;k<freqBins;k++){
-      const bh=(mag[k]/maxM)*(H*0.85);
-      const hue = 180 + (mag[k]/maxM)*60;
-      ctx.fillStyle=`hsl(${hue},80%,60%)`;
-      ctx.fillRect(k*bw, H-bh, bw-1, bh);
-    }
-
-    ctx.fillStyle='#64748b'; ctx.font=`${9*dpr}px Inter`;
-    ctx.textAlign='left'; ctx.fillText('|X(f)|', 4, 14);
-    ctx.textAlign='right'; ctx.fillText('frequency (MHz) →', W-4, H-4);
-    ctx.fillStyle='#34d399'; ctx.font=`bold ${10*dpr}px Inter`;
-    ctx.textAlign='left'; ctx.fillText('FFT', 4, H-4);
-  }
-
-  function heatmapColor(v){
-    /* v in [0,1]; navy→cyan→yellow→white */
-    if(v<0.33){ const t=v/0.33; return [lerp(15,8,t), lerp(23,145,t), lerp(94,178,t)]; }
-    if(v<0.66){ const t=(v-0.33)/0.33; return [lerp(8,250,t), lerp(145,200,t), lerp(178,50,t)]; }
-    const t=(v-0.66)/0.34; return [lerp(250,255,t),lerp(200,255,t),lerp(50,255,t)];
-  }
+window.addEventListener('load', function() {
+  const PI  = Math.PI;
+  const DPR = window.devicePixelRatio || 1;
+  function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
   function lerp(a,b,t){ return Math.round(a+(b-a)*t); }
 
-  function drawSpectrogram(ctx, cwt){
-    const W=ctx.canvas.width, H=ctx.canvas.height;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#0a0f1a'; ctx.fillRect(0,0,W,H);
+  function initCanvas(el, cssH) {
+    const w = Math.max(el.offsetWidth, 300);
+    el.width  = w * DPR;
+    el.height = cssH * DPR;
+    el.style.height = cssH + 'px';
+    return el.getContext('2d');
+  }
+  /* ================================================================
+     BLOCK 1 — CROSS-CORRELATION
+     Fix: sigma=12 samples (was 0.25), proper sample-space pulse
+     ================================================================ */
+  (function(){
+    const N      = 256;
+    const SIGMA  = 12;    // envelope width in samples — visible pulse
+    const FCARR  = 0.10;  // carrier: 0.1 cycles/sample → period = 10 samples
 
-    const freqSteps=cwt.length;
-    let maxVal=1e-9;
-    cwt.forEach(row=>{ for(let i=0;i<row.length;i++) if(row[i]>maxVal) maxVal=row[i]; });
+    const sCanvas = document.getElementById('xcorrSignalCanvas');
+    const cCanvas = document.getElementById('xcorrCorrCanvas');
+    let sCtx = initCanvas(sCanvas, 190);
+    let cCtx = initCanvas(cCanvas, 130);
 
-    const cellW = W/N;
-    const cellH = H/freqSteps;
+    const offsetSlider = document.getElementById('xcorrOffset');
+    const noiseSlider  = document.getElementById('xcorrNoise');
+    const offsetLabel  = document.getElementById('xcorrOffsetLabel');
+    const noiseLabel   = document.getElementById('xcorrNoiseLabel');
+    const playBtn      = document.getElementById('xcorrPlayBtn');
+    const resetBtn     = document.getElementById('xcorrResetBtn');
 
-    for(let fi=0;fi<freqSteps;fi++){
-      const row=cwt[fi];
-      const y=H - (fi+1)*cellH; /* low freq at bottom */
-      for(let t=0;t<N;t++){
-        const v=clamp(row[t]/maxVal,0,1);
-        const [r,g,b]=heatmapColor(v);
-        ctx.fillStyle=`rgb(${r},${g},${b})`;
-        ctx.fillRect(t*cellW, y, Math.ceil(cellW)+1, Math.ceil(cellH)+1);
+    let lagPos=0, isPlaying=false, animFrame=null;
+
+    function gpulse(i, t0){
+      const dt=i-t0;
+      return Math.exp(-(dt*dt)/(2*SIGMA*SIGMA)) * Math.cos(2*PI*FCARR*dt);
+    }
+
+    function buildSignal(offset, noisePct){
+      const t1=45, t2=t1+offset;
+      const clean=new Float32Array(N);
+      for(let i=0;i<N;i++) clean[i]=gpulse(i,t1)+gpulse(i,t2);
+      const noiseAmp=(noisePct/100)*0.5;
+      const noisy=new Float32Array(N);
+      for(let i=0;i<N;i++) noisy[i]=clean[i]+noiseAmp*(Math.random()*2-1);
+      return {clean,noisy,t1,t2};
+    }
+
+    function extractTemplate(sig, center, hw){
+      const tmpl=new Float32Array(hw*2+1);
+      for(let k=0;k<tmpl.length;k++) tmpl[k]=sig[clamp(center-hw+k,0,N-1)];
+      return tmpl;
+    }
+
+    function crossCorrelate(sig, tmpl, tStart){
+      const maxLag=N;
+      const corr=new Float32Array(maxLag*2+1);
+      for(let lag=-maxLag;lag<=maxLag;lag++){
+        let s=0;
+        for(let k=0;k<tmpl.length;k++){
+          const si=tStart+k+lag;
+          if(si>=0&&si<N) s+=sig[si]*tmpl[k];
+        }
+        corr[lag+maxLag]=s;
       }
+      return corr;
     }
 
-    /* axis labels */
-    const dpr=devicePixelRatio;
-    ctx.fillStyle='rgba(148,163,184,0.9)';
-    ctx.font=`${10*dpr}px Inter`;
-    ctx.textAlign='left';  ctx.fillText('freq (MHz) ↑', 6, 16);
-    ctx.textAlign='right'; ctx.fillText('time →', W-6, H-6);
-
-    /* freq tick labels */
-    [2,4,6,8].forEach(f=>{
-      const fy = H - (f-0.3)/(9.5-0.3)*H;
-      ctx.fillStyle='rgba(100,116,139,0.8)';
-      ctx.font=`${9*dpr}px Inter`;
-      ctx.textAlign='left'; ctx.fillText(f+' MHz', 4, fy);
-      ctx.strokeStyle='rgba(100,116,139,0.25)'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(50*dpr, fy); ctx.lineTo(W,fy); ctx.stroke();
-    });
-  }
-
-  function drawSigOverlay(ctx, sig){
-    const W=ctx.canvas.width, H=ctx.canvas.height;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,W,H);
-    const mid=H*0.5, amp=H*0.4;
-    ctx.beginPath(); ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2;
-    for(let i=0;i<N;i++){
-      const x=i*W/N, y=mid-sig[i]*amp;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    function drawSignal(sig, noisy, t1, t2, slidePos){
+      const W=sCanvas.width, H=sCanvas.height;
+      sCtx.clearRect(0,0,W,H);
+      sCtx.fillStyle='#0f172a'; sCtx.fillRect(0,0,W,H);
+      [0.25,0.5,0.75].forEach(fy=>{
+        sCtx.strokeStyle='#1e293b'; sCtx.lineWidth=1;
+        sCtx.beginPath(); sCtx.moveTo(0,H*fy); sCtx.lineTo(W,H*fy); sCtx.stroke();
+      });
+      const xS=W/N, mid=H*0.5, amp=H*0.38;
+      const hw=22, tmplW=(hw*2+1)*xS;
+      sCtx.fillStyle='rgba(8,145,178,0.15)';
+      sCtx.fillRect(slidePos*xS-tmplW/2,0,tmplW,H);
+      // noisy
+      sCtx.beginPath(); sCtx.strokeStyle='#334155'; sCtx.lineWidth=1;
+      for(let i=0;i<N;i++){const x=i*xS,y=mid-noisy[i]*amp;if(i===0)sCtx.moveTo(x,y);else sCtx.lineTo(x,y);}
+      sCtx.stroke();
+      // clean
+      sCtx.beginPath(); sCtx.strokeStyle='#38bdf8'; sCtx.lineWidth=2;
+      for(let i=0;i<N;i++){const x=i*xS,y=mid-sig[i]*amp;if(i===0)sCtx.moveTo(x,y);else sCtx.lineTo(x,y);}
+      sCtx.stroke();
+      // sliding window
+      sCtx.strokeStyle='rgba(8,145,178,0.9)'; sCtx.lineWidth=2; sCtx.setLineDash([5,3]);
+      sCtx.strokeRect(slidePos*xS-tmplW/2,H*0.08,tmplW,H*0.84);
+      sCtx.setLineDash([]);
+      // labels
+      const fz=Math.round(10*DPR);
+      sCtx.font=`bold ${fz}px Inter,sans-serif`;
+      sCtx.fillStyle='#fbbf24'; sCtx.textAlign='center';
+      sCtx.fillText('FW pulse',t1*xS,H*0.1);
+      sCtx.strokeStyle='#fbbf24'; sCtx.lineWidth=1;
+      sCtx.beginPath(); sCtx.moveTo(t1*xS,H*0.13); sCtx.lineTo(t1*xS,mid-amp*0.6); sCtx.stroke();
+      sCtx.fillStyle='#a78bfa';
+      sCtx.fillText('BW pulse',t2*xS,H*0.1);
+      sCtx.strokeStyle='#a78bfa';
+      sCtx.beginPath(); sCtx.moveTo(t2*xS,H*0.13); sCtx.lineTo(t2*xS,mid-amp*0.6); sCtx.stroke();
+      sCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
+      sCtx.fillStyle='#475569'; sCtx.textAlign='left'; sCtx.fillText('Amp',4,13);
+      sCtx.textAlign='right'; sCtx.fillText('time →',W-4,H-4);
     }
-    ctx.stroke();
-    const dpr=devicePixelRatio;
-    ctx.fillStyle='#475569'; ctx.font=`${9*dpr}px Inter`;
-    ctx.textAlign='right'; ctx.fillText('time →', W-4, H-4);
-  }
 
-  /* ── Render all ── */
-  let renderPending=false;
-  function renderAll(){
-    if(renderPending) return;
-    renderPending=true;
-    requestAnimationFrame(()=>{
-      renderPending=false;
-      const sig = getSignal();
-      const omega0 = parseFloat(omegaSlider.value);
-      omegaLabel.textContent = omega0;
-      freqLabel.textContent  = freqSlider.value + ' MHz';
+    function drawCorr(corrArr, peakLag, progress){
+      const W=cCanvas.width, H=cCanvas.height;
+      cCtx.clearRect(0,0,W,H);
+      cCtx.fillStyle='#0f172a'; cCtx.fillRect(0,0,W,H);
+      cCtx.strokeStyle='#1e293b'; cCtx.lineWidth=1;
+      cCtx.beginPath(); cCtx.moveTo(0,H*0.5); cCtx.lineTo(W,H*0.5); cCtx.stroke();
+      let maxC=1e-9;
+      for(let i=0;i<corrArr.length;i++) if(Math.abs(corrArr[i])>maxC) maxC=Math.abs(corrArr[i]);
+      const mid=H*0.5, amp=H*0.42, total=corrArr.length;
+      const upTo=Math.floor(progress*total);
+      cCtx.beginPath(); cCtx.strokeStyle='#34d399'; cCtx.lineWidth=2;
+      for(let i=0;i<upTo;i++){
+        const x=i*W/total, y=mid-(corrArr[i]/maxC)*amp;
+        if(i===0)cCtx.moveTo(x,y);else cCtx.lineTo(x,y);
+      }
+      cCtx.stroke();
+      const peakIdx=peakLag+Math.floor(total/2);
+      if(peakIdx>=0&&peakIdx<upTo){
+        const px=peakIdx*W/total, py=mid-(corrArr[peakIdx]/maxC)*amp;
+        cCtx.fillStyle='#fbbf24';
+        cCtx.beginPath(); cCtx.arc(px,py,5*DPR,0,2*PI); cCtx.fill();
+        cCtx.font=`bold ${Math.round(9*DPR)}px Inter,sans-serif`;
+        cCtx.fillStyle='#fbbf24'; cCtx.textAlign='center';
+        cCtx.fillText('Δt = '+peakLag+' samp',px,py-8*DPR);
+      }
+      cCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
+      cCtx.fillStyle='#475569'; cCtx.textAlign='left'; cCtx.fillText('R(τ)',4,12);
+      cCtx.textAlign='center'; cCtx.fillText('lag τ →',W*0.5,H-3);
+    }
 
-      drawTimeDomain(tdCtx, sig);
-      drawFFT(ffCtx, sig);
+    function render(){
+      const offset=parseInt(offsetSlider.value);
+      const noise=parseInt(noiseSlider.value);
+      offsetLabel.textContent=offset+' samp';
+      noiseLabel.textContent=noise+'%';
+      const {clean,noisy,t1,t2}=buildSignal(offset,noise);
+      const hw=22, tmpl=extractTemplate(clean,t2,hw);
+      const corrArr=crossCorrelate(noisy,tmpl,t2-hw);
+      const cCenter=Math.floor(corrArr.length/2);
+      let maxV=-1e9, peakLag=0;
+      for(let i=0;i<corrArr.length;i++) if(corrArr[i]>maxV){maxV=corrArr[i];peakLag=i-cCenter;}
+      const progress=isPlaying?lagPos/N:1;
+      drawSignal(clean,noisy,t1,t2,lagPos);
+      drawCorr(corrArr,peakLag,progress);
+    }
 
-      /* CWT is expensive — run async-ish in chunks via setTimeout to avoid blocking */
-      const cwt = computeCWT(sig, omega0, 60);
-      drawSpectrogram(spCtx, cwt);
-      drawSigOverlay(sgCtx, sig);
+    function animate(){
+      if(!isPlaying) return;
+      lagPos+=2; if(lagPos>=N){lagPos=0;}
+      render(); animFrame=requestAnimationFrame(animate);
+    }
+
+    playBtn.addEventListener('click',()=>{
+      if(isPlaying){isPlaying=false;cancelAnimationFrame(animFrame);playBtn.textContent='▶ Animate';}
+      else{lagPos=0;isPlaying=true;playBtn.textContent='⏸ Pause';animate();}
     });
-  }
+    resetBtn.addEventListener('click',()=>{
+      isPlaying=false;cancelAnimationFrame(animFrame);
+      lagPos=0;playBtn.textContent='▶ Animate';render();
+    });
+    offsetSlider.addEventListener('input',()=>{if(!isPlaying)render();});
+    noiseSlider.addEventListener('input',()=>{if(!isPlaying)render();});
+    window.addEventListener('resize',()=>{
+      sCtx=initCanvas(sCanvas,190); cCtx=initCanvas(cCanvas,130); render();
+    });
+    render();
+  })();
 
-  /* ── Button switching ── */
-  function setActive(btn){
-    [btnPulse,btnChirp,btnMulti].forEach(b=>b.classList.remove('primary'));
-    btn.classList.add('primary');
-  }
-  btnPulse.addEventListener('click', ()=>{ sigType='pulse'; setActive(btnPulse); renderAll(); });
-  btnChirp.addEventListener('click', ()=>{ sigType='chirp'; setActive(btnChirp); renderAll(); });
-  btnMulti.addEventListener('click', ()=>{ sigType='multi'; setActive(btnMulti); renderAll(); });
-  omegaSlider.addEventListener('input', renderAll);
-  freqSlider.addEventListener('input', renderAll);
 
-  renderAll();
-})();
+  /* ================================================================
+     BLOCK 2 — WAVELET TRANSFORM
+     Fix: N=256, CWT support cutoff (O(N×scale) not O(N²)), deferred
+     ================================================================ */
+  (function(){
+    const N=256, Fs=20;
+
+    const tdCanvas = document.getElementById('wvTimeDomainCanvas');
+    const ffCanvas = document.getElementById('wvFFTCanvas');
+    const spCanvas = document.getElementById('wvSpectroCanvas');
+    const sgCanvas = document.getElementById('wvSigCanvas');
+    let tdCtx=initCanvas(tdCanvas,160), ffCtx=initCanvas(ffCanvas,160);
+    let spCtx=initCanvas(spCanvas,220), sgCtx=initCanvas(sgCanvas,90);
+
+    const btnPulse=document.getElementById('wvSigPulse');
+    const btnChirp=document.getElementById('wvSigChirp');
+    const btnMulti=document.getElementById('wvSigMulti');
+    const omegaSlider=document.getElementById('wvOmega');
+    const freqSlider=document.getElementById('wvFreq');
+    const omegaLabel=document.getElementById('wvOmegaLabel');
+    const freqLabel=document.getElementById('wvFreqLabel');
+    let sigType='pulse';
+
+    function makePulse(fc){
+      const sig=new Float32Array(N);
+      const t0=N*0.45, sigma=N*0.07;
+      for(let i=0;i<N;i++){const dt=i-t0;sig[i]=Math.exp(-(dt*dt)/(2*sigma*sigma))*Math.cos(2*PI*(fc/Fs)*dt);}
+      return sig;
+    }
+    function makeChirp(){
+      const sig=new Float32Array(N);
+      const f1=1,f2=8,sigma=N*0.28,center=N*0.5;
+      for(let i=0;i<N;i++){
+        const fi=f1+(f2-f1)*i/N;
+        const env=Math.exp(-((i-center)*(i-center))/(2*sigma*sigma));
+        sig[i]=env*Math.cos(2*PI*(fi/Fs)*i);
+      }
+      return sig;
+    }
+    function makeMultiMode(){
+      const sig=new Float32Array(N);
+      const tA=N*0.28,sA=N*0.07,fA=2,tB=N*0.65,sB=N*0.06,fB=6;
+      for(let i=0;i<N;i++){
+        const dtA=i-tA,dtB=i-tB;
+        sig[i]=Math.exp(-(dtA*dtA)/(2*sA*sA))*Math.cos(2*PI*(fA/Fs)*dtA)
+              +Math.exp(-(dtB*dtB)/(2*sB*sB))*0.75*Math.cos(2*PI*(fB/Fs)*dtB);
+      }
+      return sig;
+    }
+    function getSignal(){
+      const fc=parseFloat(freqSlider.value);
+      if(sigType==='chirp') return makeChirp();
+      if(sigType==='multi') return makeMultiMode();
+      return makePulse(fc);
+    }
+
+    /* DFT — 64 bins, fast enough for display */
+    function computeDFT(sig){
+      const M=64, mag=new Float32Array(M);
+      for(let k=0;k<M;k++){
+        let r=0,im=0;
+        for(let n=0;n<N;n++){const a=2*PI*k*n/N;r+=sig[n]*Math.cos(a);im-=sig[n]*Math.sin(a);}
+        mag[k]=Math.sqrt(r*r+im*im);
+      }
+      return mag;
+    }
+
+    /* CWT — Morlet with Gaussian support cutoff: O(N × scale) not O(N²) */
+    function computeCWT(sig, omega0){
+      const freqSteps=48, freqMin=0.3, freqMax=9.8;
+      const result=[];
+      for(let fi=0;fi<freqSteps;fi++){
+        const freq=freqMin+(freqMax-freqMin)*fi/freqSteps;
+        const scale=omega0/(2*PI*freq/Fs);
+        const halfSupp=Math.min(Math.ceil(4.5*scale), N-1);
+        const row=new Float32Array(N);
+        for(let b=0;b<N;b++){
+          let wr=0,wi=0;
+          const t0=Math.max(0,b-halfSupp), t1=Math.min(N-1,b+halfSupp);
+          for(let t=t0;t<=t1;t++){
+            const tau=(t-b)/scale;
+            const g=Math.exp(-0.5*tau*tau);
+            wr+=sig[t]*g*Math.cos(omega0*tau);
+            wi+=sig[t]*g*Math.sin(omega0*tau);
+          }
+          row[b]=Math.sqrt(wr*wr+wi*wi)/Math.sqrt(scale+0.001);
+        }
+        result.push(row);
+      }
+      return result;
+    }
+
+    function heatColor(v){
+      if(v<0.33){const t=v/0.33;return[lerp(10,8,t),lerp(15,145,t),lerp(80,178,t)];}
+      if(v<0.66){const t=(v-0.33)/0.33;return[lerp(8,250,t),lerp(145,200,t),lerp(178,50,t)];}
+      const t=(v-0.66)/0.34;return[lerp(250,255,t),lerp(200,255,t),lerp(50,255,t)];
+    }
+
+    function drawTimeDomain(){
+      const sig=getSignal();
+      const W=tdCanvas.width, H=tdCanvas.height;
+      tdCtx.clearRect(0,0,W,H);
+      tdCtx.fillStyle='#0f172a'; tdCtx.fillRect(0,0,W,H);
+      [0.25,0.5,0.75].forEach(fy=>{
+        tdCtx.strokeStyle='#1e293b'; tdCtx.lineWidth=1;
+        tdCtx.beginPath(); tdCtx.moveTo(0,H*fy); tdCtx.lineTo(W,H*fy); tdCtx.stroke();
+      });
+      const mid=H*0.5, amp=H*0.42;
+      tdCtx.beginPath(); tdCtx.strokeStyle='#38bdf8'; tdCtx.lineWidth=2;
+      for(let i=0;i<N;i++){const x=i*W/N,y=mid-sig[i]*amp;if(i===0)tdCtx.moveTo(x,y);else tdCtx.lineTo(x,y);}
+      tdCtx.stroke();
+      const fz=Math.round(9*DPR);
+      tdCtx.font=`${fz}px Inter,sans-serif`; tdCtx.fillStyle='#475569';
+      tdCtx.textAlign='left'; tdCtx.fillText('v(t)',4,13);
+      tdCtx.textAlign='right'; tdCtx.fillText('time →',W-4,H-4);
+    }
+
+    function drawFFT(){
+      const sig=getSignal();
+      const W=ffCanvas.width, H=ffCanvas.height;
+      ffCtx.clearRect(0,0,W,H); ffCtx.fillStyle='#0f172a'; ffCtx.fillRect(0,0,W,H);
+      [0.25,0.5,0.75].forEach(fy=>{
+        ffCtx.strokeStyle='#1e293b'; ffCtx.lineWidth=1;
+        ffCtx.beginPath(); ffCtx.moveTo(0,H*fy); ffCtx.lineTo(W,H*fy); ffCtx.stroke();
+      });
+      const mag=computeDFT(sig);
+      let maxM=1e-9; for(let k=0;k<mag.length;k++) if(mag[k]>maxM) maxM=mag[k];
+      const bw=W/mag.length;
+      for(let k=0;k<mag.length;k++){
+        const v=mag[k]/maxM;
+        ffCtx.fillStyle=`hsl(${180+v*60},80%,60%)`;
+        ffCtx.fillRect(k*bw,H-v*(H*0.86),bw-1,v*(H*0.86));
+      }
+      const fz=Math.round(9*DPR);
+      ffCtx.font=`${fz}px Inter,sans-serif`; ffCtx.fillStyle='#475569';
+      ffCtx.textAlign='left'; ffCtx.fillText('|X(f)|',4,13);
+      ffCtx.textAlign='right'; ffCtx.fillText('freq →',W-4,H-4);
+    }
+
+    function drawSpectrogram(cwt){
+      const W=spCanvas.width, H=spCanvas.height;
+      spCtx.clearRect(0,0,W,H); spCtx.fillStyle='#0a0f1a'; spCtx.fillRect(0,0,W,H);
+      let maxV=1e-9;
+      cwt.forEach(r=>{for(let i=0;i<r.length;i++) if(r[i]>maxV) maxV=r[i];});
+      const freqSteps=cwt.length;
+      const imgData=spCtx.createImageData(W,H);
+      const d=imgData.data;
+      for(let fi=0;fi<freqSteps;fi++){
+        const row=cwt[fi];
+        const py=Math.round(H-(fi+1)*H/freqSteps);
+        const ph=Math.max(1,Math.round(H/freqSteps));
+        for(let t=0;t<N;t++){
+          const v=clamp(row[t]/maxV,0,1);
+          const [cr,cg,cb]=heatColor(v);
+          const px=Math.round(t*W/N);
+          const pw=Math.max(1,Math.round(W/N));
+          for(let dy=0;dy<ph;dy++){const ry=py+dy;if(ry<0||ry>=H)continue;
+            for(let dx=0;dx<pw;dx++){const rx=px+dx;if(rx<0||rx>=W)continue;
+              const idx=(ry*W+rx)*4;d[idx]=cr;d[idx+1]=cg;d[idx+2]=cb;d[idx+3]=255;}}
+        }
+      }
+      spCtx.putImageData(imgData,0,0);
+      const fz=Math.round(9*DPR);
+      spCtx.font=`${fz}px Inter,sans-serif`; spCtx.fillStyle='rgba(148,163,184,0.9)';
+      spCtx.textAlign='left'; spCtx.fillText('freq (MHz) ↑',5,15);
+      spCtx.textAlign='right'; spCtx.fillText('time →',W-5,H-5);
+      [2,4,6,8].forEach(f=>{
+        const fy=H-(f-0.3)/(9.8-0.3)*H;
+        spCtx.fillStyle='rgba(148,163,184,0.7)';
+        spCtx.font=`${fz}px Inter,sans-serif`;
+        spCtx.textAlign='left'; spCtx.fillText(f+' MHz',4,fy);
+        spCtx.strokeStyle='rgba(100,116,139,0.3)'; spCtx.lineWidth=1;
+        spCtx.beginPath(); spCtx.moveTo(52*DPR,fy); spCtx.lineTo(W,fy); spCtx.stroke();
+      });
+    }
+
+    function drawSigOverlay(){
+      const sig=getSignal();
+      const W=sgCanvas.width, H=sgCanvas.height;
+      sgCtx.clearRect(0,0,W,H); sgCtx.fillStyle='#0f172a'; sgCtx.fillRect(0,0,W,H);
+      const mid=H*0.5, amp=H*0.4;
+      sgCtx.beginPath(); sgCtx.strokeStyle='#38bdf8'; sgCtx.lineWidth=2;
+      for(let i=0;i<N;i++){const x=i*W/N,y=mid-sig[i]*amp;if(i===0)sgCtx.moveTo(x,y);else sgCtx.lineTo(x,y);}
+      sgCtx.stroke();
+    }
+
+    let pending=false;
+    function renderAll(){
+      if(pending) return; pending=true;
+      requestAnimationFrame(()=>{
+        pending=false;
+        omegaLabel.textContent=omegaSlider.value;
+        freqLabel.textContent=freqSlider.value+' MHz';
+        const sig=getSignal();
+        drawTimeDomain(); drawFFT();
+        const cwt=computeCWT(sig, parseFloat(omegaSlider.value));
+        drawSpectrogram(cwt); drawSigOverlay();
+      });
+    }
+
+    function setActive(btn){[btnPulse,btnChirp,btnMulti].forEach(b=>b.classList.remove('primary'));btn.classList.add('primary');}
+    btnPulse.addEventListener('click',()=>{sigType='pulse';setActive(btnPulse);renderAll();});
+    btnChirp.addEventListener('click',()=>{sigType='chirp';setActive(btnChirp);renderAll();});
+    btnMulti.addEventListener('click',()=>{sigType='multi';setActive(btnMulti);renderAll();});
+    omegaSlider.addEventListener('input',renderAll);
+    freqSlider.addEventListener('input',renderAll);
+    window.addEventListener('resize',()=>{
+      tdCtx=initCanvas(tdCanvas,160); ffCtx=initCanvas(ffCanvas,160);
+      spCtx=initCanvas(spCanvas,220); sgCtx=initCanvas(sgCanvas,90);
+      renderAll();
+    });
+    renderAll();
+  })();
+
+}); // end window.load
 </script>
 </body>
 </html>
