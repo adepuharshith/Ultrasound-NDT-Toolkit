@@ -1243,16 +1243,161 @@
         <div class="theory-section" id="attenuation">
           <h2>&#128308; Attenuation — Detailed</h2>
           <p>
-            Attenuation is frequency-dependent and must be measured experimentally for each material.
+            Total attenuation in a polycrystalline metal has two physically distinct contributions:
+            <strong>absorption</strong> (thermoelastic and viscous energy conversion to heat) and
+            <strong>scattering</strong> (energy redirected by grain boundaries, pores, and inclusions).
+            Their frequency scalings differ, so the dominant mechanism — and the optimal inspection
+            frequency — depends on grain size relative to wavelength.
           </p>
-          <h3>Frequency Dependence</h3>
-          <ul>
-            <li><strong>Absorption:</strong> scales roughly linearly with frequency (viscous losses).</li>
-            <li><strong>Rayleigh scattering (d &laquo; &lambda;):</strong> scales as f&sup4; — dominant in fine-grained materials at high frequency.</li>
-            <li><strong>Stochastic scattering (d ~ &lambda;):</strong> scales as f&sup2; — typical grain-noise regime in metals.</li>
-          </ul>
+
+          <div class="eq-box">$$\alpha_\text{total}(f) = \underbrace{\alpha_\text{abs} \cdot f}_{\text{absorption}} + \underbrace{\alpha_R \cdot f^4 \cdot d^3}_{\text{Rayleigh}} + \underbrace{\alpha_S \cdot f^2 \cdot d}_{\text{stochastic}}$$</div>
+
+          <p>
+            where <em>d</em> is mean grain diameter, <em>f</em> is frequency, and &alpha;<sub>R</sub>,
+            &alpha;<sub>S</sub> are material constants. The active regime is determined by the
+            dimensionless parameter <em>kd</em> = 2&pi;fd/c:
+          </p>
+
+          <h3>Three Scattering Regimes</h3>
+
+          <!-- SVG: log-log α vs f showing three regimes -->
+          <div class="scan-svg-wrap" style="margin:1.2rem 0;">
+            <svg viewBox="0 0 580 280" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;width:100%;display:block;margin:auto;">
+              <defs>
+                <marker id="att-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+                </marker>
+              </defs>
+              <!-- Background -->
+              <rect width="580" height="280" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+
+              <!-- Grid lines (log scale tick positions mapped linearly into plot area) -->
+              <!-- Plot area: x 60–540, y 30–240 -->
+              <g stroke="#e2e8f0" stroke-width="1">
+                <!-- Vertical grid -->
+                <line x1="165" y1="30" x2="165" y2="240"/>
+                <line x1="270" y1="30" x2="270" y2="240"/>
+                <line x1="375" y1="30" x2="375" y2="240"/>
+                <line x1="480" y1="30" x2="480" y2="240"/>
+                <!-- Horizontal grid -->
+                <line x1="60" y1="87" x2="540" y2="87"/>
+                <line x1="60" y1="135" x2="540" y2="135"/>
+                <line x1="60" y1="183" x2="540" y2="183"/>
+              </g>
+
+              <!-- Axes -->
+              <line x1="60" y1="240" x2="545" y2="240" stroke="#475569" stroke-width="2" marker-end="url(#att-arrow)"/>
+              <line x1="60" y1="240" x2="60" y2="22" stroke="#475569" stroke-width="2" marker-end="url(#att-arrow)"/>
+
+              <!-- Axis labels -->
+              <text x="295" y="272" text-anchor="middle" font-size="13" fill="#475569" font-family="sans-serif">Frequency (log scale)</text>
+              <text x="18" y="140" text-anchor="middle" font-size="13" fill="#475569" font-family="sans-serif" transform="rotate(-90,18,140)">&#945; (dB/mm) — log scale</text>
+
+              <!-- X-axis tick labels -->
+              <text x="60" y="257" text-anchor="middle" font-size="11" fill="#64748b" font-family="monospace">0.5</text>
+              <text x="165" y="257" text-anchor="middle" font-size="11" fill="#64748b" font-family="monospace">1</text>
+              <text x="270" y="257" text-anchor="middle" font-size="11" fill="#64748b" font-family="monospace">2</text>
+              <text x="375" y="257" text-anchor="middle" font-size="11" fill="#64748b" font-family="monospace">5</text>
+              <text x="480" y="257" text-anchor="middle" font-size="11" fill="#64748b" font-family="monospace">10 MHz</text>
+
+              <!-- Curve 1: Absorption ~ f (slope 1 in log-log) — gentle rise -->
+              <polyline points="60,225 165,213 270,200 375,183 480,165 540,155"
+                        fill="none" stroke="#0891b2" stroke-width="2.5" stroke-dasharray="8,4"/>
+
+              <!-- Curve 2: Stochastic ~ f² (slope 2) -->
+              <polyline points="60,235 165,222 270,200 375,163 480,122 540,100"
+                        fill="none" stroke="#f97316" stroke-width="2.5"/>
+
+              <!-- Curve 3: Rayleigh ~ f⁴ (slope 4) — steep only at high f -->
+              <polyline points="60,239 165,234 270,220 375,168 480,90 540,52"
+                        fill="none" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="5,3"/>
+
+              <!-- Regime boundary: kd = 1 at ~3 MHz for d=200 µm -->
+              <line x1="350" y1="30" x2="350" y2="240" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <text x="352" y="45" font-size="10" fill="#64748b" font-family="sans-serif">kd ≈ 1</text>
+              <text x="352" y="57" font-size="10" fill="#64748b" font-family="sans-serif">(d≈200 µm)</text>
+
+              <!-- Legend -->
+              <rect x="360" y="190" width="175" height="72" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1.2"/>
+              <line x1="370" y1="208" x2="400" y2="208" stroke="#0891b2" stroke-width="2.5" stroke-dasharray="8,4"/>
+              <text x="407" y="212" font-size="11" fill="#334155" font-family="sans-serif">Absorption (∝ f)</text>
+              <line x1="370" y1="228" x2="400" y2="228" stroke="#f97316" stroke-width="2.5"/>
+              <text x="407" y="232" font-size="11" fill="#334155" font-family="sans-serif">Stochastic (∝ f²)</text>
+              <line x1="370" y1="248" x2="400" y2="248" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="5,3"/>
+              <text x="407" y="252" font-size="11" fill="#334155" font-family="sans-serif">Rayleigh (∝ f⁴)</text>
+
+              <!-- Regime labels -->
+              <text x="110" y="50" text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif" font-style="italic">Rayleigh</text>
+              <text x="110" y="63" text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif" font-style="italic">regime</text>
+              <text x="110" y="76" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="sans-serif">(kd ≪ 1)</text>
+              <text x="465" y="50" text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif" font-style="italic">Stochastic</text>
+              <text x="465" y="63" text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif" font-style="italic">regime</text>
+              <text x="465" y="76" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="sans-serif">(kd ~ 1)</text>
+            </svg>
+            <p style="text-align:center;font-size:0.82rem;color:#64748b;margin-top:0.3rem;">
+              Schematic log–log attenuation vs. frequency for a polycrystalline metal. Regime boundary shifts left for coarser grains (larger <em>d</em>).
+            </p>
+          </div>
+
+          <h3>Regime Summary</h3>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Regime</th><th>Condition</th><th>&alpha; scaling</th><th>Dominant in</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Rayleigh</strong></td>
+                <td><em>kd</em> &ll; 1 &nbsp;(d &ll; &lambda;/6)</td>
+                <td>&alpha; &prop; f&#8308; &middot; d&#179;</td>
+                <td>Fine-grained wrought steel / Al at 1–5 MHz</td>
+              </tr>
+              <tr>
+                <td><strong>Stochastic</strong></td>
+                <td><em>kd</em> ~ 1</td>
+                <td>&alpha; &prop; f&sup2; &middot; d</td>
+                <td>Coarse-grained castings, austenitic welds, AM metals</td>
+              </tr>
+              <tr>
+                <td><strong>Geometric</strong></td>
+                <td><em>kd</em> &gg; 1</td>
+                <td>&alpha; &rarr; frequency-independent</td>
+                <td>Very coarse grains; rarely used in practice</td>
+              </tr>
+              <tr>
+                <td><strong>Absorption</strong></td>
+                <td>All regimes</td>
+                <td>&alpha; &prop; f</td>
+                <td>Polymers, viscous media; minor in metals</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>NDE Example: Austenitic Stainless Steel Welds</h3>
+          <p>
+            Austenitic SS weld metal solidifies as columnar dendritic grains, with effective grain
+            diameters of 50–500 &micro;m and strong crystallographic texture. At a typical 5 MHz
+            inspection frequency in steel (c<sub>L</sub> &asymp; 5 900 m/s, &lambda; &asymp; 1.2 mm),
+            a 200 &micro;m grain gives <em>kd</em> &asymp; 0.7 — squarely in the stochastic regime.
+            The consequence is severe coherent grain noise (often called <em>backwall grass</em>)
+            that can mask crack tip signals. The standard engineering response is to drop to
+            1–2 MHz, accepting lower axial resolution, to push <em>kd</em> back into the
+            Rayleigh regime and recover signal-to-noise. The trade-off is quantified by the
+            <strong>figure of merit</strong>:
+          </p>
+          <div class="eq-box">$$\text{FOM} = \frac{\alpha}{f^2}$$</div>
+          <p>
+            FOM is approximately constant within the stochastic regime and is used as a material
+            characterisation parameter for phased-array inspection qualification. For fine-grained
+            carbon steel (d ~ 20 &micro;m), FOM &asymp; 0.005–0.02 dB/(mm&middot;MHz&sup2;);
+            for coarse austenitic weld metal it can reach 0.1–0.5 — an order-of-magnitude degradation
+            in inspectability.
+          </p>
           <div class="callout">
-            <strong>Rule of thumb:</strong> For carbon steel, &alpha; &asymp; 0.5–2 dB/(mm&middot;MHz) at 5 MHz depending on grain size. Coarse-grained castings can be 10&times; worse.
+            <strong>Practical rule:</strong> For carbon steel, &alpha; &asymp; 0.5–2 dB/(mm&middot;MHz)
+            at 5 MHz depending on grain size. Coarse-grained castings can be 10&times; worse, and
+            austenitic weld metal 20–50&times; worse than fine-grained wrought steel.
+            Always measure &alpha; on a representative coupon — never assume handbook values for
+            cast or additively manufactured microstructures.
           </div>
         </div>
 
