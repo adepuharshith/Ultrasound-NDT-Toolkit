@@ -98,8 +98,8 @@
 
     /* ── Canvas container ── */
     .canvas-box {
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
       position: relative;
@@ -111,7 +111,7 @@
       left: .75rem;
       font-size: .7rem;
       font-weight: 700;
-      color: #94a3b8;
+      color: #475569;
       letter-spacing: .06em;
       text-transform: uppercase;
     }
@@ -218,10 +218,10 @@
       margin: 1.75rem 0;
     }
 
-    /* ── Dark SVG wrapper (for RF/envelope diagrams) ── */
+    /* ── SVG wrapper ── */
     .scan-svg-wrap {
-      background: #0d1b2a;
-      border: 1px solid #1e3a5f;
+      background: #ffffff;
+      border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
       margin: 1.25rem 0 1.75rem;
@@ -573,9 +573,9 @@
 
   <div class="scan-svg-wrap">
     <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg">
-      <rect width="580" height="160" fill="#0d1b2a"/>
-      <line x1="30" y1="80" x2="555" y2="80" stroke="#1e3a5f" stroke-width="1"/>
-      <polyline fill="none" stroke="#22d3ee" stroke-width="1.4" opacity="0.8"
+      <rect width="580" height="160" fill="#ffffff"/>
+      <line x1="30" y1="80" x2="555" y2="80" stroke="#e2e8f0" stroke-width="1"/>
+      <polyline fill="none" stroke="#0891b2" stroke-width="1.4" opacity="0.85"
         points="30,80 40,80 45,79 50,81 55,80
           60,74 63,67 66,71 69,93 72,116 74,115 76,80 78,47 80,35 82,65 84,93 86,101 88,91 90,80 92,77 94,78 96,80
           100,80 110,78 120,82 130,79 140,81 150,78 160,82 170,79 180,81 190,80 200,78 210,82 220,79 230,81 240,80 248,80
@@ -583,22 +583,22 @@
           290,82 310,78 330,82 350,79 370,81 390,80 410,82 430,80
           432,79 434,81 436,80 438,74 440,68 442,72 444,92 446,114 448,114 450,80 452,47 454,38 456,65 458,93 460,101 462,91 464,80 466,77 468,78 470,80
           480,80 555,80"/>
-      <path fill="none" stroke="#fb923c" stroke-width="2.4" opacity="0.95"
+      <path fill="none" stroke="#ea580c" stroke-width="2.4" opacity="0.95"
         d="M 30,80 L 55,80 Q 65,64 72,50 Q 78,38 80,35 Q 82,40 88,60 Q 94,76 100,78
            L 248,78 Q 256,65 263,56 Q 268,52 272,60 Q 278,72 285,78
            L 430,78 Q 440,58 447,45 Q 452,38 456,48 Q 464,68 472,78 L 555,78"/>
-      <text x="80" y="22" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="Inter,sans-serif">IP</text>
-      <line x1="80" y1="25" x2="80" y2="37" stroke="#7dd3fc" stroke-width="1" stroke-dasharray="3,2"/>
-      <text x="268" y="30" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="Inter,sans-serif">Flaw Echo</text>
-      <line x1="268" y1="33" x2="268" y2="54" stroke="#fca5a5" stroke-width="1" stroke-dasharray="3,2"/>
-      <text x="452" y="22" text-anchor="middle" fill="#86efac" font-size="10" font-weight="700" font-family="Inter,sans-serif">BW</text>
-      <line x1="452" y1="25" x2="452" y2="40" stroke="#86efac" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="280" y1="147" x2="310" y2="147" stroke="#22d3ee" stroke-width="1.8" opacity="0.8"/>
-      <text x="315" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">RF signal (bipolar)</text>
-      <line x1="420" y1="147" x2="450" y2="147" stroke="#fb923c" stroke-width="2.4"/>
-      <text x="455" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Hilbert envelope</text>
-      <text x="292" y="10" text-anchor="middle" fill="#64748b" font-size="9" font-family="Inter,sans-serif">A-scan RF signal and its Hilbert envelope</text>
-      <text x="292" y="100" text-anchor="middle" fill="#475569" font-size="8.5" font-family="Inter,sans-serif">time &#8594;</text>
+      <text x="80" y="22" text-anchor="middle" fill="#0369a1" font-size="10" font-weight="700" font-family="Inter,sans-serif">IP</text>
+      <line x1="80" y1="25" x2="80" y2="37" stroke="#0891b2" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="268" y="30" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="700" font-family="Inter,sans-serif">Flaw Echo</text>
+      <line x1="268" y1="33" x2="268" y2="54" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="452" y="22" text-anchor="middle" fill="#15803d" font-size="10" font-weight="700" font-family="Inter,sans-serif">BW</text>
+      <line x1="452" y1="25" x2="452" y2="40" stroke="#16a34a" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="280" y1="147" x2="310" y2="147" stroke="#0891b2" stroke-width="1.8" opacity="0.85"/>
+      <text x="315" y="151" fill="#475569" font-size="9" font-family="Inter,sans-serif">RF signal (bipolar)</text>
+      <line x1="420" y1="147" x2="450" y2="147" stroke="#ea580c" stroke-width="2.4"/>
+      <text x="455" y="151" fill="#475569" font-size="9" font-family="Inter,sans-serif">Hilbert envelope</text>
+      <text x="292" y="10" text-anchor="middle" fill="#475569" font-size="9" font-family="Inter,sans-serif">A-scan RF signal and its Hilbert envelope</text>
+      <text x="292" y="100" text-anchor="middle" fill="#64748b" font-size="8.5" font-family="Inter,sans-serif">time &#8594;</text>
     </svg>
   </div>
 
@@ -804,21 +804,21 @@ window.addEventListener('load', function() {
     function drawSignal(sig, noisy, t1, t2, slidePos){
       const W=sCanvas.width, H=sCanvas.height;
       sCtx.clearRect(0,0,W,H);
-      sCtx.fillStyle='#0f172a'; sCtx.fillRect(0,0,W,H);
+      sCtx.fillStyle='#ffffff'; sCtx.fillRect(0,0,W,H);
       [0.25,0.5,0.75].forEach(fy=>{
-        sCtx.strokeStyle='#1e293b'; sCtx.lineWidth=1;
+        sCtx.strokeStyle='#e2e8f0'; sCtx.lineWidth=1;
         sCtx.beginPath(); sCtx.moveTo(0,H*fy); sCtx.lineTo(W,H*fy); sCtx.stroke();
       });
       const xS=W/N, mid=H*0.5, amp=H*0.38;
       const hw=22, tmplW=(hw*2+1)*xS;
-      sCtx.fillStyle='rgba(8,145,178,0.15)';
+      sCtx.fillStyle='rgba(8,145,178,0.08)';
       sCtx.fillRect(slidePos*xS-tmplW/2,0,tmplW,H);
       // noisy
-      sCtx.beginPath(); sCtx.strokeStyle='#334155'; sCtx.lineWidth=1;
+      sCtx.beginPath(); sCtx.strokeStyle='#b0c4d8'; sCtx.lineWidth=1;
       for(let i=0;i<N;i++){const x=i*xS,y=mid-noisy[i]*amp;if(i===0)sCtx.moveTo(x,y);else sCtx.lineTo(x,y);}
       sCtx.stroke();
       // clean
-      sCtx.beginPath(); sCtx.strokeStyle='#38bdf8'; sCtx.lineWidth=2;
+      sCtx.beginPath(); sCtx.strokeStyle='#0891b2'; sCtx.lineWidth=2;
       for(let i=0;i<N;i++){const x=i*xS,y=mid-sig[i]*amp;if(i===0)sCtx.moveTo(x,y);else sCtx.lineTo(x,y);}
       sCtx.stroke();
       // sliding window
@@ -828,30 +828,30 @@ window.addEventListener('load', function() {
       // labels
       const fz=Math.round(10*DPR);
       sCtx.font=`bold ${fz}px Inter,sans-serif`;
-      sCtx.fillStyle='#fbbf24'; sCtx.textAlign='center';
+      sCtx.fillStyle='#d97706'; sCtx.textAlign='center';
       sCtx.fillText('FW pulse',t1*xS,H*0.1);
-      sCtx.strokeStyle='#fbbf24'; sCtx.lineWidth=1;
+      sCtx.strokeStyle='#d97706'; sCtx.lineWidth=1;
       sCtx.beginPath(); sCtx.moveTo(t1*xS,H*0.13); sCtx.lineTo(t1*xS,mid-amp*0.6); sCtx.stroke();
-      sCtx.fillStyle='#a78bfa';
+      sCtx.fillStyle='#7c3aed';
       sCtx.fillText('BW pulse',t2*xS,H*0.1);
-      sCtx.strokeStyle='#a78bfa';
+      sCtx.strokeStyle='#7c3aed';
       sCtx.beginPath(); sCtx.moveTo(t2*xS,H*0.13); sCtx.lineTo(t2*xS,mid-amp*0.6); sCtx.stroke();
       sCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
-      sCtx.fillStyle='#475569'; sCtx.textAlign='left'; sCtx.fillText('Amp',4,13);
+      sCtx.fillStyle='#334155'; sCtx.textAlign='left'; sCtx.fillText('Amp',4,13);
       sCtx.textAlign='right'; sCtx.fillText('time →',W-4,H-4);
     }
 
     function drawCorr(corrArr, peakLag, progress){
       const W=cCanvas.width, H=cCanvas.height;
       cCtx.clearRect(0,0,W,H);
-      cCtx.fillStyle='#0f172a'; cCtx.fillRect(0,0,W,H);
-      cCtx.strokeStyle='#1e293b'; cCtx.lineWidth=1;
+      cCtx.fillStyle='#ffffff'; cCtx.fillRect(0,0,W,H);
+      cCtx.strokeStyle='#e2e8f0'; cCtx.lineWidth=1;
       cCtx.beginPath(); cCtx.moveTo(0,H*0.5); cCtx.lineTo(W,H*0.5); cCtx.stroke();
       let maxC=1e-9;
       for(let i=0;i<corrArr.length;i++) if(Math.abs(corrArr[i])>maxC) maxC=Math.abs(corrArr[i]);
       const mid=H*0.5, amp=H*0.42, total=corrArr.length;
       const upTo=Math.floor(progress*total);
-      cCtx.beginPath(); cCtx.strokeStyle='#34d399'; cCtx.lineWidth=2;
+      cCtx.beginPath(); cCtx.strokeStyle='#059669'; cCtx.lineWidth=2;
       for(let i=0;i<upTo;i++){
         const x=i*W/total, y=mid-(corrArr[i]/maxC)*amp;
         if(i===0)cCtx.moveTo(x,y);else cCtx.lineTo(x,y);
@@ -860,14 +860,14 @@ window.addEventListener('load', function() {
       const peakIdx=peakLag+Math.floor(total/2);
       if(peakIdx>=0&&peakIdx<upTo){
         const px=peakIdx*W/total, py=mid-(corrArr[peakIdx]/maxC)*amp;
-        cCtx.fillStyle='#fbbf24';
+        cCtx.fillStyle='#d97706';
         cCtx.beginPath(); cCtx.arc(px,py,5*DPR,0,2*PI); cCtx.fill();
         cCtx.font=`bold ${Math.round(9*DPR)}px Inter,sans-serif`;
-        cCtx.fillStyle='#fbbf24'; cCtx.textAlign='center';
+        cCtx.fillStyle='#d97706'; cCtx.textAlign='center';
         cCtx.fillText('Δt = '+peakLag+' samp',px,py-8*DPR);
       }
       cCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
-      cCtx.fillStyle='#475569'; cCtx.textAlign='left'; cCtx.fillText('R(τ)',4,12);
+      cCtx.fillStyle='#334155'; cCtx.textAlign='left'; cCtx.fillText('R(τ)',4,12);
       cCtx.textAlign='center'; cCtx.fillText('lag τ →',W*0.5,H-3);
     }
 
@@ -1003,26 +1003,28 @@ window.addEventListener('load', function() {
     }
 
     function heatColor(v){
-      if(v<0.33){const t=v/0.33;return[lerp(10,8,t),lerp(15,145,t),lerp(80,178,t)];}
-      if(v<0.66){const t=(v-0.33)/0.33;return[lerp(8,250,t),lerp(145,200,t),lerp(178,50,t)];}
-      const t=(v-0.66)/0.34;return[lerp(250,255,t),lerp(200,255,t),lerp(50,255,t)];
+      /* White-background thermal: white → light yellow → orange → red → dark maroon */
+      if(v<0.20){const t=v/0.20;return[255,lerp(255,240,t),lerp(255,220,t)];}
+      if(v<0.45){const t=(v-0.20)/0.25;return[255,lerp(240,180,t),lerp(220,0,t)];}
+      if(v<0.70){const t=(v-0.45)/0.25;return[lerp(255,210,t),lerp(180,0,t),0];}
+      const t=(v-0.70)/0.30;return[lerp(210,80,t),0,lerp(0,40,t)];
     }
 
     function drawTimeDomain(){
       const sig=getSignal();
       const W=tdCanvas.width, H=tdCanvas.height;
       tdCtx.clearRect(0,0,W,H);
-      tdCtx.fillStyle='#0f172a'; tdCtx.fillRect(0,0,W,H);
+      tdCtx.fillStyle='#ffffff'; tdCtx.fillRect(0,0,W,H);
       [0.25,0.5,0.75].forEach(fy=>{
-        tdCtx.strokeStyle='#1e293b'; tdCtx.lineWidth=1;
+        tdCtx.strokeStyle='#e2e8f0'; tdCtx.lineWidth=1;
         tdCtx.beginPath(); tdCtx.moveTo(0,H*fy); tdCtx.lineTo(W,H*fy); tdCtx.stroke();
       });
       const mid=H*0.5, amp=H*0.42;
-      tdCtx.beginPath(); tdCtx.strokeStyle='#38bdf8'; tdCtx.lineWidth=2;
+      tdCtx.beginPath(); tdCtx.strokeStyle='#0891b2'; tdCtx.lineWidth=2;
       for(let i=0;i<N;i++){const x=i*W/N,y=mid-sig[i]*amp;if(i===0)tdCtx.moveTo(x,y);else tdCtx.lineTo(x,y);}
       tdCtx.stroke();
       const fz=Math.round(9*DPR);
-      tdCtx.font=`${fz}px Inter,sans-serif`; tdCtx.fillStyle='#475569';
+      tdCtx.font=`${fz}px Inter,sans-serif`; tdCtx.fillStyle='#334155';
       tdCtx.textAlign='left'; tdCtx.fillText('v(t)',4,13);
       tdCtx.textAlign='right'; tdCtx.fillText('time →',W-4,H-4);
     }
@@ -1030,9 +1032,9 @@ window.addEventListener('load', function() {
     function drawFFT(){
       const sig=getSignal();
       const W=ffCanvas.width, H=ffCanvas.height;
-      ffCtx.clearRect(0,0,W,H); ffCtx.fillStyle='#0f172a'; ffCtx.fillRect(0,0,W,H);
+      ffCtx.clearRect(0,0,W,H); ffCtx.fillStyle='#ffffff'; ffCtx.fillRect(0,0,W,H);
       [0.25,0.5,0.75].forEach(fy=>{
-        ffCtx.strokeStyle='#1e293b'; ffCtx.lineWidth=1;
+        ffCtx.strokeStyle='#e2e8f0'; ffCtx.lineWidth=1;
         ffCtx.beginPath(); ffCtx.moveTo(0,H*fy); ffCtx.lineTo(W,H*fy); ffCtx.stroke();
       });
       const mag=computeDFT(sig);
@@ -1040,18 +1042,18 @@ window.addEventListener('load', function() {
       const bw=W/mag.length;
       for(let k=0;k<mag.length;k++){
         const v=mag[k]/maxM;
-        ffCtx.fillStyle=`hsl(${180+v*60},80%,60%)`;
+        ffCtx.fillStyle=`hsl(${210-v*40},${60+v*20}%,${55-v*25}%)`;
         ffCtx.fillRect(k*bw,H-v*(H*0.86),bw-1,v*(H*0.86));
       }
       const fz=Math.round(9*DPR);
-      ffCtx.font=`${fz}px Inter,sans-serif`; ffCtx.fillStyle='#475569';
+      ffCtx.font=`${fz}px Inter,sans-serif`; ffCtx.fillStyle='#334155';
       ffCtx.textAlign='left'; ffCtx.fillText('|X(f)|',4,13);
       ffCtx.textAlign='right'; ffCtx.fillText('freq →',W-4,H-4);
     }
 
     function drawSpectrogram(cwt){
       const W=spCanvas.width, H=spCanvas.height;
-      spCtx.clearRect(0,0,W,H); spCtx.fillStyle='#0a0f1a'; spCtx.fillRect(0,0,W,H);
+      spCtx.clearRect(0,0,W,H); spCtx.fillStyle='#ffffff'; spCtx.fillRect(0,0,W,H);
       let maxV=1e-9;
       cwt.forEach(r=>{for(let i=0;i<r.length;i++) if(r[i]>maxV) maxV=r[i];});
       const freqSteps=cwt.length;
@@ -1073,15 +1075,15 @@ window.addEventListener('load', function() {
       }
       spCtx.putImageData(imgData,0,0);
       const fz=Math.round(9*DPR);
-      spCtx.font=`${fz}px Inter,sans-serif`; spCtx.fillStyle='rgba(148,163,184,0.9)';
+      spCtx.font=`${fz}px Inter,sans-serif`; spCtx.fillStyle='rgba(51,65,85,0.9)';
       spCtx.textAlign='left'; spCtx.fillText('freq (MHz) ↑',5,15);
       spCtx.textAlign='right'; spCtx.fillText('time →',W-5,H-5);
       [2,4,6,8].forEach(f=>{
         const fy=H-(f-0.3)/(9.8-0.3)*H;
-        spCtx.fillStyle='rgba(148,163,184,0.7)';
+        spCtx.fillStyle='rgba(51,65,85,0.8)';
         spCtx.font=`${fz}px Inter,sans-serif`;
         spCtx.textAlign='left'; spCtx.fillText(f+' MHz',4,fy);
-        spCtx.strokeStyle='rgba(100,116,139,0.3)'; spCtx.lineWidth=1;
+        spCtx.strokeStyle='rgba(100,116,139,0.5)'; spCtx.lineWidth=1;
         spCtx.beginPath(); spCtx.moveTo(52*DPR,fy); spCtx.lineTo(W,fy); spCtx.stroke();
       });
     }
@@ -1089,9 +1091,9 @@ window.addEventListener('load', function() {
     function drawSigOverlay(){
       const sig=getSignal();
       const W=sgCanvas.width, H=sgCanvas.height;
-      sgCtx.clearRect(0,0,W,H); sgCtx.fillStyle='#0f172a'; sgCtx.fillRect(0,0,W,H);
+      sgCtx.clearRect(0,0,W,H); sgCtx.fillStyle='#ffffff'; sgCtx.fillRect(0,0,W,H);
       const mid=H*0.5, amp=H*0.4;
-      sgCtx.beginPath(); sgCtx.strokeStyle='#38bdf8'; sgCtx.lineWidth=2;
+      sgCtx.beginPath(); sgCtx.strokeStyle='#0891b2'; sgCtx.lineWidth=2;
       for(let i=0;i<N;i++){const x=i*W/N,y=mid-sig[i]*amp;if(i===0)sgCtx.moveTo(x,y);else sgCtx.lineTo(x,y);}
       sgCtx.stroke();
     }
