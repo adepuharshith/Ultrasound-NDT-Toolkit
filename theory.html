@@ -1911,11 +1911,22 @@
           <h2>&#128207; Calibration &amp; Reference Levels</h2>
           <p>
             Calibration establishes a quantitative reference so that any indication can be evaluated
-            consistently regardless of depth or scan position.
+            consistently regardless of depth or scan position. The core problem it solves is that echo
+            amplitude from an identical flaw decreases with depth due to beam spreading and attenuation —
+            without a depth-corrected baseline, a deep 3 mm crack looks weaker than a shallow 1 mm pore.
           </p>
 
           <h3>Decibel Scale</h3>
-          <div class="eq-box">$$\Delta I\;(\text{dB}) = 20\log_{10}\!\!\left(\frac{P_2}{P_1}\right)$$</div>
+          <p>
+            UT amplitudes span several orders of magnitude, so all gain and sensitivity comparisons are
+            expressed logarithmically:
+          </p>
+          <div class="eq-box">$$\Delta\,(\text{dB}) = 20\log_{10}\!\!\left(\frac{A_2}{A_1}\right)$$</div>
+          <p>
+            The factor of 20 (not 10) arises because acoustic intensity scales as amplitude squared;
+            \(20\log_{10}(A_2/A_1) = 10\log_{10}(A_2^2/A_1^2)\). This means the dB scale is the same
+            whether you express it in terms of pressure amplitude or intensity.
+          </p>
           <div class="callout">
             <strong>Quick conversions:</strong>
             +6 dB = &times;2 amplitude &nbsp;|&nbsp;
@@ -1927,10 +1938,130 @@
 
           <h3>Distance Amplitude Correction (DAC)</h3>
           <p>
-            DAC is a reference curve constructed by recording peak amplitude from identical reference
-            reflectors (side-drilled holes or flat-bottom holes) at multiple depths. Any indication
-            that reaches or exceeds the DAC curve is evaluated as a recordable indication — the curve
-            has already accounted for amplitude decay with depth.
+            DAC is constructed by scanning reference reflectors of identical size (side-drilled holes, SDH,
+            or flat-bottom holes, FBH) at multiple depths in a calibration block made of the same material
+            as the part under inspection. At each depth the gain is held fixed and the peak echo is marked
+            on the A-scan screen. Connecting these peaks traces the DAC curve — a direct empirical map of
+            how amplitude from an equal-area reflector decays with path length under the combined effects of
+            beam divergence (\(\propto 1/r^2\) in the far field) and material attenuation
+            (\(\propto e^{-2\alpha r}\)). Any indication reaching the DAC curve is flagged for evaluation;
+            most codes add sub-DAC evaluation lines at &minus;6 dB (50 % of DAC amplitude) and &minus;14 dB.
+          </p>
+
+          <!-- DAC SVG diagram -->
+          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);padding:1rem 0.5rem;">
+            <svg viewBox="0 0 600 270" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+              <!-- Plot area background -->
+              <rect x="70" y="20" width="500" height="200" fill="#ffffff" rx="4" stroke="#e2e8f0" stroke-width="1"/>
+
+              <!-- Horizontal grid -->
+              <line x1="70" y1="60"  x2="570" y2="60"  stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="70" y1="100" x2="570" y2="100" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="70" y1="140" x2="570" y2="140" stroke="#f1f5f9" stroke-width="1"/>
+              <line x1="70" y1="180" x2="570" y2="180" stroke="#f1f5f9" stroke-width="1"/>
+
+              <!-- Axes -->
+              <line x1="70" y1="220" x2="570" y2="220" stroke="#334155" stroke-width="1.8"/>
+              <line x1="70" y1="20"  x2="70"  y2="220" stroke="#334155" stroke-width="1.8"/>
+
+              <!-- Y-axis ticks & labels (0 % at y=220, 100 % at y=20 → 1 % = 2 px) -->
+              <text x="62" y="24"  text-anchor="end" fill="#64748b" font-size="10">100%</text>
+              <text x="62" y="64"  text-anchor="end" fill="#64748b" font-size="10">80%</text>
+              <text x="62" y="104" text-anchor="end" fill="#64748b" font-size="10">60%</text>
+              <text x="62" y="144" text-anchor="end" fill="#64748b" font-size="10">40%</text>
+              <text x="62" y="184" text-anchor="end" fill="#64748b" font-size="10">20%</text>
+              <text x="62" y="220" text-anchor="end" fill="#64748b" font-size="10">0%</text>
+
+              <!-- X-axis tick labels (depth, mm) -->
+              <text x="170" y="234" text-anchor="middle" fill="#64748b" font-size="10">25</text>
+              <text x="320" y="234" text-anchor="middle" fill="#64748b" font-size="10">50</text>
+              <text x="440" y="234" text-anchor="middle" fill="#64748b" font-size="10">75</text>
+              <text x="566" y="234" text-anchor="middle" fill="#64748b" font-size="10">100</text>
+              <text x="318" y="250" text-anchor="middle" fill="#334155" font-size="11" font-weight="600">Reflector depth (mm)</text>
+
+              <!-- Y-axis label -->
+              <text transform="rotate(-90,16,120)" x="16" y="120" text-anchor="middle" fill="#334155" font-size="11" font-weight="600">Amplitude (% FSH)</text>
+
+              <!-- ── Amplitude bars (echo representations) ── -->
+              <!-- SDH #1 at 25 mm: 82% FSH → y = 220 - 82×2 = 56 -->
+              <rect x="166" y="56" width="8" height="164" fill="#0f2d5e" fill-opacity="0.12" rx="1"/>
+              <!-- SDH #2 at 50 mm: 55% FSH → y = 220 - 55×2 = 110 -->
+              <rect x="316" y="110" width="8" height="110" fill="#0f2d5e" fill-opacity="0.12" rx="1"/>
+              <!-- SDH #3 at 75 mm: 36% FSH → y = 220 - 36×2 = 148 -->
+              <rect x="436" y="148" width="8" height="72" fill="#0f2d5e" fill-opacity="0.12" rx="1"/>
+
+              <!-- ── DAC curve (through reference points) ── -->
+              <!-- Points: (170,56) (320,110) (440,148) extrapolated to (570,172) -->
+              <path d="M 110,36 C 135,36 148,56 170,56 C 240,56 290,110 320,110 C 380,110 410,148 440,148 C 498,148 534,168 570,172"
+                    fill="none" stroke="#0891b2" stroke-width="2.5" stroke-linecap="round"/>
+
+              <!-- ── –6 dB evaluation line (50 % of DAC amplitude) ── -->
+              <!-- Shift each y by +50 % of (220 - y_dac): (220-56)×0.5=82 → 56+82=138 etc. -->
+              <path d="M 110,118 C 135,118 148,138 170,138 C 240,138 290,166 320,166 C 380,166 410,184 440,184 C 498,184 534,196 570,200"
+                    fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+              <!-- ── Reference echo dots ── -->
+              <circle cx="170" cy="56"  r="5.5" fill="#0f2d5e" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="320" cy="110" r="5.5" fill="#0f2d5e" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="440" cy="148" r="5.5" fill="#0f2d5e" stroke="#fff" stroke-width="1.5"/>
+
+              <!-- ── Recordable indication above DAC ── -->
+              <!-- At ~60 mm depth (x≈356), amplitude 75% FSH → y = 220 - 75×2 = 70 -->
+              <!-- DAC at 60 mm is about 95 → just below is fine to show it's above -->
+              <rect x="353" y="70" width="8" height="150" fill="#dc2626" fill-opacity="0.12" rx="1"/>
+              <circle cx="357" cy="70" r="5.5" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>
+              <text x="370" y="65" fill="#dc2626" font-size="9" font-weight="700">▲ Indication exceeds DAC</text>
+              <text x="370" y="76" fill="#dc2626" font-size="9">→ Record &amp; evaluate per code</text>
+
+              <!-- ── Sub-recordable indication below –6 dB line ── -->
+              <!-- At ~80 mm (x≈466), amplitude 14% FSH → y = 220 - 14×2 = 192 -->
+              <rect x="463" y="206" width="8" height="14" fill="#94a3b8" fill-opacity="0.4" rx="1"/>
+              <circle cx="467" cy="206" r="4" fill="#94a3b8" stroke="#fff" stroke-width="1.2"/>
+              <text x="478" y="202" fill="#94a3b8" font-size="9">Below –6 dB → not recorded</text>
+
+              <!-- Legend -->
+              <line x1="80" y1="258" x2="105" y2="258" stroke="#0891b2" stroke-width="2.5"/>
+              <text x="108" y="261" fill="#0891b2" font-size="9" font-weight="700">DAC curve</text>
+              <line x1="180" y1="258" x2="205" y2="258" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+              <text x="208" y="261" fill="#f59e0b" font-size="9">–6 dB evaluation line</text>
+              <circle cx="340" cy="258" r="4" fill="#0f2d5e"/>
+              <text x="347" y="261" fill="#0f2d5e" font-size="9">Reference SDH echoes</text>
+              <circle cx="460" cy="258" r="4" fill="#dc2626"/>
+              <text x="467" y="261" fill="#dc2626" font-size="9">Recordable indication</text>
+            </svg>
+          </div>
+
+          <h3>Worked Example — Contact UT on Steel Pressure Vessel</h3>
+          <p>
+            Setup: 5 MHz, 12.7 mm diameter contact transducer on low-alloy steel
+            (c<sub>L</sub> = 5 900 m/s). Near field N = D²f / 4c = 12.7² × 5×10⁶ / (4 × 5 900) ≈ 34 mm,
+            so reflectors at 25, 50, and 75 mm are all in the far field.
+            An ASTM E1158 block with 2.4 mm (3/32") SDH at those three depths is used.
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr><th>SDH Depth</th><th>Recorded Peak Amp.</th><th>Amplitude Drop from #1</th><th>Implied Decay</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>25 mm (SDH #1)</strong></td><td>82 % FSH <em>(gain set here)</em></td><td>—</td><td>—</td></tr>
+              <tr><td><strong>50 mm (SDH #2)</strong></td><td>55 % FSH</td><td>&minus;3.5 dB</td><td>Geometric spreading + ~0.04 dB/mm attenuation</td></tr>
+              <tr><td><strong>75 mm (SDH #3)</strong></td><td>36 % FSH</td><td>&minus;7.1 dB (from #1)</td><td>Consistent; no anomalous grain scattering</td></tr>
+            </tbody>
+          </table>
+          <p>
+            During the scan an indication appears at 60 mm depth, peaking at 73 % FSH. The DAC curve
+            interpolated at 60 mm reads ≈ 47 % FSH. Because 73 % &gt; 47 %, the indication exceeds DAC
+            and must be recorded and evaluated per the applicable code (e.g., ASME Sec. VIII, AWS D1.1).
+          </p>
+
+          <h3>Time-Corrected Gain (TCG) — the Digital Equivalent</h3>
+          <p>
+            Modern digital instruments implement DAC in hardware as <strong>TCG</strong>: instead of
+            drawing a reference curve on the A-scan, the instrument dynamically increases amplifier gain
+            with time-of-flight so that the reference echo from any depth appears at the same screen
+            height (typically 80 % FSH). This linearises the display — every point on the A-scan can be
+            compared against a flat 100 % reference line. TCG is mandatory for phased-array instruments
+            and encoded scanning where the gain must track to sub-millimetre depth increments.
           </p>
 
           <h3>Reference Blocks &amp; Standards</h3>
@@ -1938,7 +2069,7 @@
             <li><strong>ASTM E127 / E428:</strong> Flat-bottom hole (FBH) blocks — standard for immersion calibration.</li>
             <li><strong>ASTM E1158:</strong> Distance-amplitude blocks — side-drilled holes at increasing depths.</li>
             <li><strong>ASME Basic Calibration Block:</strong> Required for pressure vessel and piping inspection (ASME Sec. V).</li>
-            <li><strong>IIW V1 / V2 blocks:</strong> International Welding Institute blocks for velocity measurement and angle-probe index checks.</li>
+            <li><strong>IIW V1 / V2 blocks:</strong> International Welding Institute blocks for velocity measurement and angle-probe index point / refracted-angle verification.</li>
           </ul>
         </div>
 
