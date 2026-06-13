@@ -399,6 +399,7 @@
     <a href="#wave-types"            class="sec-nav-btn">Sound vs EM</a>
     <a href="#speed-comparison"      class="sec-nav-btn">Key Differences</a>
     <a href="#applications"          class="sec-nav-btn">Applications</a>
+    <a href="#ut-principle"          class="sec-nav-btn">UT Principle</a>
     <a href="#ultrasound-spectrum"   class="sec-nav-btn">UT Spectrum</a>
     <a href="#generating-ultrasound" class="sec-nav-btn">Generating UT</a>
     <a href="#a-scan"                class="sec-nav-btn">A-scan</a>
@@ -538,6 +539,48 @@
                 <li><strong>Infrared thermography (IRT)</strong> — surface hot-spot detection in electronics, composites, and building envelopes</li>
                 <li><strong>Optical fiber</strong> — high-bandwidth data transmission via light pulses in glass fiber</li>
               </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             UT PRINCIPLE — Pulse-Echo Schematic
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="ut-principle">
+          <h2>Fundamental Principle of Ultrasonic NDT</h2>
+
+          <p>
+            In <strong>pulse-echo UT</strong>, a transducer fires a short burst of ultrasound
+            into the part and listens for returning echoes. The time it takes each echo to arrive
+            directly encodes depth — flaws appear as early echoes, the back wall gives total thickness.
+            Everything flows from <strong><em>d</em> = <em>c</em> × <em>t</em> / 2</strong>.
+          </p>
+
+          <div class="wave-pair">
+            <!-- Left: schematic -->
+            <div class="wave-demo">
+              <div class="wave-demo-header">
+                <span>&#128266; Pulse-Echo Schematic</span>
+                <button class="wave-demo-btn" id="utp-playpause">&#9646;&#9646; Pause</button>
+              </div>
+              <canvas id="utp-left" class="wave-canvas" width="480" height="300"></canvas>
+              <p class="wave-caption">
+                <strong style="color:#22d3ee;">Cyan arcs</strong> = transmitted pulse &amp; back-wall echo. &ensp;
+                <strong style="color:#ef4444;">Red arcs</strong> = flaw echo reflected from the void.
+              </p>
+            </div>
+
+            <!-- Right: A-scan -->
+            <div class="wave-demo">
+              <div class="wave-demo-header">
+                <span>&#128200; A-scan — Amplitude vs Time</span>
+              </div>
+              <canvas id="utp-right" class="wave-canvas" width="480" height="300"></canvas>
+              <p class="wave-caption">
+                <strong>IP</strong> = initial pulse &ensp;&bull;&ensp;
+                <strong style="color:#ef4444;">Flaw Echo</strong> = void reflection &ensp;&bull;&ensp;
+                <strong>BW</strong> = back-wall echo. &ensp; Trace builds as pulse travels.
+              </p>
             </div>
           </div>
         </div>
@@ -2493,6 +2536,289 @@
     draw(); frame++;
     requestAnimationFrame(tick);
   }
+
+  requestAnimationFrame(tick);
+})();
+
+/* ============================================================
+   UT PRINCIPLE — pulse-echo schematic + A-scan sweep
+   ============================================================ */
+(function () {
+  'use strict';
+  const lc = document.getElementById('utp-left');
+  const rc = document.getElementById('utp-right');
+  if (!lc || !rc) return;
+  const lx = lc.getContext('2d');
+  const rx = rc.getContext('2d');
+
+  /* canvas intrinsic size */
+  lc.width = 480; lc.height = 300;
+  rc.width = 480; rc.height = 300;
+  const CW = 480, CH = 300;
+
+  /* ── Left-panel geometry ── */
+  const MX = 82, MY = 50, MW = 316, MH = 212;   /* material box */
+  const MBOT = MY + MH;                           /* back-wall y  */
+  const TCX  = MX + MW / 2;                       /* beam centre x */
+  const TRX  = TCX - 58, TRW = 116, TRY = 9, TRH = 37; /* transducer */
+  const VCX  = TCX, VCY = MY + Math.round(MH * 0.37);   /* void centre */
+  const VRX = 21, VRY = 9;
+
+  /* ── Wave parameters ── */
+  const SPD  = 1.8;   /* px / frame */
+  const LAM  = 17;    /* px between arcs in a packet */
+  const NARC = 3;     /* arcs per packet */
+
+  /* ── Key timings (frames) ── */
+  const D_VOID  = VCY - MY;
+  const D_BACK  = MH;
+  const T_VOID_HIT  = D_VOID / SPD;
+  const T_BACK_HIT  = D_BACK / SPD;
+  const T_VOID_ECHO = 2 * D_VOID / SPD;
+  const T_BACK_ECHO = 2 * D_BACK / SPD;
+  const TAIL        = (NARC - 1) * LAM / SPD;   /* trailing-arc lag */
+  const T_CYCLE     = T_BACK_ECHO + 58;
+
+  let frame = 0, running = true;
+
+  /* rounded-rect helper (no roundRect dependency) */
+  function rrect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  /* draw a packet of arcs
+     cx,cy = centre; rad = leading-arc radius;
+     up = true → upper-half arcs (upgoing); false → lower-half (downgoing)
+     col = rgba string with '$A' placeholder for alpha */
+  function arcPack(ctx, cx, cy, rad, up, col, baseA) {
+    for (let i = 0; i < NARC; i++) {
+      const r = rad - i * LAM;
+      if (r < 2) continue;
+      const a = Math.max(0, baseA - i * 0.24);
+      ctx.beginPath();
+      if (up) ctx.arc(cx, cy, r, Math.PI, 2 * Math.PI);
+      else    ctx.arc(cx, cy, r, 0,       Math.PI);
+      ctx.strokeStyle = col.replace('$A', a.toFixed(2));
+      ctx.lineWidth   = 2.0 - i * 0.48;
+      ctx.stroke();
+    }
+  }
+
+  /* ── Draw schematic ── */
+  function drawSchematic(t) {
+    lx.clearRect(0, 0, CW, CH);
+
+    /* material */
+    lx.fillStyle = '#94a3b8';
+    rrect(lx, MX, MY, MW, MH, 5);
+    lx.fill();
+
+    lx.fillStyle = 'rgba(255,255,255,0.3)';
+    lx.font = '10px Inter,sans-serif';
+    lx.textAlign = 'right';
+    lx.fillText('Test Material (Steel)', MX + MW - 8, MBOT - 8);
+
+    /* clip arcs to material box */
+    lx.save();
+    lx.beginPath();
+    lx.rect(MX, MY, MW, MH);
+    lx.clip();
+
+    const txR = t * SPD;
+
+    /* transmitted pulse (downgoing, centred at surface) */
+    if (t < T_BACK_HIT + TAIL) {
+      arcPack(lx, TCX, MY,   txR,                  false, 'rgba(6,182,212,$A)',  0.88);
+    }
+    /* void reflection (upgoing, centred at void) */
+    if (t >= T_VOID_HIT && t <= T_VOID_ECHO + TAIL) {
+      arcPack(lx, VCX, VCY, (t - T_VOID_HIT) * SPD, true,  'rgba(239,68,68,$A)', 0.82);
+    }
+    /* back-wall echo (upgoing, centred at back wall) */
+    if (t >= T_BACK_HIT) {
+      arcPack(lx, TCX, MBOT, (t - T_BACK_HIT) * SPD, true,  'rgba(6,182,212,$A)',  0.88);
+    }
+
+    lx.restore();
+
+    /* void ellipse (on top of arcs) */
+    lx.fillStyle = '#ffffff';
+    lx.beginPath();
+    lx.ellipse(VCX, VCY, VRX, VRY, 0, 0, Math.PI * 2);
+    lx.fill();
+    lx.strokeStyle = '#cbd5e1';
+    lx.lineWidth = 1;
+    lx.stroke();
+
+    lx.fillStyle = '#f1f5f9';
+    lx.font = '10px Inter,sans-serif';
+    lx.textAlign = 'left';
+    lx.fillText('Void / Flaw', VCX + VRX + 5, VCY + 4);
+
+    /* transducer */
+    lx.fillStyle = '#0891b2';
+    rrect(lx, TRX, TRY, TRW, TRH, 5);
+    lx.fill();
+    lx.fillStyle = '#fff';
+    lx.font = 'bold 11px Inter,sans-serif';
+    lx.textAlign = 'center';
+    lx.fillText('Transducer', TCX, TRY + 23);
+
+    /* depth ruler — right side */
+    const RX0 = MX + MW + 4, RX1 = MX + MW + 32;
+    lx.strokeStyle = '#64748b';
+    lx.lineWidth = 0.8;
+    lx.setLineDash([3, 3]);
+    [
+      [MY,   'Surface'],
+      [VCY,  'Flaw'],
+      [MBOT, 'Back Wall']
+    ].forEach(([y, label]) => {
+      lx.beginPath();
+      lx.moveTo(RX0, y);
+      lx.lineTo(RX1, y);
+      lx.stroke();
+      lx.fillStyle = '#64748b';
+      lx.font = '9px Inter,sans-serif';
+      lx.textAlign = 'left';
+      lx.fillText(label, RX0 + 2, y - 3);
+    });
+    lx.setLineDash([]);
+  }
+
+  /* ── Draw A-scan ── */
+  function drawAScan(t) {
+    rx.clearRect(0, 0, CW, CH);
+    rx.fillStyle = '#0d1b2a';
+    rx.fillRect(0, 0, CW, CH);
+
+    const PX = 50, PY = 26, PW = CW - 68, PH = CH - 68;
+    const BL = PY + PH * 0.58;   /* baseline */
+
+    /* subtle grid */
+    rx.strokeStyle = '#192d43';
+    rx.lineWidth = 0.8;
+    for (let i = 1; i <= 4; i++) {
+      rx.beginPath();
+      rx.moveTo(PX, PY + PH * i / 5);
+      rx.lineTo(PX + PW, PY + PH * i / 5);
+      rx.stroke();
+    }
+
+    /* axes */
+    rx.strokeStyle = '#2d4a6a';
+    rx.lineWidth = 1.5;
+    rx.beginPath();
+    rx.moveTo(PX, PY);
+    rx.lineTo(PX, PY + PH);
+    rx.lineTo(PX + PW, PY + PH);
+    rx.stroke();
+
+    /* axis labels */
+    rx.fillStyle = '#64748b';
+    rx.font = '11px Inter,sans-serif';
+    rx.textAlign = 'center';
+    rx.fillText('Time  (proportional to depth)', PX + PW / 2, CH - 10);
+    rx.save();
+    rx.translate(14, PY + PH / 2);
+    rx.rotate(-Math.PI / 2);
+    rx.fillText('Amplitude', 0, 0);
+    rx.restore();
+
+    /* baseline */
+    rx.strokeStyle = '#1e3a5f';
+    rx.lineWidth = 1;
+    rx.beginPath();
+    rx.moveTo(PX, BL);
+    rx.lineTo(PX + PW, BL);
+    rx.stroke();
+
+    /* spike fractional positions */
+    const F_IP   = 0.0;
+    const F_VOID = T_VOID_ECHO / T_BACK_ECHO;   /* ≈ 0.37 */
+    const F_BW   = 1.0;
+    const tFrac  = Math.min(t / T_BACK_ECHO, 1.05);
+
+    function spike(frac, h, col, label, lblCol) {
+      const sx = PX + frac * PW;
+      const ty = BL - h;
+      rx.strokeStyle = col;
+      rx.lineWidth = 2.4;
+      rx.beginPath();
+      rx.moveTo(sx, BL);
+      rx.lineTo(sx, ty);
+      rx.stroke();
+      rx.fillStyle = col;
+      rx.beginPath();
+      rx.arc(sx, ty, 3.5, 0, Math.PI * 2);
+      rx.fill();
+      if (label) {
+        rx.fillStyle = lblCol || col;
+        rx.font = 'bold 10px Inter,sans-serif';
+        rx.textAlign = 'center';
+        rx.fillText(label, sx, ty - 9);
+      }
+    }
+
+    /* IP — always shown */
+    spike(F_IP, PH * 0.45, '#22d3ee', 'IP', '#7dd3fc');
+
+    /* flaw echo — revealed when cursor reaches it (RED) */
+    if (tFrac >= F_VOID) {
+      spike(F_VOID, PH * 0.27, '#ef4444', 'Flaw Echo', '#fca5a5');
+    }
+
+    /* back-wall echo — revealed at end */
+    if (tFrac >= F_BW) {
+      spike(F_BW, PH * 0.42, '#22d3ee', 'Back Wall', '#7dd3fc');
+    }
+
+    /* sweep cursor */
+    if (tFrac <= 1.02) {
+      const cx = PX + tFrac * PW;
+      rx.save();
+      rx.strokeStyle = 'rgba(255,255,255,0.28)';
+      rx.lineWidth = 1;
+      rx.setLineDash([5, 4]);
+      rx.beginPath();
+      rx.moveTo(cx, PY);
+      rx.lineTo(cx, PY + PH);
+      rx.stroke();
+      rx.restore();
+    }
+
+    /* colour legend */
+    rx.font = '9.5px Inter,sans-serif';
+    rx.textAlign = 'right';
+    rx.fillStyle = '#22d3ee';
+    rx.fillText('■ Transmitted / Back-wall', CW - 6, PY + 14);
+    rx.fillStyle = '#ef4444';
+    rx.fillText('■ Flaw echo', CW - 6, PY + 28);
+  }
+
+  /* ── Animation loop ── */
+  function tick() {
+    const t = frame % T_CYCLE;
+    drawSchematic(t);
+    drawAScan(t);
+    if (running) frame++;
+    requestAnimationFrame(tick);
+  }
+
+  document.getElementById('utp-playpause').addEventListener('click', function () {
+    running = !running;
+    this.textContent = running ? '⏸ Pause' : '▶ Play';
+  });
 
   requestAnimationFrame(tick);
 })();
