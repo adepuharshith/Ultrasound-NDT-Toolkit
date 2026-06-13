@@ -261,6 +261,46 @@
       padding: .1rem .6rem .3rem;
     }
 
+    /* ---- Top section nav (mirrors signal-processing.html) ---- */
+    .sec-nav {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: .7rem 2rem;
+      position: sticky;
+      top: var(--nav-h);
+      z-index: 80;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .sec-nav-inner { display: inline-flex; gap: .4rem; flex-wrap: wrap; }
+    .sec-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: .26rem .78rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+      font-size: .76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--brand-blue); text-decoration: none; }
+    .sec-nav-divider { opacity: .25; padding: 0 .25rem; line-height: 1; font-size: .9rem; align-self: center; }
+
+    /* ---- Theory content wrapper ---- */
+    .theory-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 5rem;
+    }
+    .theory-section {
+      scroll-margin-top: calc(var(--nav-h) + 58px);
+    }
+    .adv-divider { scroll-margin-top: calc(var(--nav-h) + 58px); }
+
     /* ---- Advanced section divider ---- */
     .adv-divider {
       display: flex;
@@ -323,67 +363,25 @@
   <p>A student-friendly guide — from fundamental wave physics to inspection methods</p>
 </div>
 
-<!-- UT QUICK-REFERENCE BANNER -->
-<div class="container" style="padding-top:0;padding-bottom:0;">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.5rem 0 1.5rem;max-width:860px;">
-    <div style="background:#f0fdf4;border:1px solid #86efac;border-left:4px solid #16a34a;border-radius:8px;padding:.85rem 1.1rem;">
-      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#15803d;margin-bottom:.5rem;">&#10003; UT Advantages</div>
-      <ul style="margin:0;padding-left:1.2rem;font-size:.83rem;color:#166534;line-height:1.7;">
-        <li>Detects both surface <em>and</em> subsurface flaws</li>
-        <li>Single-sided access sufficient (pulse-echo)</li>
-        <li>High depth accuracy — timing resolves &micro;m</li>
-        <li>Penetrates thick metal sections (&gt;500 mm steel)</li>
-        <li>No radiation hazard; real-time electronic output</li>
-        <li>Works on metals, plastics, ceramics, composites</li>
-      </ul>
-    </div>
-    <div style="background:#fff7ed;border:1px solid #fdba74;border-left:4px solid #ea580c;border-radius:8px;padding:.85rem 1.1rem;">
-      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#c2410c;margin-bottom:.5rem;">&#9888; UT Limitations</div>
-      <ul style="margin:0;padding-left:1.2rem;font-size:.83rem;color:#9a3412;line-height:1.7;">
-        <li>Requires liquid couplant (or immersion) for contact</li>
-        <li>Coarse-grained or porous materials scatter the beam</li>
-        <li>Cracks parallel to the beam may go undetected</li>
-        <li>Rough or irregular surfaces degrade coupling</li>
-        <li>Extensive operator training required</li>
-        <li>Near-surface dead zone (ring-down) limits shallow detection</li>
-      </ul>
-    </div>
+<!-- SECTION NAV -->
+<div class="sec-nav">
+  <div class="sec-nav-inner">
+    <a href="#wave-types"           class="sec-nav-btn">1 Sound vs EM</a>
+    <a href="#speed-comparison"     class="sec-nav-btn">2 Speed</a>
+    <a href="#energy-loss"          class="sec-nav-btn">3 Energy Loss</a>
+    <a href="#why-longitudinal"     class="sec-nav-btn">4 Why Longitudinal</a>
+    <a href="#ultrasound-spectrum"  class="sec-nav-btn">5 UT Spectrum</a>
+    <a href="#generating-ultrasound" class="sec-nav-btn">6 Generating UT</a>
+    <a href="#a-scan"               class="sec-nav-btn">7 A-scan</a>
+    <a href="#b-scan"               class="sec-nav-btn">8 B-scan</a>
+    <a href="#c-scan"               class="sec-nav-btn">9 C-scan</a>
+    <span class="sec-nav-divider">│</span>
+    <a href="#advanced-topics"      class="sec-nav-btn">Advanced Topics ↓</a>
   </div>
 </div>
 
 <!-- CONTENT -->
-<section class="section">
-  <div class="container">
-    <div class="two-col-layout">
-
-      <!-- SIDEBAR -->
-      <aside class="topic-sidebar">
-        <h4>Student Path</h4>
-        <a href="#wave-types"><span class="step-dot">1</span>Sound vs EM Waves</a>
-        <a href="#speed-comparison"><span class="step-dot">2</span>Speed in Media</a>
-        <a href="#energy-loss"><span class="step-dot">3</span>Energy Loss</a>
-        <a href="#why-longitudinal"><span class="step-dot">4</span>Why Longitudinal?</a>
-        <a href="#ultrasound-spectrum"><span class="step-dot">5</span>Ultrasound Spectrum</a>
-        <a href="#generating-ultrasound"><span class="step-dot">6</span>Generating Ultrasound</a>
-        <a href="#a-scan"><span class="step-dot">7</span>A-scan</a>
-        <a href="#b-scan"><span class="step-dot">8</span>B-scan</a>
-        <a href="#c-scan"><span class="step-dot">9</span>C-scan</a>
-        <hr class="sidebar-sep"/>
-        <div class="sidebar-label">Advanced Topics</div>
-        <a href="#acoustic-impedance">Acoustic Impedance</a>
-        <a href="#attenuation">Attenuation</a>
-        <a href="#beam-physics">Beam Physics</a>
-        <a href="#snell">Snell's Law &amp; Mode Conversion</a>
-        <a href="#signal-processing">Signal Processing</a>
-        <a href="#phased-arrays">Phased Arrays</a>
-        <a href="#calibration">Calibration &amp; DAC</a>
-        <a href="#pulser-receiver">Pulser-Receiver</a>
-        <a href="#tofd">TOFD</a>
-        <a href="#weld-inspection">Weld Inspection</a>
-      </aside>
-
-      <!-- MAIN CONTENT -->
-      <main>
+<div class="theory-content">
 
         <!-- ══════════════════════════════════════════════
              SECTION 1 — Sound Waves vs Electromagnetic Waves
@@ -2221,10 +2219,7 @@
           </div>
         </div>
 
-      </main>
-    </div>
-  </div>
-</section>
+</div>
 
 <footer class="footer">
   <div class="footer-links">
@@ -2253,12 +2248,8 @@
   const CH = canvas.height;  /* 200 */
 
   const LEFT = 20, RIGHT = 360, TOP = 24, BOT = 148;
-  const PW = RIGHT - LEFT;   /* 340 */
-  const PH = BOT - TOP;      /* 124 */
-
-  const NX = 18, NY = 4;
-  const dx0 = PW / NX;
-  const dy0 = PH / (NY - 1);
+  const PW = RIGHT - LEFT;
+  const PH = BOT - TOP;
 
   const N_WAVES = 3;
   const LAM_PX  = PW / N_WAVES;
@@ -2266,6 +2257,19 @@
   const A       = 7;
   const PERIOD  = 130;
   const OMEGA   = 2 * Math.PI / PERIOD;
+
+  /* Random rest positions — generated once, never on a grid */
+  const N_PARTICLES = 90;
+  const particles = [];
+  /* seed a simple deterministic random for reproducible layout */
+  let _seed = 42;
+  function rng() { _seed = (_seed * 1664525 + 1013904223) >>> 0; return _seed / 0xffffffff; }
+  for (let i = 0; i < N_PARTICLES; i++) {
+    particles.push({
+      rx: LEFT + rng() * PW,
+      ry: TOP + 6 + rng() * (PH - 12)
+    });
+  }
 
   let frame = 0, running = true;
 
@@ -2303,35 +2307,31 @@
       }
     }
 
-    /* Particles */
-    for (let j = 0; j < NY; j++) {
-      for (let i = 0; i < NX; i++) {
-        const xRest = LEFT + (i + 0.5) * dx0;
-        const yRest = TOP  + j * dy0;
-        const xr    = xRest - LEFT;
-        const disp  = A * Math.sin(K * xr - OMEGA * frame);
-        const xDraw = xRest + disp;
+    /* Particles — randomly positioned, oscillate horizontally with the wave */
+    for (const p of particles) {
+      const xr    = p.rx - LEFT;
+      const disp  = A * Math.sin(K * xr - OMEGA * frame);
+      const xDraw = p.rx + disp;
 
-        const prs  = -A * K * Math.cos(K * xr - OMEGA * frame);
-        const norm = Math.max(-1, Math.min(1, prs / (A * K)));
-        let r, g, b;
-        if (norm > 0.12) {
-          r = Math.round(8  + 60 * (1 - norm));
-          g = Math.round(120 + 20 * norm);
-          b = Math.round(180 + 50 * norm);
-        } else if (norm < -0.12) {
-          r = Math.round(200 + 35 * (-norm));
-          g = Math.round(80 - 50 * (-norm));
-          b = Math.round(12 + 30 * (-norm));
-        } else {
-          const v = Math.round(80 + 60 * Math.abs(norm));
-          r = g = b = v;
-        }
-        ctx.beginPath();
-        ctx.arc(xDraw, yRest, 3.2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgb(${r},${g},${b})`;
-        ctx.fill();
+      const prs  = -A * K * Math.cos(K * xr - OMEGA * frame);
+      const norm = Math.max(-1, Math.min(1, prs / (A * K)));
+      let r, g, b;
+      if (norm > 0.12) {
+        r = Math.round(8  + 60 * (1 - norm));
+        g = Math.round(120 + 20 * norm);
+        b = Math.round(180 + 50 * norm);
+      } else if (norm < -0.12) {
+        r = Math.round(200 + 35 * (-norm));
+        g = Math.round(80 - 50 * (-norm));
+        b = Math.round(12 + 30 * (-norm));
+      } else {
+        const v = Math.round(80 + 60 * Math.abs(norm));
+        r = g = b = v;
       }
+      ctx.beginPath();
+      ctx.arc(xDraw, p.ry, 3.2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fill();
     }
 
     /* Dynamic compression / rarefaction labels */
