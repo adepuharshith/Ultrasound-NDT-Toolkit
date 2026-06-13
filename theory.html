@@ -352,6 +352,46 @@
       color: var(--text-muted);
       white-space: nowrap;
     }
+
+    /* ---- Material Properties section ---- */
+    .mp-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1.5rem;
+      align-items: start;
+      margin: 1.75rem 0 0;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border);
+    }
+    @media (max-width: 700px) { .mp-row { grid-template-columns: 1fr; } }
+    .mp-info h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); margin: .4rem 0 .6rem; }
+    .mp-info p  { font-size: .87rem; color: var(--text-muted); line-height: 1.65; margin-bottom: .75rem; }
+    .mp-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      font-size: .78rem;
+      font-weight: 800;
+      margin-bottom: .5rem;
+    }
+    .mp-badge.speed   { background: #e0f2fe; color: #0369a1; }
+    .mp-badge.atten   { background: #fef3c7; color: #b45309; }
+    .mp-badge.scatter { background: #f3e8ff; color: #7c3aed; }
+    .mp-formula {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--brand-cyan);
+      border-radius: 0 8px 8px 0;
+      padding: .55rem 1rem;
+      font-family: 'Georgia', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: .01em;
+      margin-bottom: .5rem;
+    }
   </style>
 </head>
 <body>
@@ -400,6 +440,7 @@
     <a href="#speed-comparison"      class="sec-nav-btn">Key Differences</a>
     <a href="#applications"          class="sec-nav-btn">Applications</a>
     <a href="#ut-principle"          class="sec-nav-btn">UT Principle</a>
+    <a href="#material-props"        class="sec-nav-btn">Material Props</a>
     <a href="#ultrasound-spectrum"   class="sec-nav-btn">UT Spectrum</a>
     <a href="#generating-ultrasound" class="sec-nav-btn">Generating UT</a>
     <a href="#a-scan"                class="sec-nav-btn">A-scan</a>
@@ -581,6 +622,69 @@
                 <strong style="color:#ef4444;">Flaw Echo</strong> = void reflection &ensp;&bull;&ensp;
                 <strong>BW</strong> = back-wall echo. &ensp; Trace builds as pulse travels.
               </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             MATERIAL PROPERTIES MEASURED BY ULTRASOUND
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="material-props">
+          <h2>What Does Ultrasound Actually Measure?</h2>
+          <p>Three distinct material properties are encoded in a single pulse-echo A-scan — each read from a different feature of the returned waveform.</p>
+
+          <!-- Property 1: Wave Speed -->
+          <div class="mp-row">
+            <div class="mp-info">
+              <div class="mp-badge speed">01</div>
+              <h3>Wave Speed</h3>
+              <p>Sound travels at a characteristic speed set by the material's elastic stiffness and density. Measuring the round-trip time between the front-wall (FW) and back-wall (BW) echo gives wave speed directly — no destructive contact needed beyond the transducer.</p>
+              <div class="mp-formula">c = 2d / &Delta;t</div>
+              <p style="font-size:.82rem;color:var(--text-muted);margin-top:.4rem;">d = known thickness &ensp;&middot;&ensp; &Delta;t = FW-to-BW time difference<br>Steel &asymp; 5 920 m/s &ensp;&middot;&ensp; Aluminium &asymp; 6 320 m/s</p>
+            </div>
+            <div class="wave-demo">
+              <div class="wave-demo-header"><span>&#128202; A-scan &mdash; Time of Flight</span></div>
+              <canvas id="mp-speed-canvas" class="wave-canvas" width="480" height="180"></canvas>
+              <p class="wave-caption"><strong>FW</strong> = front-wall echo &nbsp;&middot;&nbsp; <strong>BW</strong> = back-wall echo &nbsp;&middot;&nbsp; <strong style="color:#fbbf24;">&Delta;t</strong> = round-trip transit time</p>
+            </div>
+          </div>
+
+          <!-- Property 2: Attenuation -->
+          <div class="mp-row">
+            <div class="mp-info">
+              <div class="mp-badge atten">02</div>
+              <h3>Attenuation</h3>
+              <p>Sound loses energy to absorption (heat) and scattering as it propagates. The back-wall echo arrives weaker than the transmitted pulse — the amplitude ratio over the round-trip path gives the attenuation coefficient &alpha;.</p>
+              <div class="mp-formula">&alpha; = (1/2d) &middot; ln(A<sub>FW</sub> / A<sub>BW</sub>)</div>
+              <p style="font-size:.82rem;color:var(--text-muted);margin-top:.4rem;">Units: Np/m or dB/mm &ensp;&middot;&ensp; Higher &alpha; &rarr; shorter inspection range<br>Typical: 0.1&ndash;5 dB/mm at 5 MHz in metals</p>
+            </div>
+            <div class="wave-demo">
+              <div class="wave-demo-header"><span>&#128202; A-scan &mdash; Amplitude Loss</span></div>
+              <canvas id="mp-atten-canvas" class="wave-canvas" width="480" height="180"></canvas>
+              <p class="wave-caption">A<sub>BW</sub> is smaller than A<sub>FW</sub> due to material attenuation &mdash; the decay is exponential with depth</p>
+            </div>
+          </div>
+
+          <!-- Property 3: Backscatter -->
+          <div class="mp-row">
+            <div class="mp-info">
+              <div class="mp-badge scatter">03</div>
+              <h3>Backscatter</h3>
+              <p>In polycrystalline metals, grain boundaries scatter sound in all directions. A fraction returns to the transducer as random &ldquo;grain noise&rdquo; filling the A-scan between FW and BW. Its intensity is a direct measure of grain size and microstructure.</p>
+              <div class="mp-formula">BSC &prop; f&#8308; &middot; d&#179;</div>
+              <p style="font-size:.82rem;color:var(--text-muted);margin-top:.4rem;">Rayleigh regime (grain size d &laquo; &lambda;) &ensp;&middot;&ensp; Coarser grains + higher frequency &rarr; stronger noise</p>
+            </div>
+            <div class="wave-pair" style="margin:0;">
+              <div class="wave-demo">
+                <div class="wave-demo-header"><span>&#127895; Material &mdash; Grain Microstructure</span></div>
+                <canvas id="mp-scatter-left" class="wave-canvas" width="480" height="260"></canvas>
+                <p class="wave-caption">Orange flashes = grain boundary scatter events as wave pulse traverses the material</p>
+              </div>
+              <div class="wave-demo">
+                <div class="wave-demo-header"><span>&#128202; A-scan &mdash; Grain Noise</span></div>
+                <canvas id="mp-scatter-right" class="wave-canvas" width="480" height="260"></canvas>
+                <p class="wave-caption">Random grain noise fills the region between FW and BW &mdash; amplitude &prop; grain size &times; f&#8308;</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1533,181 +1637,6 @@
             interrogate the near-surface, mid-thickness (back wall), and near-far-surface regions
             respectively — critical for full volumetric weld coverage per ASME and AWS D1.1.
           </p>
-        </div>
-
-        <!-- Signal Processing -->
-        <div class="theory-section" id="signal-processing">
-          <h2>&#128250; Signal Processing</h2>
-          <p>
-            The raw A-scan is a time-domain RF voltage waveform — a bipolar oscillating signal whose amplitude
-            encodes reflector strength and whose timing encodes depth. Four processing steps convert that raw
-            signal into a displayable, measurable, and imageable result.
-          </p>
-
-          <h3>Envelope Detection (Hilbert Transform)</h3>
-          <p>
-            Gated C-scans sample peak echo amplitude within a depth window. Sampling the raw RF signal
-            directly produces a position-dependent artifact: a reflector sitting at a wave crest reads full
-            amplitude; one at a zero-crossing reads zero — yet both are physically identical. The cure is
-            the <strong>analytic signal</strong>:
-          </p>
-          <div class="eq-box">$$z(t) = s(t) + j\,\mathcal{H}\!\left\{s(t)\right\} \;\longrightarrow\; \lvert z(t)\rvert = \text{envelope}$$</div>
-          <p>
-            The Hilbert transform H{&middot;} phase-shifts every frequency component by 90&deg;, producing
-            a quadrature imaginary part. The magnitude |z(t)| is a smooth, non-negative envelope that tracks
-            peak echo amplitude regardless of RF phase. In practice it is computed via FFT &rarr; zero all
-            negative-frequency bins &rarr; inverse FFT.
-          </p>
-
-          <!-- SVG: RF waveform vs Hilbert envelope -->
-          <div class="scan-svg-wrap">
-            <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg">
-              <!-- Background -->
-              <rect width="580" height="160" fill="#0d1b2a"/>
-              <!-- Zero-amplitude axis -->
-              <line x1="30" y1="80" x2="555" y2="80" stroke="#1e3a5f" stroke-width="1"/>
-
-              <!-- RF signal polyline (cyan) -->
-              <polyline fill="none" stroke="#22d3ee" stroke-width="1.4" opacity="0.8"
-                points="
-                  30,80 40,80 45,79 50,81 55,80
-                  60,74 63,67 66,71 69,93 72,116 74,115 76,80 78,47 80,35 82,65 84,93 86,101 88,91 90,80 92,77 94,78 96,80
-                  100,80 110,78 120,82 130,79 140,81 150,78 160,82 170,79 180,81 190,80 200,78 210,82 220,79 230,81 240,80 248,80
-                  250,79 252,76 254,73 257,80 260,95 262,104 264,92 266,68 268,52 270,65 272,80 274,87 276,84 278,81 280,80
-                  290,82 310,78 330,82 350,79 370,81 390,80 410,82 430,80
-                  432,79 434,81 436,80 438,74 440,68 442,72 444,92 446,114 448,114 450,80 452,47 454,38 456,65 458,93 460,101 462,91 464,80 466,77 468,78 470,80
-                  480,80 555,80
-                "
-              />
-
-              <!-- Envelope curve (orange Bezier) -->
-              <path fill="none" stroke="#fb923c" stroke-width="2.4" opacity="0.95"
-                d="M 30,80 L 55,80
-                   Q 65,64 72,50 Q 78,38 80,35 Q 82,40 88,60 Q 94,76 100,78
-                   L 248,78
-                   Q 256,65 263,56 Q 268,52 272,60 Q 278,72 285,78
-                   L 430,78
-                   Q 440,58 447,45 Q 452,38 456,48 Q 464,68 472,78
-                   L 555,78"
-              />
-
-              <!-- Echo peak labels -->
-              <text x="80" y="22" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="Inter,sans-serif">IP</text>
-              <line x1="80" y1="25" x2="80" y2="37" stroke="#7dd3fc" stroke-width="1" stroke-dasharray="3,2"/>
-
-              <text x="268" y="30" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="Inter,sans-serif">Flaw Echo</text>
-              <line x1="268" y1="33" x2="268" y2="54" stroke="#fca5a5" stroke-width="1" stroke-dasharray="3,2"/>
-
-              <text x="452" y="22" text-anchor="middle" fill="#86efac" font-size="10" font-weight="700" font-family="Inter,sans-serif">BW</text>
-              <line x1="452" y1="25" x2="452" y2="40" stroke="#86efac" stroke-width="1" stroke-dasharray="3,2"/>
-
-              <!-- Legend -->
-              <line x1="280" y1="147" x2="310" y2="147" stroke="#22d3ee" stroke-width="1.8" opacity="0.8"/>
-              <text x="315" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">RF signal (bipolar)</text>
-              <line x1="420" y1="147" x2="450" y2="147" stroke="#fb923c" stroke-width="2.4"/>
-              <text x="455" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Hilbert envelope</text>
-
-              <!-- Axis labels -->
-              <text x="292" y="10" text-anchor="middle" fill="#64748b" font-size="9" font-family="Inter,sans-serif">A-scan RF signal and its Hilbert envelope</text>
-              <text x="292" y="100" text-anchor="middle" fill="#475569" font-size="8.5" font-family="Inter,sans-serif">time &#8594;</text>
-            </svg>
-          </div>
-
-          <div class="callout">
-            <strong>NDE example:</strong> Automated immersion UT of aerospace titanium forgings gates on
-            the Hilbert envelope of the back-wall echo to flag embedded porosity. A &minus;6 dB drop in
-            gated amplitude marks a suspect region. Using raw RF instead would produce false positives
-            every time the back wall shifts by a quarter wavelength relative to the gate centre — an
-            artefact that no threshold setting can suppress.
-          </div>
-
-          <h3>Time Gain Compensation (TGC)</h3>
-          <p>
-            Attenuation decays echo amplitude exponentially with depth, so identical reflectors at
-            different depths return unequal signals. TGC applies a programmable depth-dependent gain
-            matched to the material's attenuation law:
-          </p>
-          <div class="eq-box">$$G_{\text{TGC}}(t) = \exp\!\left(+\alpha \cdot c \cdot \tfrac{t}{2}\right) \quad [\text{dB-linear ramp; compensates round-trip path loss}]$$</div>
-          <p>
-            In practice, &alpha; is measured on a step-wedge or DAC block and the ramp is set in
-            dB/&mu;s. A properly compensated A-scan shows equal amplitude for equal-size reflectors at
-            all depths, making the C-scan color scale a direct indicator of reflectivity rather than
-            a convolution of reflectivity and depth.
-          </p>
-          <div class="callout">
-            <strong>NDE example:</strong> Corrosion mapping of a 6–20 mm carbon steel pressure vessel
-            wall at 5 MHz (α ≈ 1 dB/(mm·MHz)). Without TGC the back-wall echo from a 20 mm wall
-            arrives 28 dB below that from a 6 mm wall (2 × 14 mm extra round-trip × 1 dB/mm).
-            TGC recovers that loss; the C-scan then maps actual wall-thinning geometry rather than
-            a depth-weighted echo map.
-          </div>
-
-          <h3>Pulse Compression (Chirp / Coded Excitation)</h3>
-          <p>
-            Conventional pulsed UT trades off resolution against SNR: shorter pulse &rarr; finer
-            range resolution, but less energy transmitted &rarr; lower SNR. Pulse compression decouples
-            these. A linear frequency-modulated (LFM) chirp of duration T and bandwidth B is transmitted;
-            a matched filter (cross-correlation with the reference chirp) compresses the received signal
-            to a pulse of length &asymp; 1/B while preserving the full energy of the long transmission:
-          </p>
-          <div class="eq-box">$$\text{SNR gain} = T \times B \quad (\text{time-bandwidth product})$$</div>
-          <p>
-            Resolution equals that of a &delta;-pulse at bandwidth B; SNR equals that of a CW burst
-            of duration T. The compressed sidelobe level must be managed (typically with amplitude
-            weighting — Hann, Taylor — at the cost of slight resolution broadening).
-          </p>
-          <div class="callout">
-            <strong>NDE example:</strong> Air-coupled UT of CFRP composites suffers 60–80 dB insertion
-            loss at each air–composite interface, burying conventional pulses in noise. A 50 &mu;s chirp
-            with B = 200 kHz yields T&times;B = 10 (+10 dB) — often the difference between resolving a
-            delamination and noise-floor burial. Pulse compression is also standard in TOFD, where weak
-            diffraction tip signals must be separated from lateral-wave and geometry arrivals.
-          </div>
-
-          <h3>SNR &amp; Noise Sources</h3>
-          <p>Three distinct noise mechanisms compete with flaw echoes and require different mitigation strategies:</p>
-
-          <table class="compare-table">
-            <thead>
-              <tr>
-                <th>Noise type</th>
-                <th>Origin</th>
-                <th>Frequency scaling</th>
-                <th>Mitigation</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Electronic noise</strong></td>
-                <td>Amplifier Johnson noise; preamplifier noise figure</td>
-                <td>White (flat spectrum)</td>
-                <td>Low-noise preamp; coherent averaging N shots &rarr; +10log₁₀(N) dB</td>
-              </tr>
-              <tr>
-                <td><strong>Coherent grain noise ("grass")</strong></td>
-                <td>Backscatter from grain boundaries; <em>coherent</em> with transmitted pulse; cannot be averaged away</td>
-                <td>&prop; f&sup2; (stochastic) or f&sup4; (Rayleigh, d &laquo; &lambda;)</td>
-                <td>Lower frequency; spatial compounding; FMC/TFM; frequency-dependent filtering</td>
-              </tr>
-              <tr>
-                <td><strong>Geometric / structural noise</strong></td>
-                <td>Surface roughness, geometry re-entrant echoes, mode-converted arrivals</td>
-                <td>Depends on geometry</td>
-                <td>Time-gating; wedge design; surface preparation; TOFD lateral-wave subtraction</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="callout">
-            <strong>NDE example — austenitic weld inspection:</strong> 316L stainless steel welds
-            contain columnar grains 100–500 &mu;m wide. At 5 MHz in this microstructure, coherent
-            grain noise sits only 10–15 dB below a 1 mm side-drilled hole reference — well within
-            typical flaw-detection thresholds. Because grain noise is <em>coherent</em>, waveform
-            averaging does not suppress it. The standard remedies are: (1) drop to 1–2 MHz to shift
-            the stochastic scattering regime (accepting coarser resolution), or (2) use phased-array
-            spatial compounding / FMC-TFM to decorrelate grain noise across apertures while keeping
-            coherent flaw signals in phase.
-          </div>
         </div>
 
         <!-- Phased Arrays -->
@@ -2951,6 +2880,422 @@
     this.textContent = running ? '⏸ Pause' : '▶ Play';
   });
 
+  requestAnimationFrame(tick);
+})();
+
+/* ================================================================
+   MATERIAL PROPS — Wave Speed canvas (mp-speed-canvas)
+   ================================================================ */
+(function () {
+  'use strict';
+  var c = document.getElementById('mp-speed-canvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  c.width = 480; c.height = 180;
+  var W = 480, H = 180;
+  var PL = 48, PR = 18, PT = 26, PB = 32;
+  var PW = W - PL - PR, PH = H - PT - PB;
+  var BL = PT + PH;
+  var FX = PL + Math.round(PW * 0.13);
+  var BX = PL + Math.round(PW * 0.84);
+  var SH = Math.round(PH * 0.80);
+  var T_SWEEP = 190, T_HOLD = 70, T_CYCLE = T_SWEEP + T_HOLD;
+  var frame = 0;
+
+  function spk(x, h, col) {
+    ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(x, BL); ctx.lineTo(x, BL - h); ctx.stroke();
+  }
+
+  function tick() {
+    var t = frame % T_CYCLE;
+    ctx.fillStyle = '#0d1b2a'; ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = '#1e3a5f'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, BL); ctx.lineTo(W - PR, BL); ctx.stroke();
+
+    ctx.fillStyle = '#334155'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Time →', PL + PW / 2, H - 3);
+    ctx.save(); ctx.translate(13, PT + PH / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Amplitude', 0, 0); ctx.restore();
+
+    spk(FX, SH, '#22d3ee');
+    ctx.fillStyle = '#7dd3fc'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('FW', FX, BL - SH - 9);
+
+    var cx = PL + Math.min(1, t / T_SWEEP) * PW;
+
+    if (cx >= BX) {
+      spk(BX, SH, '#22d3ee');
+      ctx.fillStyle = '#7dd3fc'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('BW', BX, BL - SH - 9);
+
+      var ay = BL - Math.round(PH * 0.22);
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(FX + 2, ay); ctx.lineTo(BX - 2, ay); ctx.stroke();
+      [FX + 2, BX - 2].forEach(function (px) {
+        ctx.beginPath(); ctx.moveTo(px, ay - 5); ctx.lineTo(px, ay + 5); ctx.stroke();
+      });
+      ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 11px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('Δt', (FX + BX) / 2, ay - 8);
+
+      ctx.fillStyle = '#a3e635'; ctx.font = 'bold 13px Georgia,serif'; ctx.textAlign = 'right';
+      ctx.fillText('c = 2d / Δt', W - PR - 4, H - 6);
+    }
+
+    if (t < T_SWEEP) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.2;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(cx, PT); ctx.lineTo(cx, BL); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    frame++;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ================================================================
+   MATERIAL PROPS — Attenuation canvas (mp-atten-canvas)
+   ================================================================ */
+(function () {
+  'use strict';
+  var c = document.getElementById('mp-atten-canvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  c.width = 480; c.height = 180;
+  var W = 480, H = 180;
+  var PL = 48, PR = 18, PT = 26, PB = 32;
+  var PW = W - PL - PR, PH = H - PT - PB;
+  var BL = PT + PH;
+  var FX = PL + Math.round(PW * 0.13);
+  var BX = PL + Math.round(PW * 0.84);
+  var FH = Math.round(PH * 0.84);
+  var BH = Math.round(PH * 0.35);
+  var kDecay = Math.log(FH / BH) / (BX - FX);
+  var T_SWEEP = 190, T_HOLD = 70, T_CYCLE = T_SWEEP + T_HOLD;
+  var frame = 0;
+
+  function spk(x, h, col) {
+    ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(x, BL); ctx.lineTo(x, BL - h); ctx.stroke();
+  }
+
+  function tick() {
+    var t = frame % T_CYCLE;
+    ctx.fillStyle = '#0d1b2a'; ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = '#1e3a5f'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, BL); ctx.lineTo(W - PR, BL); ctx.stroke();
+
+    ctx.fillStyle = '#334155'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Time →', PL + PW / 2, H - 3);
+    ctx.save(); ctx.translate(13, PT + PH / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Amplitude', 0, 0); ctx.restore();
+
+    spk(FX, FH, '#22d3ee');
+    ctx.fillStyle = '#7dd3fc'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('FW', FX, BL - FH - 9);
+    ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(FX, BL - FH); ctx.lineTo(FX - 22, BL - FH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#7dd3fc'; ctx.font = '8px Inter,sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText('A_FW', FX - 24, BL - FH + 3);
+
+    var cx = PL + Math.min(1, t / T_SWEEP) * PW;
+
+    if (cx >= BX) {
+      ctx.strokeStyle = 'rgba(251,146,60,0.65)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(FX, BL - FH);
+      for (var x = FX; x <= BX; x++) {
+        ctx.lineTo(x, BL - FH * Math.exp(-kDecay * (x - FX)));
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+
+      ctx.fillStyle = '#fb923c'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('exp. decay', (FX + BX) / 2, BL - Math.sqrt(FH * BH) - 8);
+
+      spk(BX, BH, '#22d3ee');
+      ctx.fillStyle = '#7dd3fc'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('BW', BX, BL - BH - 9);
+      ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(BX, BL - BH); ctx.lineTo(BX + 22, BL - BH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#7dd3fc'; ctx.font = '8px Inter,sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('A_BW', BX + 24, BL - BH + 3);
+
+      ctx.fillStyle = '#fb923c'; ctx.font = 'bold 12px Georgia,serif'; ctx.textAlign = 'center';
+      ctx.fillText('α = (1/2d) · ln(A_FW / A_BW)', PL + PW / 2, PT + 16);
+    }
+
+    if (t < T_SWEEP) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.2;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(cx, PT); ctx.lineTo(cx, BL); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    frame++;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ================================================================
+   MATERIAL PROPS — Backscatter canvases (mp-scatter-left / right)
+   ================================================================ */
+(function () {
+  'use strict';
+  var lc = document.getElementById('mp-scatter-left');
+  var rc = document.getElementById('mp-scatter-right');
+  if (!lc || !rc) return;
+  var lx = lc.getContext('2d');
+  var rx = rc.getContext('2d');
+  lc.width = 480; lc.height = 260;
+  rc.width = 480; rc.height = 260;
+  var LW = 480, LH = 260, RW = 480, RH = 260;
+
+  /* Material box */
+  var MX = 72, MY = 68, MW = 336, MH = 155;
+  var MBOT = MY + MH;
+  var TCX = MX + MW / 2;  /* 240 */
+  var TRW = 96, TRH = 28, TRX = TCX - 48, TRY = 24;
+
+  /* Wave params */
+  var SPD = 1.5, N_ARC = 3, ARC_SP = 15;
+  var T_DOWN = Math.round(MH / SPD);   /* ~103 */
+  var T_UP = T_DOWN;
+  var T_HOLD = 58;
+  var T_CYCLE = T_DOWN + T_UP + T_HOLD;
+  var T_SWEEP = T_DOWN + T_UP;
+
+  /* Right A-scan geometry */
+  var RPL = 48, RPR = 18, RPT = 30, RPB = 35;
+  var RPW = RW - RPL - RPR, RPH = RH - RPT - RPB;
+  var RBL = RPT + RPH;
+  var FX = RPL + Math.round(RPW * 0.11);
+  var BX = RPL + Math.round(RPW * 0.86);
+  var FH = Math.round(RPH * 0.76);
+  var BH = Math.round(RPH * 0.74);
+
+  /* Build Voronoi grain texture offscreen */
+  var grainOff = document.createElement('canvas');
+  grainOff.width = MW; grainOff.height = MH;
+  var gx = grainOff.getContext('2d');
+  (function () {
+    var img = gx.createImageData(MW, MH);
+    var px = img.data;
+    var gs = 99371;
+    function grng() { gs = (gs * 1664525 + 1013904223) >>> 0; return gs / 4294967295; }
+    var N = 11;
+    var seeds = [], palette = [
+      [190,208,221],[178,196,211],[200,215,228],[184,202,215],
+      [194,212,224],[174,192,208],[204,220,232],[180,198,212],
+      [196,214,226],[172,190,206],[186,204,217]
+    ];
+    for (var i = 0; i < N; i++) seeds.push([Math.round(grng() * MW), Math.round(grng() * MH)]);
+    var cell = new Int32Array(MW * MH);
+    for (var y = 0; y < MH; y++) {
+      for (var x = 0; x < MW; x++) {
+        var md = 1e18, best = 0;
+        for (var s = 0; s < N; s++) {
+          var dx = x - seeds[s][0], dy = y - seeds[s][1];
+          var d = dx * dx + dy * dy;
+          if (d < md) { md = d; best = s; }
+        }
+        cell[y * MW + x] = best;
+        var idx = (y * MW + x) * 4;
+        var col = palette[best];
+        px[idx] = col[0]; px[idx + 1] = col[1]; px[idx + 2] = col[2]; px[idx + 3] = 255;
+      }
+    }
+    for (var y = 0; y < MH; y++) {
+      for (var x = 0; x < MW; x++) {
+        var c0 = cell[y * MW + x];
+        var bnd = (x < MW - 1 && cell[y * MW + x + 1] !== c0) ||
+                  (y < MH - 1 && cell[(y + 1) * MW + x] !== c0);
+        if (bnd) {
+          var idx = (y * MW + x) * 4;
+          px[idx] = 118; px[idx + 1] = 136; px[idx + 2] = 153; px[idx + 3] = 255;
+        }
+      }
+    }
+    gx.putImageData(img, 0, 0);
+  })();
+
+  /* Scatter flash points (local to material box) */
+  var SPTS = [];
+  var ss = 55443;
+  function srng() { ss = (ss * 1664525 + 1013904223) >>> 0; return ss / 4294967295; }
+  for (var i = 0; i < 26; i++) {
+    SPTS.push({ lx: Math.round(srng() * (MW - 20) + 10), ly: Math.round(srng() * (MH - 10) + 5) });
+  }
+
+  /* Right-canvas grain noise spikes */
+  var NSPIKES = [];
+  var ns = 73892;
+  function nrng() { ns = (ns * 1664525 + 1013904223) >>> 0; return ns / 4294967295; }
+  for (var i = 0; i < 38; i++) {
+    NSPIKES.push({
+      x: FX + 22 + Math.round(nrng() * (BX - FX - 44)),
+      h: Math.round(nrng() * 30 + 5)
+    });
+  }
+
+  var frame = 0;
+
+  function drawLeft(t) {
+    lx.fillStyle = '#f8fafc'; lx.fillRect(0, 0, LW, LH);
+
+    /* Grain texture clipped to material */
+    lx.save();
+    lx.beginPath(); lx.rect(MX, MY, MW, MH); lx.clip();
+    lx.drawImage(grainOff, MX, MY);
+    lx.restore();
+
+    /* Material outline */
+    lx.strokeStyle = '#94a3b8'; lx.lineWidth = 2;
+    lx.strokeRect(MX, MY, MW, MH);
+
+    /* Label */
+    lx.fillStyle = '#64748b'; lx.font = '10px Inter,sans-serif'; lx.textAlign = 'center';
+    lx.fillText('Test Material (Polycrystalline Metal)', LW / 2, MBOT + 18);
+
+    /* Grain label inside box */
+    lx.fillStyle = 'rgba(90,110,130,0.85)'; lx.font = '9px Inter,sans-serif'; lx.textAlign = 'left';
+    lx.fillText('grains', MX + 5, MY + 12);
+
+    /* Transducer */
+    lx.fillStyle = '#0f2d5e';
+    lx.beginPath(); lx.rect(TRX, TRY, TRW, TRH); lx.fill();
+    lx.strokeStyle = '#22d3ee'; lx.lineWidth = 1.5; lx.stroke();
+    lx.fillStyle = '#fff'; lx.font = 'bold 10px Inter,sans-serif'; lx.textAlign = 'center';
+    lx.fillText('TX/RX', TCX, TRY + TRH / 2 + 4);
+    lx.strokeStyle = '#475569'; lx.lineWidth = 1.5;
+    lx.beginPath(); lx.moveTo(TCX, TRY); lx.lineTo(TCX, 10); lx.stroke();
+
+    /* Couplant dashes */
+    lx.strokeStyle = 'rgba(34,211,238,0.5)'; lx.lineWidth = 1; lx.setLineDash([3, 4]);
+    lx.beginPath(); lx.moveTo(TRX + 6, TRY + TRH); lx.lineTo(TRX + TRW - 6, TRY + TRH); lx.stroke();
+    lx.setLineDash([]);
+
+    /* Wave arcs clipped to material */
+    lx.save();
+    lx.beginPath(); lx.rect(MX, MY, MW, MH); lx.clip();
+
+    if (t < T_DOWN + N_ARC * ARC_SP / SPD) {
+      var lead = t * SPD;
+      for (var i = 0; i < N_ARC; i++) {
+        var r = lead - i * ARC_SP;
+        if (r < 1) continue;
+        var a = Math.max(0, 1 - i * 0.3) * 0.88;
+        lx.beginPath(); lx.arc(TCX, MY, r, 0, Math.PI);
+        lx.strokeStyle = 'rgba(34,211,238,' + a.toFixed(2) + ')';
+        lx.lineWidth = 2.2 - i * 0.6; lx.stroke();
+      }
+    }
+    if (t >= T_DOWN) {
+      var lead = (t - T_DOWN) * SPD;
+      for (var i = 0; i < N_ARC; i++) {
+        var r = lead - i * ARC_SP;
+        if (r < 1 || r > MH + 30) continue;
+        var a = Math.max(0, 1 - i * 0.3) * 0.78;
+        lx.beginPath(); lx.arc(TCX, MBOT, r, Math.PI, 2 * Math.PI);
+        lx.strokeStyle = 'rgba(34,211,238,' + a.toFixed(2) + ')';
+        lx.lineWidth = 2.2 - i * 0.6; lx.stroke();
+      }
+    }
+    lx.restore();
+
+    /* Scatter flash dots */
+    for (var i = 0; i < SPTS.length; i++) {
+      var p = SPTS[i];
+      var hitT = p.ly / SPD;
+      var age = t - hitT;
+      if (age >= 0 && age < 22) {
+        var alpha = Math.max(0, 1 - age / 22);
+        var r2 = 3 + age * 0.4;
+        lx.beginPath();
+        lx.arc(MX + p.lx, MY + p.ly, r2, 0, 2 * Math.PI);
+        lx.fillStyle = 'rgba(251,146,60,' + (alpha * 0.92).toFixed(2) + ')';
+        lx.fill();
+      }
+    }
+
+    /* Legend */
+    lx.fillStyle = 'rgba(34,211,238,0.85)'; lx.fillRect(LW - 128, LH - 44, 14, 3);
+    lx.fillStyle = '#64748b'; lx.font = '8px Inter,sans-serif'; lx.textAlign = 'left';
+    lx.fillText('wave arc', LW - 108, LH - 41);
+    lx.beginPath(); lx.arc(LW - 121, LH - 28, 4, 0, 2 * Math.PI);
+    lx.fillStyle = 'rgba(251,146,60,0.88)'; lx.fill();
+    lx.fillStyle = '#64748b'; lx.font = '8px Inter,sans-serif';
+    lx.fillText('scatter', LW - 108, LH - 25);
+  }
+
+  function drawRight(t) {
+    rx.fillStyle = '#0d1b2a'; rx.fillRect(0, 0, RW, RH);
+
+    rx.strokeStyle = '#1e3a5f'; rx.lineWidth = 1;
+    rx.beginPath(); rx.moveTo(RPL, RPT); rx.lineTo(RPL, RBL); rx.lineTo(RW - RPR, RBL); rx.stroke();
+
+    rx.fillStyle = '#334155'; rx.font = '9px Inter,sans-serif'; rx.textAlign = 'center';
+    rx.fillText('Time →', RPL + RPW / 2, RH - 4);
+    rx.save(); rx.translate(13, RPT + RPH / 2); rx.rotate(-Math.PI / 2);
+    rx.fillText('Amplitude', 0, 0); rx.restore();
+
+    /* FW echo always visible */
+    rx.strokeStyle = '#22d3ee'; rx.lineWidth = 2.5;
+    rx.beginPath(); rx.moveTo(FX, RBL); rx.lineTo(FX, RBL - FH); rx.stroke();
+    rx.fillStyle = '#7dd3fc'; rx.font = 'bold 10px Inter,sans-serif'; rx.textAlign = 'center';
+    rx.fillText('FW', FX, RBL - FH - 8);
+
+    var curX = RPL + Math.min(1, t / T_SWEEP) * RPW;
+
+    /* Grain noise spikes */
+    for (var i = 0; i < NSPIKES.length; i++) {
+      var sp = NSPIKES[i];
+      if (curX >= sp.x) {
+        rx.strokeStyle = '#f97316'; rx.lineWidth = 1;
+        rx.beginPath(); rx.moveTo(sp.x, RBL); rx.lineTo(sp.x, RBL - sp.h); rx.stroke();
+      }
+    }
+
+    /* Grain noise label bracket */
+    if (curX > FX + 50) {
+      var mid = (FX + Math.min(curX, BX - 10)) / 2;
+      rx.fillStyle = 'rgba(249,115,22,0.75)'; rx.font = '9px Inter,sans-serif'; rx.textAlign = 'center';
+      rx.fillText('grain noise', mid, RBL - 50);
+      rx.strokeStyle = 'rgba(249,115,22,0.4)'; rx.lineWidth = 1;
+      rx.beginPath();
+      rx.moveTo(FX + 14, RBL - 45); rx.lineTo(FX + 14, RBL - 43);
+      rx.lineTo(Math.min(curX - 6, BX - 12), RBL - 43);
+      rx.lineTo(Math.min(curX - 6, BX - 12), RBL - 45);
+      rx.stroke();
+    }
+
+    /* BW echo appears at end of sweep */
+    if (t >= T_SWEEP) {
+      rx.strokeStyle = '#22d3ee'; rx.lineWidth = 2.5;
+      rx.beginPath(); rx.moveTo(BX, RBL); rx.lineTo(BX, RBL - BH); rx.stroke();
+      rx.fillStyle = '#7dd3fc'; rx.font = 'bold 10px Inter,sans-serif'; rx.textAlign = 'center';
+      rx.fillText('BW', BX, RBL - BH - 8);
+    }
+
+    /* Sweep cursor */
+    if (t < T_SWEEP) {
+      rx.strokeStyle = 'rgba(255,255,255,0.48)'; rx.lineWidth = 1.2;
+      rx.setLineDash([5, 4]);
+      rx.beginPath(); rx.moveTo(curX, RPT); rx.lineTo(curX, RBL); rx.stroke();
+      rx.setLineDash([]);
+    }
+  }
+
+  function tick() {
+    var t = frame % T_CYCLE;
+    drawLeft(t);
+    drawRight(t);
+    frame++;
+    requestAnimationFrame(tick);
+  }
   requestAnimationFrame(tick);
 })();
 </script>

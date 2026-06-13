@@ -217,6 +217,45 @@
       border-top: 1px dashed var(--border);
       margin: 1.75rem 0;
     }
+
+    /* ── Dark SVG wrapper (for RF/envelope diagrams) ── */
+    .scan-svg-wrap {
+      background: #0d1b2a;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1.25rem 0 1.75rem;
+    }
+    .scan-svg-wrap svg { display: block; width: 100%; height: auto; }
+
+    /* ── Comparison table ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: .88rem;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .compare-table th {
+      background: var(--brand-navy);
+      color: #fff;
+      padding: .65rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: .85rem;
+    }
+    .compare-table td {
+      padding: .58rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:nth-child(even) td { background: #f8fafc; }
+    .compare-table .hi { color: var(--brand-cyan); font-weight: 700; }
+    .compare-table strong { color: var(--text); }
   </style>
 </head>
 <body>
@@ -255,8 +294,9 @@
 <!-- SECTION NAV -->
 <div class="sec-nav">
   <div class="sec-nav-inner">
-    <a href="#xcorr"   class="sec-nav-btn">⟨⟩ Cross-Correlation</a>
-    <a href="#wavelet" class="sec-nav-btn">〜 Wavelet Transform</a>
+    <a href="#xcorr"            class="sec-nav-btn">&#9001;&#9002; Cross-Correlation</a>
+    <a href="#wavelet"          class="sec-nav-btn">&#12316; Wavelet Transform</a>
+    <a href="#ascan-processing" class="sec-nav-btn">&#128250; A-scan Processing</a>
   </div>
 </div>
 
@@ -487,6 +527,184 @@
       <span style="font-weight:700; font-size:.92rem; color:#7c3aed;">Wavelet CWT</span>
       <div class="step-text">Best for <strong>non-stationary signals</strong>: dispersive waves, multi-mode Lamb, AE transients. Reveals <em>when</em> each frequency arrives. Use for: Lamb wave mode separation, dispersion curve extraction, AE source characterization.</div>
     </div>
+  </div>
+</div>
+
+
+
+<!-- ══════════════════════════════════════════════════════════
+     BLOCK 3 — A-SCAN SIGNAL PROCESSING
+══════════════════════════════════════════════════════════ -->
+<div class="sp-block" id="ascan-processing">
+  <div class="sp-subtitle">Technique 03</div>
+  <h2>&#128250; A-scan Signal Processing</h2>
+
+  <div class="concept-row">
+    <span class="concept-chip">Envelope Detection</span>
+    <span class="concept-chip orange">TGC</span>
+    <span class="concept-chip purple">Pulse Compression</span>
+    <span class="concept-chip green">SNR &amp; Noise</span>
+  </div>
+
+  <p>
+    The raw A-scan is a time-domain RF voltage waveform — a bipolar oscillating signal whose amplitude
+    encodes reflector strength and whose timing encodes depth. Four processing steps convert that raw
+    signal into a displayable, measurable, and imageable result.
+  </p>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">Envelope Detection (Hilbert Transform)</h3>
+  <p>
+    Gated C-scans sample peak echo amplitude within a depth window. Sampling the raw RF signal
+    directly produces a position-dependent artefact: a reflector sitting at a wave crest reads full
+    amplitude; one at a zero-crossing reads zero — yet both are physically identical. The cure is
+    the <strong>analytic signal</strong>:
+  </p>
+  <div class="formula-box">
+    z(t) = s(t) + j&#8239;&#8459;{s(t)} &nbsp;&#10230;&nbsp; |z(t)| = envelope
+    <div class="f-note">&#8459; = Hilbert transform; magnitude |z(t)| is smooth, non-negative, phase-independent</div>
+  </div>
+  <p>
+    The Hilbert transform phase-shifts every frequency component by 90&deg;, producing
+    a quadrature imaginary part. The magnitude |z(t)| tracks peak echo amplitude regardless of RF phase.
+    In practice: FFT &rarr; zero negative-frequency bins &rarr; inverse FFT.
+  </p>
+
+  <div class="scan-svg-wrap">
+    <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg">
+      <rect width="580" height="160" fill="#0d1b2a"/>
+      <line x1="30" y1="80" x2="555" y2="80" stroke="#1e3a5f" stroke-width="1"/>
+      <polyline fill="none" stroke="#22d3ee" stroke-width="1.4" opacity="0.8"
+        points="30,80 40,80 45,79 50,81 55,80
+          60,74 63,67 66,71 69,93 72,116 74,115 76,80 78,47 80,35 82,65 84,93 86,101 88,91 90,80 92,77 94,78 96,80
+          100,80 110,78 120,82 130,79 140,81 150,78 160,82 170,79 180,81 190,80 200,78 210,82 220,79 230,81 240,80 248,80
+          250,79 252,76 254,73 257,80 260,95 262,104 264,92 266,68 268,52 270,65 272,80 274,87 276,84 278,81 280,80
+          290,82 310,78 330,82 350,79 370,81 390,80 410,82 430,80
+          432,79 434,81 436,80 438,74 440,68 442,72 444,92 446,114 448,114 450,80 452,47 454,38 456,65 458,93 460,101 462,91 464,80 466,77 468,78 470,80
+          480,80 555,80"/>
+      <path fill="none" stroke="#fb923c" stroke-width="2.4" opacity="0.95"
+        d="M 30,80 L 55,80 Q 65,64 72,50 Q 78,38 80,35 Q 82,40 88,60 Q 94,76 100,78
+           L 248,78 Q 256,65 263,56 Q 268,52 272,60 Q 278,72 285,78
+           L 430,78 Q 440,58 447,45 Q 452,38 456,48 Q 464,68 472,78 L 555,78"/>
+      <text x="80" y="22" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="Inter,sans-serif">IP</text>
+      <line x1="80" y1="25" x2="80" y2="37" stroke="#7dd3fc" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="268" y="30" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="Inter,sans-serif">Flaw Echo</text>
+      <line x1="268" y1="33" x2="268" y2="54" stroke="#fca5a5" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="452" y="22" text-anchor="middle" fill="#86efac" font-size="10" font-weight="700" font-family="Inter,sans-serif">BW</text>
+      <line x1="452" y1="25" x2="452" y2="40" stroke="#86efac" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="280" y1="147" x2="310" y2="147" stroke="#22d3ee" stroke-width="1.8" opacity="0.8"/>
+      <text x="315" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">RF signal (bipolar)</text>
+      <line x1="420" y1="147" x2="450" y2="147" stroke="#fb923c" stroke-width="2.4"/>
+      <text x="455" y="151" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Hilbert envelope</text>
+      <text x="292" y="10" text-anchor="middle" fill="#64748b" font-size="9" font-family="Inter,sans-serif">A-scan RF signal and its Hilbert envelope</text>
+      <text x="292" y="100" text-anchor="middle" fill="#475569" font-size="8.5" font-family="Inter,sans-serif">time &#8594;</text>
+    </svg>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">&#128161;</div>
+    <p>
+      <strong>NDE example:</strong> Automated immersion UT of aerospace titanium forgings gates on
+      the Hilbert envelope to flag embedded porosity. A &minus;6&nbsp;dB drop in gated amplitude marks a
+      suspect region. Using raw RF instead would produce false positives every time the back wall shifts by
+      a quarter wavelength — an artefact no threshold setting can suppress.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">Time Gain Compensation (TGC)</h3>
+  <p>
+    Attenuation decays echo amplitude exponentially with depth, so identical reflectors at different depths
+    return unequal signals. TGC applies a programmable depth-dependent gain matched to the material's
+    attenuation law:
+  </p>
+  <div class="formula-box">
+    G<sub>TGC</sub>(t) = exp(+&alpha; &middot; c &middot; t/2)
+    <div class="f-note">dB-linear ramp compensating round-trip path loss; &alpha; set from step-wedge or DAC calibration</div>
+  </div>
+  <p>
+    A properly compensated A-scan shows equal amplitude for equal-size reflectors at all depths, making
+    the C-scan colour scale a direct indicator of reflectivity rather than a convolution of reflectivity
+    and depth.
+  </p>
+  <div class="insight blue">
+    <div class="insight-icon">&#128161;</div>
+    <p>
+      <strong>NDE example:</strong> Corrosion mapping of a 6&ndash;20&nbsp;mm carbon-steel pressure vessel
+      at 5&nbsp;MHz (&alpha;&nbsp;&asymp;&nbsp;1&nbsp;dB/(mm&middot;MHz)). Without TGC the back-wall echo from a 20&nbsp;mm
+      wall arrives 28&nbsp;dB below a 6&nbsp;mm wall reading. TGC recovers that loss, making the C-scan
+      map actual wall-thinning geometry.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">Pulse Compression (Chirp / Coded Excitation)</h3>
+  <p>
+    Conventional pulsed UT trades off resolution against SNR: shorter pulse &rarr; finer range resolution,
+    but less energy &rarr; lower SNR. Pulse compression decouples these. A linear FM chirp of duration T and
+    bandwidth B is transmitted; a matched filter compresses the received signal to &asymp;&nbsp;1/B while
+    preserving the full transmitted energy:
+  </p>
+  <div class="formula-box">
+    SNR gain = T &times; B &ensp; (time&ndash;bandwidth product)
+    <div class="f-note">Resolution = 1/B; SNR equivalent to a CW burst of duration T</div>
+  </div>
+  <p>
+    Sidelobe levels must be managed with amplitude weighting (Hann, Taylor) at the cost of slight
+    resolution broadening.
+  </p>
+  <div class="insight purple">
+    <div class="insight-icon">&#128161;</div>
+    <p>
+      <strong>NDE example:</strong> Air-coupled UT of CFRP suffers 60&ndash;80&nbsp;dB insertion loss at
+      each air&ndash;composite interface. A 50&nbsp;&mu;s chirp with B&nbsp;=&nbsp;200&nbsp;kHz yields
+      T&times;B&nbsp;=&nbsp;10&nbsp;(+10&nbsp;dB) — often the difference between resolving a delamination
+      and noise-floor burial.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">SNR &amp; Noise Sources</h3>
+  <p>Three distinct noise mechanisms compete with flaw echoes and require different mitigation strategies:</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>Noise type</th><th>Origin</th><th>Frequency scaling</th><th>Mitigation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Electronic noise</strong></td>
+        <td>Amplifier Johnson noise; preamplifier noise figure</td>
+        <td>White (flat spectrum)</td>
+        <td>Low-noise preamp; coherent averaging N shots &rarr; +10log&#x2081;&#x2080;(N)&nbsp;dB</td>
+      </tr>
+      <tr>
+        <td><strong>Coherent grain noise</strong></td>
+        <td>Backscatter from grain boundaries; coherent with transmitted pulse; cannot be averaged away</td>
+        <td>&prop; f&#178; (stochastic) or f&#8308; (Rayleigh, d&nbsp;&laquo;&nbsp;&lambda;)</td>
+        <td>Lower frequency; spatial compounding; FMC/TFM; frequency-dependent filtering</td>
+      </tr>
+      <tr>
+        <td><strong>Geometric / structural noise</strong></td>
+        <td>Surface roughness, geometry re-entrant echoes, mode-converted arrivals</td>
+        <td>Depends on geometry</td>
+        <td>Time-gating; wedge design; surface preparation; TOFD lateral-wave subtraction</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="insight">
+    <div class="insight-icon">&#9888;&#65039;</div>
+    <p>
+      <strong>Austenitic weld inspection:</strong> 316L stainless steel welds contain columnar grains
+      100&ndash;500&nbsp;&mu;m wide. At 5&nbsp;MHz, coherent grain noise sits only 10&ndash;15&nbsp;dB below
+      a 1&nbsp;mm side-drilled hole reference — well within typical flaw-detection thresholds. Because grain
+      noise is <em>coherent</em>, waveform averaging does not suppress it. Remedies: (1)&nbsp;drop to
+      1&ndash;2&nbsp;MHz, or (2)&nbsp;use phased-array spatial compounding / FMC-TFM to decorrelate grain
+      noise while keeping coherent flaw signals in phase.
+    </p>
   </div>
 </div>
 
