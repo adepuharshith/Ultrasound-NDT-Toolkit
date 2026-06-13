@@ -301,6 +301,42 @@
     }
     .adv-divider { scroll-margin-top: calc(var(--nav-h) + 58px); }
 
+    /* ---- VS comparison grid ---- */
+    .vs-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1.2fr 1.55fr;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin: 1.25rem 0 1.75rem;
+      border: 1px solid var(--border);
+      font-size: .88rem;
+    }
+    .vs-head {
+      padding: .72rem 1rem;
+      font-weight: 700;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+    .vs-head-prop  { background: #f1f5f9; color: var(--text-muted); }
+    .vs-head-sound { background: #0c4a6e; color: #7dd3fc; }
+    .vs-head-em    { background: #312e81; color: #c7d2fe; }
+    .vs-cell {
+      padding: .65rem 1rem;
+      border-top: 1px solid var(--border);
+      line-height: 1.55;
+    }
+    .vs-cell small { display: block; font-size: .76rem; color: var(--text-muted); margin-top: .15rem; }
+    .vs-cell.vs-prop  { background: #f8fafc; color: var(--text); font-weight: 600; }
+    .vs-cell.vs-sound { background: #f0f9ff; color: var(--text); }
+    .vs-cell.vs-em    { background: #f5f3ff; color: var(--text); }
+    .big-num    { font-size: 1.08rem; font-weight: 800; color: #0891b2; display: block; }
+    .big-num-em { font-size: 1.08rem; font-weight: 800; color: #6366f1; display: block; }
+    .badge-yes     { display: inline-block; background: #dcfce7; color: #15803d; border-radius: 4px; padding: .1rem .45rem; font-weight: 700; font-size: .8rem; }
+    .badge-no      { display: inline-block; background: #fef3c7; color: #b45309; border-radius: 4px; padding: .1rem .45rem; font-weight: 700; font-size: .8rem; }
+    .badge-blocked { display: inline-block; background: #fee2e2; color: #dc2626; border-radius: 4px; padding: .1rem .45rem; font-weight: 700; font-size: .8rem; }
+
     /* ---- Advanced section divider ---- */
     .adv-divider {
       display: flex;
@@ -366,17 +402,15 @@
 <!-- SECTION NAV -->
 <div class="sec-nav">
   <div class="sec-nav-inner">
-    <a href="#wave-types"           class="sec-nav-btn">1 Sound vs EM</a>
-    <a href="#speed-comparison"     class="sec-nav-btn">2 Speed</a>
-    <a href="#energy-loss"          class="sec-nav-btn">3 Energy Loss</a>
-    <a href="#why-longitudinal"     class="sec-nav-btn">4 Why Longitudinal</a>
-    <a href="#ultrasound-spectrum"  class="sec-nav-btn">5 UT Spectrum</a>
-    <a href="#generating-ultrasound" class="sec-nav-btn">6 Generating UT</a>
-    <a href="#a-scan"               class="sec-nav-btn">7 A-scan</a>
-    <a href="#b-scan"               class="sec-nav-btn">8 B-scan</a>
-    <a href="#c-scan"               class="sec-nav-btn">9 C-scan</a>
+    <a href="#wave-types"            class="sec-nav-btn">1 Sound vs EM</a>
+    <a href="#speed-comparison"      class="sec-nav-btn">2 Key Differences</a>
+    <a href="#ultrasound-spectrum"   class="sec-nav-btn">3 UT Spectrum</a>
+    <a href="#generating-ultrasound" class="sec-nav-btn">4 Generating UT</a>
+    <a href="#a-scan"                class="sec-nav-btn">5 A-scan</a>
+    <a href="#b-scan"                class="sec-nav-btn">6 B-scan</a>
+    <a href="#c-scan"                class="sec-nav-btn">7 C-scan</a>
     <span class="sec-nav-divider">│</span>
-    <a href="#advanced-topics"      class="sec-nav-btn">Advanced Topics ↓</a>
+    <a href="#advanced-topics"       class="sec-nav-btn">Advanced Topics ↓</a>
   </div>
 </div>
 
@@ -425,255 +459,66 @@
             </div>
           </div>
 
-          <h3>Sound vs EM Waves — Fundamental Comparison</h3>
-          <table class="compare-table">
-            <thead>
-              <tr>
-                <th>Property</th>
-                <th>Sound Wave (Longitudinal / P-wave)</th>
-                <th>Electromagnetic Wave (Light, X-ray, Microwave)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Physical nature</strong></td>
-                <td>Mechanical pressure oscillation — medium particles vibrate</td>
-                <td>Coupled oscillating electric (E) &amp; magnetic (B) fields</td>
-              </tr>
-              <tr>
-                <td><strong>Requires medium?</strong></td>
-                <td class="hi-orange">Yes — solid, liquid, or gas</td>
-                <td class="hi">No — propagates in vacuum</td>
-              </tr>
-              <tr>
-                <td><strong>Speed in air</strong></td>
-                <td>~343 m/s</td>
-                <td class="hi">~3 &times; 10<sup>8</sup> m/s &nbsp;(876,000&times; faster)</td>
-              </tr>
-              <tr>
-                <td><strong>Speed in steel</strong></td>
-                <td class="hi">~5,900 m/s (faster in solids!)</td>
-                <td class="hi-orange">Cannot propagate — absorbed by metal</td>
-              </tr>
-              <tr>
-                <td><strong>Penetrates metals?</strong></td>
-                <td class="hi">Yes — used for flaw detection inside metal</td>
-                <td class="hi-orange">No — reflected or absorbed (hence UT over X-ray for thick parts)</td>
-              </tr>
-              <tr>
-                <td><strong>Polarisation?</strong></td>
-                <td>Not polarised (scalar pressure field)</td>
-                <td>Yes — E and B fields define polarisation plane</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="callout">
-            <strong>Why does ultrasound win for metal inspection?</strong>
-            EM waves (X-rays excluded) cannot enter a metal — the free electrons reflect them.
-            Sound travels freely through steel at ~5,900 m/s, and the round-trip time-of-flight for a
-            50 mm thick block (~17 &micro;s) is trivially measurable with standard electronics.
-            That is the physical foundation of every UT inspection.
-          </div>
         </div>
 
         <!-- ══════════════════════════════════════════════
-             SECTION 2 — Speed Comparison
+             SECTION 2 — Key Differences: Speed, Medium & Energy Loss
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="speed-comparison">
-          <h2><span class="step-n">2</span> Speed: Sound vs Electromagnetic Waves</h2>
+          <h2><span class="step-n">2</span> Key Differences — Speed, Medium &amp; Energy Loss</h2>
 
           <p>
-            How fast a wave travels depends on the wave type and the medium it moves through.
-            Sound (a mechanical wave) and light (an electromagnetic wave) behave very differently.
+            The animations show <em>how</em> the two waves look. Here is what matters for NDE:
+            how fast each wave travels in different materials, what it can pass through,
+            and how much energy it loses along the way.
           </p>
 
-          <h3>Speed of Sound in Different Media</h3>
-          <p>
-            Sound needs a medium to travel. The stiffer and denser the material, the faster sound travels —
-            counterintuitively, sound is <em>fastest in solids</em>, not gases.
-          </p>
+          <div class="vs-grid">
+            <div class="vs-head vs-head-prop">Property</div>
+            <div class="vs-head vs-head-sound">&#128266; Sound Wave</div>
+            <div class="vs-head vs-head-em">&#9889; EM Wave (light / radio / microwave)</div>
 
-          <div class="speed-bar-wrap">
-            <div class="speed-bar-label">Steel (solid) — 5,900 m/s</div>
-            <div class="speed-bar-track">
-              <div class="speed-bar-fill" style="width:100%; background:linear-gradient(90deg,#0891b2,#06b6d4);">5,900 m/s</div>
-            </div>
-            <div class="speed-bar-label">Aluminum (solid) — 6,320 m/s</div>
-            <div class="speed-bar-track">
-              <div class="speed-bar-fill" style="width:100%; background:linear-gradient(90deg,#0e7490,#22d3ee);">6,320 m/s</div>
-            </div>
-            <div class="speed-bar-label">Water (liquid) — 1,480 m/s</div>
-            <div class="speed-bar-track">
-              <div class="speed-bar-fill" style="width:25%; background:linear-gradient(90deg,#1e40af,#3b82f6);">1,480 m/s</div>
-            </div>
-            <div class="speed-bar-label">Air (gas) — 343 m/s</div>
-            <div class="speed-bar-track">
-              <div class="speed-bar-fill" style="width:6%; min-width:60px; background:linear-gradient(90deg,#334155,#64748b);">343 m/s</div>
-            </div>
+            <div class="vs-cell vs-prop">Needs a medium?</div>
+            <div class="vs-cell vs-sound"><span class="badge-yes">&#10003; Yes</span> — solid, liquid, or gas</div>
+            <div class="vs-cell vs-em"><span class="badge-no">&#10007; No</span> — propagates freely in vacuum</div>
+
+            <div class="vs-cell vs-prop">Speed in Vacuum</div>
+            <div class="vs-cell vs-sound"><span class="badge-blocked">&#10007; Cannot travel</span><small>no medium &rarr; no wave</small></div>
+            <div class="vs-cell vs-em"><span class="big-num-em">3 &times; 10<sup>8</sup> m/s</span><small>constant — the speed of light, <em>c</em></small></div>
+
+            <div class="vs-cell vs-prop">Speed in Air</div>
+            <div class="vs-cell vs-sound"><span class="big-num">343 m/s</span></div>
+            <div class="vs-cell vs-em"><span class="big-num-em">3 &times; 10<sup>8</sup> m/s</span><small>876,000&times; faster than sound in air</small></div>
+
+            <div class="vs-cell vs-prop">Speed in Water</div>
+            <div class="vs-cell vs-sound"><span class="big-num">1,480 m/s</span></div>
+            <div class="vs-cell vs-em"><span class="big-num-em">2.25 &times; 10<sup>8</sup> m/s</span><small>slows slightly (n &asymp; 1.33)</small></div>
+
+            <div class="vs-cell vs-prop">Speed in Steel</div>
+            <div class="vs-cell vs-sound"><span class="big-num">5,900 m/s</span><small>faster in solids than in liquids or gases</small></div>
+            <div class="vs-cell vs-em"><span class="badge-blocked">&#10007; Cannot penetrate</span><small>absorbed / reflected at the metal surface</small></div>
+
+            <div class="vs-cell vs-prop">Energy Loss<br/><span style="font-weight:400; font-size:.8rem; color:var(--text-muted);">as the wave travels</span></div>
+            <div class="vs-cell vs-sound">Attenuates with distance &amp; frequency<br/><small>&alpha; &asymp; 0.5&ndash;2 dB/(mm&middot;MHz) in steel — higher frequency loses energy faster</small></div>
+            <div class="vs-cell vs-em">Zero loss in vacuum or transparent media<br/><small>Fully absorbed or reflected at any metal surface — cannot inspect inside metals</small></div>
           </div>
-
-          <h3>Sound vs Electromagnetic (EM) Waves</h3>
-          <table class="compare-table">
-            <thead>
-              <tr>
-                <th>Medium</th>
-                <th>Sound Speed</th>
-                <th>EM Wave Speed</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Steel (solid)</strong></td>
-                <td>~5,900 m/s</td>
-                <td>EM waves do not penetrate metals (absorbed)</td>
-              </tr>
-              <tr>
-                <td><strong>Water (liquid)</strong></td>
-                <td>~1,480 m/s</td>
-                <td>~225,000,000 m/s (n ≈ 1.33)</td>
-              </tr>
-              <tr>
-                <td><strong>Air (gas)</strong></td>
-                <td>~343 m/s</td>
-                <td class="hi">~300,000,000 m/s</td>
-              </tr>
-              <tr>
-                <td><strong>Vacuum</strong></td>
-                <td class="hi-orange">Cannot travel (needs a medium)</td>
-                <td class="hi">300,000,000 m/s (c — constant)</td>
-              </tr>
-            </tbody>
-          </table>
 
           <div class="callout">
-            <strong>Key insight:</strong> Sound is roughly <strong>50,000&times; slower</strong> than light in air.
-            That slowness is actually an <em>advantage</em> for inspection — the time it takes an ultrasonic pulse to travel through a 50 mm steel block (~17 &micro;s) is easily measurable with standard electronics, letting us compute the exact depth of a flaw from time-of-flight (d = c &times; t / 2).
-          </div>
-
-          <p>
-            EM waves (X-rays, microwaves, light) do not penetrate metals, which is why sound —
-            specifically <strong>ultrasound</strong> — is the preferred wave for inspecting metallic structures.
-          </p>
-        </div>
-
-        <!-- ══════════════════════════════════════════════
-             SECTION 3 — Energy Loss
-             ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="energy-loss">
-          <h2><span class="step-n">3</span> Energy Loss: Longitudinal vs Transverse</h2>
-
-          <p>
-            As a wave travels through a material, it gradually loses energy. This is called
-            <strong>attenuation</strong> and comes from two sources: <em>absorption</em> (energy converted to heat)
-            and <em>scattering</em> (energy deflected in all directions by grain boundaries, pores, and inclusions).
-          </p>
-
-          <h3>Comparing Attenuation</h3>
-          <table class="compare-table">
-            <thead>
-              <tr>
-                <th>Wave Type</th>
-                <th>Travels in</th>
-                <th>Attenuation in Steel</th>
-                <th>Practical implication</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Longitudinal (P)</strong></td>
-                <td class="hi">All media</td>
-                <td>~0.5–2 dB/(mm&middot;MHz)</td>
-                <td>Can penetrate thick sections; couples through liquid couplant</td>
-              </tr>
-              <tr>
-                <td><strong>Transverse / Shear (S)</strong></td>
-                <td>Solids only</td>
-                <td>~1–4 dB/(mm&middot;MHz) — typically 2&times; higher</td>
-                <td>Higher loss limits inspection range; cannot travel through couplant layer</td>
-              </tr>
-              <tr>
-                <td><strong>Surface (Rayleigh)</strong></td>
-                <td>Solid surface only</td>
-                <td>Low in-surface attenuation</td>
-                <td>Useful for surface cracks; depth limited to ~1&lambda;</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="callout">
-            <strong>Why can't shear waves travel in liquids or gases?</strong>
-            Liquids and gases have no shear stiffness — their molecules slide past each other freely.
-            A shear wave requires adjacent layers of material to pull on each other sideways, which only happens in solids.
-            This is also why earthquakes S-waves stop at Earth's liquid outer core — a clue that helped
-            geologists discover it is molten!
-          </div>
-
-          <h3>Attenuation Law</h3>
-          <div class="eq-box">$$A(x) = A_0 \cdot e^{-\alpha x}$$</div>
-          <p>
-            where &alpha; is the attenuation coefficient [dB/(mm&middot;MHz)], x is propagation distance,
-            and A<sub>0</sub> is the initial amplitude. Attenuation increases with frequency — there is always
-            a trade-off between resolution (higher frequency) and penetration depth (lower frequency).
-          </p>
-        </div>
-
-        <!-- ══════════════════════════════════════════════
-             SECTION 4 — Why Longitudinal for Metal Inspection
-             ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="why-longitudinal">
-          <h2><span class="step-n">4</span> Why Longitudinal Waves for Metal Inspection?</h2>
-
-          <p>
-            Given that both wave types exist in solids, why do most straight-beam contact and immersion
-            inspections use longitudinal waves? Here are the key reasons:
-          </p>
-
-          <table class="compare-table">
-            <thead>
-              <tr>
-                <th>Reason</th>
-                <th>Explanation</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Works through liquid couplant</strong></td>
-                <td>A thin layer of water or gel is needed between the transducer and the metal surface. Only longitudinal waves can travel through this liquid film — shear waves die immediately in the liquid.</td>
-              </tr>
-              <tr>
-                <td><strong>Lower attenuation</strong></td>
-                <td>Longitudinal waves attenuate less per unit distance in metals, allowing inspection of thicker sections and detection of deeper flaws.</td>
-              </tr>
-              <tr>
-                <td><strong>Simple generation</strong></td>
-                <td>A straight-face transducer naturally generates longitudinal waves. No wedge or angle adapter is needed for most thickness measurements and flaw detection.</td>
-              </tr>
-              <tr>
-                <td><strong>Predictable speed</strong></td>
-                <td>Longitudinal wave speed in metals is stable and well-characterised (~5,900 m/s in steel). Time-of-flight to depth conversion is straightforward.</td>
-              </tr>
-              <tr>
-                <td><strong>Works in all materials</strong></td>
-                <td>The same approach works in metals, plastics, ceramics, and composites — no limitation to solids only.</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="callout">
-            <strong>When are shear (transverse) waves used?</strong>
-            Shear waves are deliberately introduced using wedge transducers for <em>weld inspection</em> and
-            <em>crack detection</em>. Because cracks are typically oriented vertically, a shear wave hitting the
-            crack face at an angle reflects strongly, making them excellent for detecting weld defects. The technique
-            is called angle-beam (or TOFD) inspection. This is an advanced topic — see Snell's Law below.
+            <strong>Why sound wins for metal inspection:</strong> EM waves (radio, microwave, visible light)
+            are stopped dead at any metal surface — the free electrons reflect them completely.
+            Sound travels freely through steel at 5,900 m/s, and the round-trip travel time for a
+            50 mm thick part (&asymp;17 &micro;s) is easily measured with standard electronics.
+            Flaw depth follows directly from <strong><em>d</em>&nbsp;=&nbsp;<em>c</em>&nbsp;&times;&nbsp;<em>t</em>&nbsp;/&nbsp;2</strong>.
           </div>
         </div>
+
+
 
         <!-- ══════════════════════════════════════════════
              SECTION 5 — Ultrasound Spectrum
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="ultrasound-spectrum">
-          <h2><span class="step-n">5</span> The Ultrasound Spectrum for Inspection</h2>
+          <h2><span class="step-n">3</span> The Ultrasound Spectrum for Inspection</h2>
 
           <p>
             "Ultrasound" simply means sound above the human hearing limit of ~20 kHz.
@@ -752,7 +597,7 @@
              SECTION 6 — Generating Ultrasound
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="generating-ultrasound">
-          <h2><span class="step-n">6</span> How is Ultrasound Generated?</h2>
+          <h2><span class="step-n">4</span> How is Ultrasound Generated?</h2>
 
           <p>
             Ultrasound for inspection is generated by a <strong>transducer</strong> — a device that converts
@@ -865,7 +710,7 @@
              SECTION 7 — A-scan
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="a-scan">
-          <h2><span class="step-n">7</span> Scanning Methods — A-scan</h2>
+          <h2><span class="step-n">5</span> Scanning Methods — A-scan</h2>
 
           <p>
             The <strong>A-scan</strong> (Amplitude scan) is the most fundamental display in ultrasonic testing.
@@ -954,7 +799,7 @@
              SECTION 8 — B-scan
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="b-scan">
-          <h2><span class="step-n">8</span> Scanning Methods — B-scan</h2>
+          <h2><span class="step-n">6</span> Scanning Methods — B-scan</h2>
 
           <p>
             A <strong>B-scan</strong> (Brightness scan) builds a 2D cross-section image by moving the
@@ -1022,7 +867,7 @@
              SECTION 9 — C-scan
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="c-scan">
-          <h2><span class="step-n">9</span> Scanning Methods — C-scan</h2>
+          <h2><span class="step-n">7</span> Scanning Methods — C-scan</h2>
 
           <p>
             A <strong>C-scan</strong> (Plan view scan) produces a <strong>top-down 2D map</strong> of the
