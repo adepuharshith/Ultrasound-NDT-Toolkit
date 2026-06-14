@@ -9,39 +9,83 @@
   <link rel="stylesheet" href="assets/css/style.css" />
   <style>
     /* Override the 540px cap from style.css (set for old 2-col layout) */
-    .calc-box { max-width: none; }
+    .calc-box { max-width: none; padding: 1.5rem 1.75rem; }
 
     /* ---- One calculator per row ---- */
     .calc-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 1.75rem;
+      gap: 1.5rem;
     }
 
     /* ---- Inner 2-panel: inputs left, viz right ---- */
     .calc-inner {
       display: flex;
-      gap: 1.5rem;
+      gap: 1.25rem;
       align-items: flex-start;
-      margin-top: .5rem;
+      margin-top: .4rem;
     }
     .calc-inputs {
       flex: 0 0 auto;
-      width: min(360px, 42%);
+      width: min(340px, 40%);
       display: flex;
       flex-direction: column;
       gap: 0;
     }
     .calc-inputs-wide {        /* water-path has more controls */
-      width: min(400px, 44%);
+      width: min(380px, 42%);
+    }
+
+    /* ---- Wave Velocity + TOFD: match standard layout ---- */
+    .calc-layout {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      margin-top: .4rem;
+    }
+    .calc-layout .calc-inputs { width: min(340px, 40%); }
+    .calc-visual {
+      flex: 1 1 auto;
+      min-width: 0;
+      background: #f0f9ff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      line-height: 0;
+    }
+    .calc-visual canvas { display: block; width: 100%; height: auto; }
+    .inp-label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .3rem;
+      margin-top: .6rem;
+    }
+    .inp-label:first-child { margin-top: 0; }
+    .calc-layout input[type="number"] {
+      width: 100%;
+      padding: .5rem .8rem;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-size: .93rem;
+      color: var(--text);
+      background: #fff;
+      transition: border-color .15s;
+      box-sizing: border-box;
+    }
+    .calc-layout input[type="number"]:focus {
+      outline: none;
+      border-color: var(--brand-cyan);
+      box-shadow: 0 0 0 3px rgba(8,145,178,.12);
     }
 
     /* ---- Canvas visualization wrapper ---- */
     .calc-viz {
       flex: 1 1 auto;
       min-width: 0;            /* allow flex shrinking */
-      background: #f0f9ff;
-      border: 1.5px solid var(--border);
+      background: #edf6ff;
+      border: 1.5px solid #cbd5e1;
       border-radius: 10px;
       overflow: hidden;
       line-height: 0;
@@ -63,10 +107,14 @@
     }
     .calc-box h3 { font-size: 1.05rem; color: var(--brand-navy); margin-bottom: .85rem; }
 
+    /* ---- Tighten form-group spacing ---- */
+    .form-group { margin-bottom: .6rem; }
+    .calc-box h3 { margin-bottom: .65rem; }
+
     /* ---- Result, formula, desc ---- */
     .calc-result {
-      margin-top: .85rem;
-      padding: .85rem 1rem;
+      margin-top: .6rem;
+      padding: .7rem .9rem;
       background: var(--accent-light);
       border-radius: 8px;
       border-left: 4px solid var(--brand-cyan);
@@ -74,18 +122,18 @@
     .calc-result .result-label { font-size: .72rem; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: .06em; }
     .calc-result .result-value { font-size: 1.45rem; font-weight: 800; color: var(--brand-navy); }
     .calc-result .result-unit  { font-size: .88rem; font-weight: 500; color: var(--text-muted); margin-left: .25rem; }
-    .calc-formula { margin-top: .75rem; padding: .6rem .9rem; background: #f1f5f9; border-radius: 6px; font-family: 'Courier New',monospace; font-size: .86rem; color: var(--text-muted); }
-    .calc-desc { font-size: .80rem; color: var(--text-muted); margin-top: .5rem; line-height: 1.55; }
+    .calc-formula { margin-top: .5rem; padding: .5rem .85rem; background: #f1f5f9; border-radius: 6px; font-family: 'Courier New',monospace; font-size: .86rem; color: #334155; }
+    .calc-desc { font-size: .79rem; color: #475569; margin-top: .4rem; line-height: 1.5; }
 
     /* ---- Dual-result row (wavelength) ---- */
-    .result-row { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: .85rem; }
+    .result-row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .6rem; }
     .result-row .calc-result { margin-top: 0; }
 
     /* ---- Impedance 2×2 grid ---- */
-    .z-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-top: .75rem; }
-    .z-cell { background: var(--accent-light); border-radius: 8px; padding: .65rem .9rem; text-align: center; }
+    .z-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .55rem; }
+    .z-cell { background: var(--accent-light); border-radius: 8px; padding: .55rem .8rem; text-align: center; }
     .z-cell .z-label { font-size: .68rem; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: .05em; }
-    .z-cell .z-val   { font-size: 1.1rem;  font-weight: 800; color: var(--brand-navy); margin-top: .15rem; }
+    .z-cell .z-val   { font-size: 1.1rem;  font-weight: 800; color: var(--brand-navy); margin-top: .1rem; }
 
     /* ---- Material table ---- */
     .mat-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: .75rem; }

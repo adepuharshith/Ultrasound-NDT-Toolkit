@@ -234,8 +234,8 @@ function _drawNFViz(D_mm, N_mm) {
 
   /* Near-field shaded region */
   const nfGrad = ctx.createLinearGradient(transX, 0, transX + Npx, 0);
-  nfGrad.addColorStop(0, 'rgba(8,145,178,.25)');
-  nfGrad.addColorStop(1, 'rgba(8,145,178,.08)');
+  nfGrad.addColorStop(0, 'rgba(8,145,178,.40)');
+  nfGrad.addColorStop(1, 'rgba(8,145,178,.14)');
   ctx.fillStyle = nfGrad;
   ctx.fillRect(transX, cy - beamHalf, Npx, beamHalf * 2);
 
@@ -246,7 +246,7 @@ function _drawNFViz(D_mm, N_mm) {
   ctx.fillRect(PAD + 14, cy - beamHalf, 6, beamHalf * 2);
 
   /* Near-field top/bottom edges */
-  ctx.strokeStyle = 'rgba(8,145,178,.50)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+  ctx.strokeStyle = 'rgba(8,145,178,.78)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
   ctx.beginPath();
   ctx.moveTo(transX, cy - beamHalf); ctx.lineTo(transX + Npx, cy - beamHalf);
   ctx.moveTo(transX, cy + beamHalf); ctx.lineTo(transX + Npx, cy + beamHalf);
@@ -256,7 +256,7 @@ function _drawNFViz(D_mm, N_mm) {
   const divAngle = 0.18;   /* rad, ~10° */
   const farEnd   = CW - PAD;
   const farLen   = farEnd - (transX + Npx);
-  ctx.strokeStyle = 'rgba(8,145,178,.30)'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 5]);
+  ctx.strokeStyle = 'rgba(8,145,178,.52)'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 5]);
   ctx.beginPath();
   ctx.moveTo(transX + Npx, cy - beamHalf);
   ctx.lineTo(farEnd, cy - beamHalf - farLen * Math.tan(divAngle));
@@ -272,8 +272,8 @@ function _drawNFViz(D_mm, N_mm) {
   /* Labels */
   ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
   const nfMidX = transX + Npx / 2;
-  ctx.fillStyle = 'rgba(8,145,178,.80)'; ctx.fillText('Near Field', nfMidX, 14);
-  ctx.fillStyle = 'rgba(8,145,178,.60)'; ctx.fillText('Far Field', transX + Npx + farLen / 2, 14);
+  ctx.fillStyle = '#0891b2'; ctx.fillText('Near Field', nfMidX, 14);
+  ctx.fillStyle = 'rgba(8,145,178,.90)'; ctx.fillText('Far Field', transX + Npx + farLen / 2, 14);
 
   ctx.fillStyle = '#0891b2'; ctx.font = 'bold 11px Inter,sans-serif';
   ctx.fillText(`N = ${fmt(N_mm, 3)} mm`, transX + Npx, cy + beamHalf + 22);
@@ -318,7 +318,7 @@ function _drawTOFViz(tof, v, depth_mm) {
 
   /* Material block */
   const mg = ctx.createLinearGradient(0, matTopY, 0, CH - 10);
-  mg.addColorStop(0, 'rgba(203,213,225,.70)'); mg.addColorStop(1, 'rgba(148,163,184,.55)');
+  mg.addColorStop(0, 'rgba(203,213,225,.88)'); mg.addColorStop(1, 'rgba(148,163,184,.72)');
   ctx.fillStyle = mg; ctx.fillRect(20, matTopY, CW - 40, CH - matTopY - 10);
 
   /* Depth arrow (center, down to defect) */
@@ -332,7 +332,7 @@ function _drawTOFViz(tof, v, depth_mm) {
   ctx.beginPath(); ctx.arc(cx, defectY, 5, 0, Math.PI * 2); ctx.stroke();
 
   /* Return path (dashed, offset slightly right) */
-  ctx.strokeStyle = 'rgba(225,29,72,.40)'; ctx.lineWidth = 1.2; ctx.setLineDash([4, 3]);
+  ctx.strokeStyle = 'rgba(225,29,72,.65)'; ctx.lineWidth = 1.2; ctx.setLineDash([4, 3]);
   ctx.beginPath(); ctx.moveTo(cx + 6, defectY); ctx.lineTo(cx + 6, transY1 + 4); ctx.stroke();
   ctx.setLineDash([]);
 
@@ -356,7 +356,7 @@ function _drawTOFViz(tof, v, depth_mm) {
   ctx.textAlign = 'center'; ctx.fillText('TX/RX', cx, PAD + 13);
 
   /* Top surface line */
-  ctx.strokeStyle = 'rgba(51,65,85,.5)'; ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(51,65,85,.82)'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(20, matTopY); ctx.lineTo(CW - 20, matTopY); ctx.stroke();
 }
 
@@ -390,7 +390,7 @@ function _drawAttViz(alpha, f, d, total_dB) {
 
   /* Material background */
   const bg = ctx.createLinearGradient(PAD_L, 0, CW - PAD_R, 0);
-  bg.addColorStop(0, 'rgba(203,213,225,.45)'); bg.addColorStop(1, 'rgba(148,163,184,.30)');
+  bg.addColorStop(0, 'rgba(203,213,225,.68)'); bg.addColorStop(1, 'rgba(148,163,184,.50)');
   ctx.fillStyle = bg; ctx.fillRect(PAD_L, PAD_T, W, H);
 
   /* Decaying sine wave */
@@ -399,7 +399,7 @@ function _drawAttViz(alpha, f, d, total_dB) {
   const lam_px = W / 8;   /* visual wavelength (~8 cycles across) */
   const att_lin = Math.pow(10, -total_dB / 20); /* linear amplitude ratio */
 
-  ctx.beginPath(); ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 2.5;
   for (let px = 0; px <= W; px++) {
     const t    = px / W;   /* 0 → 1 across the beam path */
     const att  = Math.pow(att_lin, t);  /* attenuation at this point */
@@ -409,7 +409,7 @@ function _drawAttViz(alpha, f, d, total_dB) {
   ctx.stroke();
 
   /* Envelope curve (dashed) */
-  ctx.beginPath(); ctx.strokeStyle = 'rgba(29,78,216,.35)'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.strokeStyle = 'rgba(29,78,216,.62)'; ctx.lineWidth = 1.4; ctx.setLineDash([3, 3]);
   for (let px = 0; px <= W; px++) {
     const att = Math.pow(att_lin, px / W);
     const y   = cy - A0 * att;
@@ -475,8 +475,8 @@ function _drawSnellViz(theta1, v1, v2, sinT2) {
   const PI  = Math.PI;
 
   /* Media */
-  ctx.fillStyle = 'rgba(186,230,253,.65)'; ctx.fillRect(0, 0, CW, iy);
-  ctx.fillStyle = 'rgba(148,163,184,.55)'; ctx.fillRect(0, iy, CW, iy);
+  ctx.fillStyle = 'rgba(186,230,253,.88)'; ctx.fillRect(0, 0, CW, iy);
+  ctx.fillStyle = 'rgba(148,163,184,.78)'; ctx.fillRect(0, iy, CW, iy);
 
   /* Interface */
   ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
@@ -553,8 +553,8 @@ function _drawZViz(Z1, Z2, R, T) {
   const RAY = 68;
 
   /* Media blocks */
-  ctx.fillStyle = 'rgba(186,230,253,.65)'; ctx.fillRect(0, 0, ix, CH);
-  ctx.fillStyle = 'rgba(148,163,184,.55)'; ctx.fillRect(ix, 0, ix, CH);
+  ctx.fillStyle = 'rgba(186,230,253,.88)'; ctx.fillRect(0, 0, ix, CH);
+  ctx.fillStyle = 'rgba(148,163,184,.78)'; ctx.fillRect(ix, 0, ix, CH);
 
   /* Interface */
   ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
@@ -637,8 +637,8 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
 
   /* Near-field tinted region */
   const nfGrad = ctx.createLinearGradient(transX, 0, transX + Npx, 0);
-  nfGrad.addColorStop(0, 'rgba(8,145,178,.22)');
-  nfGrad.addColorStop(1, 'rgba(8,145,178,.05)');
+  nfGrad.addColorStop(0, 'rgba(8,145,178,.40)');
+  nfGrad.addColorStop(1, 'rgba(8,145,178,.12)');
   ctx.fillStyle = nfGrad;
   ctx.fillRect(transX, cy - beamHPx, Npx, beamHPx * 2);
 
@@ -649,7 +649,7 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
   ctx.fillRect(PAD + 16, cy - beamHPx, 6, beamHPx * 2);
 
   /* Near-field parallel edges */
-  ctx.strokeStyle = 'rgba(8,145,178,.55)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+  ctx.strokeStyle = 'rgba(8,145,178,.82)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
   ctx.beginPath();
   ctx.moveTo(transX, cy - beamHPx); ctx.lineTo(transX + Npx, cy - beamHPx);
   ctx.moveTo(transX, cy + beamHPx); ctx.lineTo(transX + Npx, cy + beamHPx);
@@ -660,7 +660,7 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
   const farLen  = farEnd - (transX + Npx);
   const halfAng = Math.asin(Math.min(sinHalf, 0.9999));
 
-  ctx.strokeStyle = 'rgba(8,145,178,.50)'; ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(8,145,178,.75)'; ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(transX + Npx, cy - beamHPx);
   ctx.lineTo(farEnd, cy - beamHPx - farLen * Math.tan(halfAng));
@@ -671,7 +671,7 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
   ctx.stroke();
 
   /* Axis centreline */
-  ctx.strokeStyle = 'rgba(8,145,178,.20)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = 'rgba(8,145,178,.38)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
   ctx.beginPath(); ctx.moveTo(transX, cy); ctx.lineTo(farEnd, cy); ctx.stroke();
   ctx.setLineDash([]);
 
@@ -691,9 +691,9 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
 
   /* Labels */
   ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
-  ctx.fillStyle = 'rgba(8,145,178,.85)';
+  ctx.fillStyle = '#0891b2';
   ctx.fillText('Near Field', transX + Npx / 2, 13);
-  ctx.fillStyle = 'rgba(8,145,178,.65)';
+  ctx.fillStyle = 'rgba(8,145,178,.90)';
   ctx.fillText('Far Field', transX + Npx + farLen / 2, 13);
 
   /* N value */
@@ -793,48 +793,58 @@ function _wpDraw() {
 
   /* Backgrounds */
   const wg = ctx.createLinearGradient(0, transY1, 0, matTopY);
-  wg.addColorStop(0, 'rgba(224,242,254,.70)'); wg.addColorStop(1, 'rgba(186,230,253,.60)');
+  wg.addColorStop(0, 'rgba(186,230,253,.90)'); wg.addColorStop(1, 'rgba(147,210,246,.80)');
   ctx.fillStyle = wg; ctx.fillRect(0, transY1, CW, matTopY - transY1);
 
   const mg = ctx.createLinearGradient(0, matTopY, 0, matBotY);
-  mg.addColorStop(0, 'rgba(203,213,225,.75)'); mg.addColorStop(1, 'rgba(148,163,184,.60)');
+  mg.addColorStop(0, 'rgba(203,213,225,.90)'); mg.addColorStop(1, 'rgba(148,163,184,.75)');
   ctx.fillStyle = mg; ctx.fillRect(0, matTopY, CW, matBotY - matTopY);
 
-  ctx.fillStyle = 'rgba(248,250,252,.40)'; ctx.fillRect(0, matBotY, CW, bottomY - matBotY);
+  ctx.fillStyle = 'rgba(248,250,252,.60)'; ctx.fillRect(0, matBotY, CW, bottomY - matBotY);
 
   /* Region labels */
   ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'left';
-  if (matTopY - transY1 > 22) { ctx.fillStyle = 'rgba(30,64,175,.70)'; ctx.fillText('Water', 7, transY1 + 14); }
-  if (matBotY - matTopY > 22) { ctx.fillStyle = 'rgba(51,65,85,.70)'; ctx.fillText('Material', 7, matTopY + 14); }
+  if (matTopY - transY1 > 22) { ctx.fillStyle = '#1e40af'; ctx.fillText('Water', 7, transY1 + 14); }
+  if (matBotY - matTopY > 22) { ctx.fillStyle = '#334155'; ctx.fillText('Material', 7, matTopY + 14); }
 
   /* Interface lines */
   ctx.save(); ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
-  ctx.strokeStyle = 'rgba(30,64,175,.50)';
+  ctx.strokeStyle = 'rgba(30,64,175,.75)';
   ctx.beginPath(); ctx.moveTo(0, matTopY); ctx.lineTo(CW, matTopY); ctx.stroke();
-  ctx.strokeStyle = 'rgba(51,65,85,.50)';
+  ctx.strokeStyle = 'rgba(51,65,85,.75)';
   ctx.beginPath(); ctx.moveTo(0, matBotY); ctx.lineTo(CW, matBotY); ctx.stroke();
   ctx.setLineDash([]); ctx.restore();
 
-  /* Beam geometry */
+  /* Beam geometry — two-stage: gradual in water, sharp convergence in material */
   const BW0 = 50, BWF = 2.5;
-  const convRate = (BW0 - BWF) / (focusY - transY1);
+  const waterLen = Math.max(matTopY - transY1, 1);
+  const matLen   = Math.max(focusY  - matTopY, 1);
+  const BW_IF    = BW0 - (BW0 - BWF) * 0.28;  /* beam half-width at water/material interface */
+  const convW    = (BW0 - BW_IF) / waterLen;   /* slow taper in water */
+  const convM    = (BW_IF - BWF) / matLen;     /* fast taper in material */
   function bHW(y) {
     if (y <= transY1) return BW0;
-    if (y <= focusY)  return BW0 - convRate * (y - transY1);
-    return BWF + convRate * (y - focusY);
+    if (y <= matTopY) return BW0 - convW * (y - transY1);
+    if (y <= focusY)  return BW_IF - convM * (y - matTopY);
+    return BWF + convM * (y - focusY);
   }
   const bwBot = bHW(bottomY);
 
   /* Beam clip + fill */
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(cx - BW0, transY1); ctx.lineTo(cx - BWF, focusY);
-  ctx.lineTo(cx - bwBot, bottomY); ctx.lineTo(cx + bwBot, bottomY);
-  ctx.lineTo(cx + BWF, focusY);   ctx.lineTo(cx + BW0, transY1);
+  ctx.moveTo(cx - BW0,    transY1);
+  ctx.lineTo(cx - BW_IF,  matTopY);
+  ctx.lineTo(cx - BWF,    focusY);
+  ctx.lineTo(cx - bwBot,  bottomY);
+  ctx.lineTo(cx + bwBot,  bottomY);
+  ctx.lineTo(cx + BWF,    focusY);
+  ctx.lineTo(cx + BW_IF,  matTopY);
+  ctx.lineTo(cx + BW0,    transY1);
   ctx.closePath(); ctx.clip();
 
   const btg = ctx.createLinearGradient(cx, transY1, cx, focusY + 20);
-  btg.addColorStop(0, 'rgba(8,145,178,.10)'); btg.addColorStop(0.85, 'rgba(8,145,178,.20)'); btg.addColorStop(1, 'rgba(8,145,178,.06)');
+  btg.addColorStop(0, 'rgba(8,145,178,.20)'); btg.addColorStop(0.85, 'rgba(8,145,178,.35)'); btg.addColorStop(1, 'rgba(8,145,178,.12)');
   ctx.fillStyle = btg; ctx.fillRect(0, transY1, CW, bottomY - transY1);
 
   /* Wavefronts */
@@ -852,18 +862,18 @@ function _wpDraw() {
       : Math.min(hw * hw / (2 * Math.max(y - focusY, 1)), 10);
     ctx.beginPath();
     ctx.moveTo(cx - hw, y); ctx.quadraticCurveTo(cx, y + Math.max(sag, 1.5), cx + hw, y);
-    ctx.strokeStyle = isC ? `rgba(8,145,178,${(0.80*fade).toFixed(2)})` : `rgba(224,242,254,${(0.55*fade).toFixed(2)})`;
+    ctx.strokeStyle = isC ? `rgba(8,145,178,${(0.95*fade).toFixed(2)})` : `rgba(186,230,253,${(0.72*fade).toFixed(2)})`;
     ctx.lineWidth   = isC ? 1.8 : 1.0;
     ctx.stroke();
   }
   ctx.restore();
 
-  /* Beam boundary dashes */
-  ctx.save(); ctx.lineWidth = 1.3; ctx.setLineDash([4, 3]);
-  ctx.strokeStyle = 'rgba(8,145,178,.45)';
-  ctx.beginPath(); ctx.moveTo(cx - BW0, transY1); ctx.lineTo(cx - BWF, focusY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx + BW0, transY1); ctx.lineTo(cx + BWF, focusY); ctx.stroke();
-  ctx.strokeStyle = 'rgba(8,145,178,.22)'; ctx.setLineDash([2, 5]);
+  /* Beam boundary dashes — kink at water/material interface shows refraction */
+  ctx.save(); ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+  ctx.strokeStyle = 'rgba(8,145,178,.70)';
+  ctx.beginPath(); ctx.moveTo(cx - BW0, transY1); ctx.lineTo(cx - BW_IF, matTopY); ctx.lineTo(cx - BWF, focusY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx + BW0, transY1); ctx.lineTo(cx + BW_IF, matTopY); ctx.lineTo(cx + BWF, focusY); ctx.stroke();
+  ctx.strokeStyle = 'rgba(8,145,178,.45)'; ctx.setLineDash([2, 5]);
   ctx.beginPath(); ctx.moveTo(cx - BWF, focusY); ctx.lineTo(cx - bwBot, bottomY); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(cx + BWF, focusY); ctx.lineTo(cx + bwBot, bottomY); ctx.stroke();
   ctx.setLineDash([]); ctx.restore();
@@ -885,7 +895,7 @@ function _wpDraw() {
     const label = `WP = ${fmt(WP, 3)} mm`, lw = 88;
     ctx.fillStyle = '#1e40af'; ctx.fillText(label, AX, transY1 + WP * scale / 2 + 4);
     const bx = AX - lw;
-    ctx.strokeStyle = '#93c5fd'; ctx.lineWidth = 1; ctx.setLineDash([1, 2]);
+    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1; ctx.setLineDash([1, 2]);
     ctx.beginPath(); ctx.moveTo(bx, transY1); ctx.lineTo(bx, matTopY); ctx.stroke();
     ctx.setLineDash([]);
     ctx.beginPath(); ctx.moveTo(bx, transY1); ctx.lineTo(bx + 4, transY1); ctx.stroke();
