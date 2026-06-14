@@ -2518,18 +2518,18 @@
     /* Panel background */
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(ox, oy, PW, PH);
-    ctx.strokeStyle = '#e2e8f0';
+    ctx.strokeStyle = '#c8d4e0';
     ctx.lineWidth = 1;
     ctx.strokeRect(ox, oy, PW, PH);
 
     /* Zero-axis */
-    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.8;
+    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 0.9;
     ctx.setLineDash([4, 3]);
     ctx.beginPath(); ctx.moveTo(ox + 8, midY); ctx.lineTo(ox + PW - 8, midY); ctx.stroke();
     ctx.setLineDash([]);
 
     /* Waveform */
-    ctx.strokeStyle = color; ctx.lineWidth = 1.8;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.0;
     ctx.beginPath();
     let started = false;
     for (let x = 4; x < PW - 4; x++) {
@@ -2743,117 +2743,108 @@
     rx.fillRect(0, 0, CW, CH);
 
     const PX = 50, PY = 26, PW = CW - 68, PH = CH - 68;
-    const BL = PY + PH * 0.50;   /* baseline — centered for bipolar display */
+    const BL = PY + PH * 0.50;
 
-    /* subtle grid */
-    rx.strokeStyle = '#e8f0f8';
-    rx.lineWidth = 0.8;
+    /* Grid lines */
+    rx.strokeStyle = '#e8eef5'; rx.lineWidth = 0.7;
     for (let i = 1; i <= 4; i++) {
       rx.beginPath();
-      rx.moveTo(PX, PY + PH * i / 5);
+      rx.moveTo(PX + 1, PY + PH * i / 5);
       rx.lineTo(PX + PW, PY + PH * i / 5);
       rx.stroke();
     }
 
-    /* axes */
-    rx.strokeStyle = '#94a3b8';
-    rx.lineWidth = 1.5;
-    rx.beginPath();
-    rx.moveTo(PX, PY);
-    rx.lineTo(PX, PY + PH);
-    rx.lineTo(PX + PW, PY + PH);
-    rx.stroke();
+    /* Y axis */
+    rx.strokeStyle = '#334155'; rx.lineWidth = 1.8;
+    rx.beginPath(); rx.moveTo(PX, PY - 6); rx.lineTo(PX, PY + PH + 1); rx.stroke();
+    /* X axis */
+    rx.beginPath(); rx.moveTo(PX, PY + PH); rx.lineTo(PX + PW + 6, PY + PH); rx.stroke();
+    /* Arrowheads */
+    rx.fillStyle = '#334155';
+    rx.beginPath(); rx.moveTo(PX, PY - 8); rx.lineTo(PX - 3.5, PY - 2); rx.lineTo(PX + 3.5, PY - 2); rx.closePath(); rx.fill();
+    rx.beginPath(); rx.moveTo(PX + PW + 8, PY + PH); rx.lineTo(PX + PW + 2, PY + PH - 3.5); rx.lineTo(PX + PW + 2, PY + PH + 3.5); rx.closePath(); rx.fill();
 
-    /* axis labels */
-    rx.fillStyle = '#475569';
-    rx.font = '11px Inter,sans-serif';
-    rx.textAlign = 'center';
-    rx.fillText('Time  (proportional to depth)', PX + PW / 2, CH - 10);
-    rx.save();
-    rx.translate(14, PY + PH / 2);
-    rx.rotate(-Math.PI / 2);
-    rx.fillText('Amplitude', 0, 0);
-    rx.restore();
+    /* Zero-baseline dashed */
+    rx.strokeStyle = '#94a3b8'; rx.lineWidth = 0.8; rx.setLineDash([4, 3]);
+    rx.beginPath(); rx.moveTo(PX, BL); rx.lineTo(PX + PW, BL); rx.stroke();
+    rx.setLineDash([]);
 
-    /* baseline */
-    rx.strokeStyle = '#e2e8f0';
-    rx.lineWidth = 1;
-    rx.beginPath();
-    rx.moveTo(PX, BL);
-    rx.lineTo(PX + PW, BL);
-    rx.stroke();
+    /* Axis labels */
+    rx.fillStyle = '#334155'; rx.font = '11px Inter,sans-serif'; rx.textAlign = 'center';
+    rx.fillText('Time  (proportional to depth)', PX + PW / 2, CH - 6);
+    rx.save(); rx.translate(14, PY + PH / 2); rx.rotate(-Math.PI / 2);
+    rx.fillText('Amplitude', 0, 0); rx.restore();
+
+    /* Pulse params — narrow 3-cycle burst */
+    const SIG = 8, PER = 9;
+    function pulseAmp(x, cx, amp) {
+      const d = x - cx;
+      if (Math.abs(d) > 28) return 0;
+      return amp * Math.exp(-(d * d) / (2 * SIG * SIG)) * Math.cos(2 * Math.PI * d / PER);
+    }
 
     /* fractional positions */
-    const F_IP   = 0.0;
-    const F_VOID = T_VOID_ECHO / T_BACK_ECHO;   /* ≈ 0.37 */
-    const F_BW   = 1.0;
+    const F_VOID = T_VOID_ECHO / T_BACK_ECHO;
     const tFrac  = Math.min(t / T_BACK_ECHO, 1.05);
+    const showFlaw = tFrac >= F_VOID;
+    const showBW   = tFrac >= 1.0;
 
-    /* bipolar Gaussian-windowed cosine pulse (matches signal-processing page) */
-    function drawPulse(cx, ampH, col) {
-      const sig = 15, period = 12;
-      rx.strokeStyle = col; rx.lineWidth = 2.2;
+    const sxIP   = PX;
+    const sxFlaw = PX + Math.round(F_VOID * PW);
+    const sxBW   = PX + PW;
+    const hIP    = PH * 0.38, hFlaw = PH * 0.22, hBW = PH * 0.35;
+
+    /* Continuous signal trace — clip to plot area */
+    rx.save(); rx.beginPath(); rx.rect(PX, PY, PW, PH); rx.clip();
+
+    /* Blue trace: IP + BW baseline (zero everywhere else) */
+    rx.strokeStyle = '#0891b2'; rx.lineWidth = 1.8;
+    rx.beginPath();
+    for (let x = PX; x <= PX + PW; x++) {
+      const yDev = pulseAmp(x, sxIP, hIP) + (showBW ? pulseAmp(x, sxBW, hBW) : 0);
+      const y = BL - yDev;
+      if (x === PX) rx.moveTo(x, y); else rx.lineTo(x, y);
+    }
+    rx.stroke();
+
+    /* Red overlay: flaw echo only */
+    if (showFlaw) {
+      rx.strokeStyle = '#ef4444'; rx.lineWidth = 1.8;
       rx.beginPath();
-      let first = true;
-      for (let x = cx - 55; x <= cx + 55; x += 0.5) {
-        const d = x - cx;
-        const env = Math.exp(-(d * d) / (2 * sig * sig));
-        const y = BL - ampH * env * Math.cos(2 * Math.PI * d / period);
-        if (first) { rx.moveTo(x, y); first = false; } else rx.lineTo(x, y);
+      for (let x = sxFlaw - 28; x <= sxFlaw + 28; x++) {
+        const y = BL - pulseAmp(x, sxFlaw, hFlaw);
+        if (x === sxFlaw - 28) rx.moveTo(x, y); else rx.lineTo(x, y);
       }
       rx.stroke();
     }
+    rx.restore();
 
-    function spike(frac, h, col, label, lblCol) {
-      const sx = PX + frac * PW;
-      const ty = BL - h;
-      drawPulse(sx, h, col);
+    /* Peak dots + labels */
+    function peakLabel(sx, amp, label, col) {
+      const py = BL - amp;
       rx.fillStyle = col;
-      rx.beginPath();
-      rx.arc(sx, ty, 3, 0, Math.PI * 2);
-      rx.fill();
-      if (label) {
-        rx.fillStyle = lblCol || col;
-        rx.font = 'bold 10px Inter,sans-serif';
-        rx.textAlign = 'center';
-        rx.fillText(label, sx, ty - 9);
-      }
+      rx.beginPath(); rx.arc(Math.max(sx, PX + 4), py, 2.5, 0, Math.PI * 2); rx.fill();
+      rx.font = 'bold 10px Inter,sans-serif'; rx.textAlign = 'center';
+      rx.fillText(label, Math.max(sx, PX + 26), py - 9);
     }
+    peakLabel(sxIP,   hIP,   'IP',        '#0369a1');
+    if (showFlaw) peakLabel(sxFlaw, hFlaw, 'Flaw Echo', '#dc2626');
+    if (showBW)   peakLabel(sxBW,   hBW,   'Back Wall', '#0369a1');
 
-    /* IP — always shown */
-    spike(F_IP, PH * 0.38, '#0891b2', 'IP', '#0369a1');
-
-    /* flaw echo — revealed when cursor reaches it (RED) */
-    if (tFrac >= F_VOID) {
-      spike(F_VOID, PH * 0.22, '#ef4444', 'Flaw Echo', '#dc2626');
-    }
-
-    /* back-wall echo — revealed at end */
-    if (tFrac >= F_BW) {
-      spike(F_BW, PH * 0.35, '#0891b2', 'Back Wall', '#0369a1');
-    }
-
-    /* sweep cursor */
+    /* Sweep cursor */
     if (tFrac <= 1.02) {
       const cx = PX + tFrac * PW;
       rx.save();
-      rx.strokeStyle = 'rgba(0,0,0,0.25)';
-      rx.lineWidth = 1;
+      rx.strokeStyle = 'rgba(71,85,105,0.35)'; rx.lineWidth = 1;
       rx.setLineDash([5, 4]);
-      rx.beginPath();
-      rx.moveTo(cx, PY);
-      rx.lineTo(cx, PY + PH);
-      rx.stroke();
+      rx.beginPath(); rx.moveTo(cx, PY); rx.lineTo(cx, PY + PH); rx.stroke();
       rx.restore();
     }
 
-    /* colour legend */
-    rx.font = '9.5px Inter,sans-serif';
-    rx.textAlign = 'right';
-    rx.fillStyle = '#0891b2';
-    rx.fillText('■ Transmitted / Back-wall', CW - 6, PY + 14);
-    rx.fillStyle = '#ef4444';
-    rx.fillText('■ Flaw echo', CW - 6, PY + 28);
+    /* Legend */
+    rx.font = '9.5px Inter,sans-serif'; rx.textAlign = 'right';
+    rx.fillStyle = '#0891b2'; rx.fillText('■ Transmitted / Back-wall', CW - 6, PY + 14);
+    rx.fillStyle = '#ef4444'; rx.fillText('■ Flaw echo', CW - 6, PY + 28);
   }
 
   /* ── Animation loop ── */
@@ -2892,62 +2883,88 @@
   var T_SWEEP = 190, T_HOLD = 70, T_CYCLE = T_SWEEP + T_HOLD;
   var frame = 0;
 
-  function drawPulse(cx, h, col) {
-    var sig = 15, period = 12;
-    ctx.strokeStyle = col; ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    var first = true;
-    for (var x = cx - 55; x <= cx + 55; x += 0.5) {
-      var d = x - cx;
-      var env = Math.exp(-(d * d) / (2 * sig * sig));
-      var y = BL - h * env * Math.cos(2 * Math.PI * d / period);
-      if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+  var SIG_W = 8, PER_W = 9;
+  function pulseAmpW(x, cx, amp) {
+    var d = x - cx; if (Math.abs(d) > 28) return 0;
+    return amp * Math.exp(-(d * d) / (2 * SIG_W * SIG_W)) * Math.cos(2 * Math.PI * d / PER_W);
   }
 
   function tick() {
     var t = frame % T_CYCLE;
+    var curFrac = Math.min(1, t / T_SWEEP);
+    var curX = PL + curFrac * PW;
+    var bwVisible = curX >= BX;
+
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
 
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, PT + PH); ctx.lineTo(W - PR, BL); ctx.stroke();
+    /* Grid */
+    ctx.strokeStyle = '#e8eef5'; ctx.lineWidth = 0.7;
+    [0.25, 0.5, 0.75].forEach(function(f) {
+      ctx.beginPath(); ctx.moveTo(PL + 1, PT + PH * f); ctx.lineTo(W - PR, PT + PH * f); ctx.stroke();
+    });
 
-    ctx.fillStyle = '#64748b'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Time →', PL + PW / 2, H - 3);
-    ctx.save(); ctx.translate(13, PT + PH / 2); ctx.rotate(-Math.PI / 2);
+    /* Y axis */
+    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(PL, PT - 6); ctx.lineTo(PL, PT + PH + 1); ctx.stroke();
+    /* X axis */
+    ctx.beginPath(); ctx.moveTo(PL, PT + PH); ctx.lineTo(W - PR + 5, PT + PH); ctx.stroke();
+    /* Arrowheads */
+    ctx.fillStyle = '#334155';
+    ctx.beginPath(); ctx.moveTo(PL, PT - 8); ctx.lineTo(PL - 3, PT - 2); ctx.lineTo(PL + 3, PT - 2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(W - PR + 7, PT + PH); ctx.lineTo(W - PR + 1, PT + PH - 3); ctx.lineTo(W - PR + 1, PT + PH + 3); ctx.closePath(); ctx.fill();
+
+    /* Zero-baseline dashed */
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 0.8; ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(PL + 1, BL); ctx.lineTo(W - PR, BL); ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* Axis labels */
+    ctx.fillStyle = '#334155'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Time →', PL + PW / 2, H - 4);
+    ctx.save(); ctx.translate(14, PT + PH / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = '#334155'; ctx.font = '10px Inter,sans-serif';
     ctx.fillText('Amplitude', 0, 0); ctx.restore();
 
-    drawPulse(FX, SH, '#0891b2');
+    /* Continuous signal trace */
+    ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.8;
+    ctx.save(); ctx.beginPath(); ctx.rect(PL, PT, PW, PH); ctx.clip();
+    ctx.beginPath();
+    for (var x = PL; x <= W - PR; x++) {
+      var yDev = pulseAmpW(x, FX, SH) + (bwVisible ? pulseAmpW(x, BX, SH) : 0);
+      var y = BL - yDev;
+      if (x === PL) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    /* Labels */
     ctx.fillStyle = '#0369a1'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('FW', FX, BL - SH - 9);
+    ctx.fillText('FW', FX, BL - SH - 11);
 
-    var cx = PL + Math.min(1, t / T_SWEEP) * PW;
+    /* Sweep cursor */
+    if (t < T_SWEEP) {
+      ctx.strokeStyle = 'rgba(71,85,105,0.35)'; ctx.lineWidth = 1;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(curX, PT); ctx.lineTo(curX, PT + PH); ctx.stroke();
+      ctx.setLineDash([]);
+    }
 
-    if (cx >= BX) {
-      drawPulse(BX, SH, '#0891b2');
+    /* BW + Δt annotation */
+    if (bwVisible) {
       ctx.fillStyle = '#0369a1'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('BW', BX, BL - SH - 9);
-
+      ctx.fillText('BW', BX, BL - SH - 11);
       var ay = BL - Math.round(PH * 0.22);
       ctx.strokeStyle = '#d97706'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(FX + 2, ay); ctx.lineTo(BX - 2, ay); ctx.stroke();
-      [FX + 2, BX - 2].forEach(function (px) {
+      [FX + 2, BX - 2].forEach(function(px) {
         ctx.beginPath(); ctx.moveTo(px, ay - 5); ctx.lineTo(px, ay + 5); ctx.stroke();
       });
       ctx.fillStyle = '#d97706'; ctx.font = 'bold 11px Inter,sans-serif'; ctx.textAlign = 'center';
       ctx.fillText('Δt', (FX + BX) / 2, ay - 8);
-
-      ctx.fillStyle = '#16a34a'; ctx.font = 'bold 13px Georgia,serif'; ctx.textAlign = 'right';
+      ctx.fillStyle = '#15803d'; ctx.font = 'bold 12px Georgia,serif'; ctx.textAlign = 'right';
       ctx.fillText('c = 2d / Δt', W - PR - 4, H - 6);
     }
 
-    if (t < T_SWEEP) {
-      ctx.strokeStyle = 'rgba(0,0,0,0.30)'; ctx.lineWidth = 1.2;
-      ctx.setLineDash([5, 4]);
-      ctx.beginPath(); ctx.moveTo(cx, PT); ctx.lineTo(cx, PT + PH); ctx.stroke();
-      ctx.setLineDash([]);
-    }
     frame++;
     requestAnimationFrame(tick);
   }
@@ -2975,57 +2992,91 @@
   var T_SWEEP = 190, T_HOLD = 70, T_CYCLE = T_SWEEP + T_HOLD;
   var frame = 0;
 
-  function drawPulse(cx, h, col) {
-    var sig = 15, period = 12;
-    ctx.strokeStyle = col; ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    var first = true;
-    for (var x = cx - 55; x <= cx + 55; x += 0.5) {
-      var d = x - cx;
-      var env = Math.exp(-(d * d) / (2 * sig * sig));
-      var y = BL - h * env * Math.cos(2 * Math.PI * d / period);
-      if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+  var SIG_A = 8, PER_A = 9;
+  function pulseAmpA(x, cx, amp) {
+    var d = x - cx; if (Math.abs(d) > 28) return 0;
+    return amp * Math.exp(-(d * d) / (2 * SIG_A * SIG_A)) * Math.cos(2 * Math.PI * d / PER_A);
   }
 
   function tick() {
     var t = frame % T_CYCLE;
+    var curFrac = Math.min(1, t / T_SWEEP);
+    var curX = PL + curFrac * PW;
+    var bwVisible = curX >= BX;
+
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
 
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, PT + PH); ctx.lineTo(W - PR, BL); ctx.stroke();
+    /* Grid */
+    ctx.strokeStyle = '#e8eef5'; ctx.lineWidth = 0.7;
+    [0.25, 0.5, 0.75].forEach(function(f) {
+      ctx.beginPath(); ctx.moveTo(PL + 1, PT + PH * f); ctx.lineTo(W - PR, PT + PH * f); ctx.stroke();
+    });
 
-    ctx.fillStyle = '#64748b'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Time →', PL + PW / 2, H - 3);
-    ctx.save(); ctx.translate(13, PT + PH / 2); ctx.rotate(-Math.PI / 2);
+    /* Y axis */
+    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(PL, PT - 6); ctx.lineTo(PL, PT + PH + 1); ctx.stroke();
+    /* X axis */
+    ctx.beginPath(); ctx.moveTo(PL, PT + PH); ctx.lineTo(W - PR + 5, PT + PH); ctx.stroke();
+    /* Arrowheads */
+    ctx.fillStyle = '#334155';
+    ctx.beginPath(); ctx.moveTo(PL, PT - 8); ctx.lineTo(PL - 3, PT - 2); ctx.lineTo(PL + 3, PT - 2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(W - PR + 7, PT + PH); ctx.lineTo(W - PR + 1, PT + PH - 3); ctx.lineTo(W - PR + 1, PT + PH + 3); ctx.closePath(); ctx.fill();
+
+    /* Zero-baseline dashed */
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 0.8; ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(PL + 1, BL); ctx.lineTo(W - PR, BL); ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* Axis labels */
+    ctx.fillStyle = '#334155'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Time →', PL + PW / 2, H - 4);
+    ctx.save(); ctx.translate(14, PT + PH / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = '#334155'; ctx.font = '10px Inter,sans-serif';
     ctx.fillText('Amplitude', 0, 0); ctx.restore();
 
-    drawPulse(FX, FH, '#0891b2');
+    /* Continuous signal trace */
+    ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.8;
+    ctx.save(); ctx.beginPath(); ctx.rect(PL, PT, PW, PH); ctx.clip();
+    ctx.beginPath();
+    for (var x = PL; x <= W - PR; x++) {
+      var yDev = pulseAmpA(x, FX, FH) + (bwVisible ? pulseAmpA(x, BX, BH) : 0);
+      var y = BL - yDev;
+      if (x === PL) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    /* FW label + amplitude annotation */
     ctx.fillStyle = '#0369a1'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('FW', FX, BL - FH - 9);
+    ctx.fillText('FW', FX, BL - FH - 11);
     ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
     ctx.beginPath(); ctx.moveTo(FX, BL - FH); ctx.lineTo(FX - 22, BL - FH); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = '#0369a1'; ctx.font = '8px Inter,sans-serif'; ctx.textAlign = 'right';
     ctx.fillText('A_FW', FX - 24, BL - FH + 3);
 
-    var cx = PL + Math.min(1, t / T_SWEEP) * PW;
+    /* Sweep cursor */
+    if (t < T_SWEEP) {
+      ctx.strokeStyle = 'rgba(71,85,105,0.35)'; ctx.lineWidth = 1;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(curX, PT); ctx.lineTo(curX, PT + PH); ctx.stroke();
+      ctx.setLineDash([]);
+    }
 
-    if (cx >= BX) {
-      ctx.strokeStyle = 'rgba(234,88,12,0.65)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+    /* BW + decay envelope */
+    if (bwVisible) {
+      ctx.strokeStyle = 'rgba(234,88,12,0.72)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
       ctx.beginPath(); ctx.moveTo(FX, BL - FH);
-      for (var x = FX; x <= BX; x++) {
-        ctx.lineTo(x, BL - FH * Math.exp(-kDecay * (x - FX)));
+      for (var x2 = FX; x2 <= BX; x2++) {
+        ctx.lineTo(x2, BL - FH * Math.exp(-kDecay * (x2 - FX)));
       }
       ctx.stroke(); ctx.setLineDash([]);
 
       ctx.fillStyle = '#ea580c'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('exp. decay', (FX + BX) / 2, BL - Math.sqrt(FH * BH) - 8);
+      ctx.fillText('exp. decay', (FX + BX) / 2, BL - Math.sqrt(FH * BH) - 9);
 
-      drawPulse(BX, BH, '#0891b2');
       ctx.fillStyle = '#0369a1'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('BW', BX, BL - BH - 9);
+      ctx.fillText('BW', BX, BL - BH - 11);
       ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
       ctx.beginPath(); ctx.moveTo(BX, BL - BH); ctx.lineTo(BX + 22, BL - BH); ctx.stroke();
       ctx.setLineDash([]);
@@ -3036,12 +3087,6 @@
       ctx.fillText('α = (1/2d) · ln(A_FW / A_BW)', PL + PW / 2, PT + 16);
     }
 
-    if (t < T_SWEEP) {
-      ctx.strokeStyle = 'rgba(0,0,0,0.30)'; ctx.lineWidth = 1.2;
-      ctx.setLineDash([5, 4]);
-      ctx.beginPath(); ctx.moveTo(cx, PT); ctx.lineTo(cx, PT + PH); ctx.stroke();
-      ctx.setLineDash([]);
-    }
     frame++;
     requestAnimationFrame(tick);
   }
@@ -3239,70 +3284,93 @@
     lx.fillText('scatter', LW - 108, LH - 25);
   }
 
-  function drawPulse_rc(ctx2, cx, h, col) {
-    var sig = 15, period = 12;
-    ctx2.strokeStyle = col; ctx2.lineWidth = 2.2;
-    ctx2.beginPath();
-    var first = true;
-    for (var x = cx - 55; x <= cx + 55; x += 0.5) {
-      var d = x - cx;
-      var env = Math.exp(-(d * d) / (2 * sig * sig));
-      var y = RBL - h * env * Math.cos(2 * Math.PI * d / period);
-      if (first) { ctx2.moveTo(x, y); first = false; } else ctx2.lineTo(x, y);
-    }
-    ctx2.stroke();
+  var SIG_R = 8, PER_R = 9;
+  function pulseAmpR(x, cx, amp) {
+    var d = x - cx; if (Math.abs(d) > 28) return 0;
+    return amp * Math.exp(-(d * d) / (2 * SIG_R * SIG_R)) * Math.cos(2 * Math.PI * d / PER_R);
   }
 
   function drawRight(t) {
     rx.fillStyle = '#ffffff'; rx.fillRect(0, 0, RW, RH);
 
-    rx.strokeStyle = '#94a3b8'; rx.lineWidth = 1;
-    rx.beginPath(); rx.moveTo(RPL, RPT); rx.lineTo(RPL, RPT + RPH); rx.lineTo(RW - RPR, RBL); rx.stroke();
+    /* Grid */
+    rx.strokeStyle = '#e8eef5'; rx.lineWidth = 0.7;
+    [0.25, 0.5, 0.75].forEach(function(f) {
+      rx.beginPath(); rx.moveTo(RPL + 1, RPT + RPH * f); rx.lineTo(RW - RPR, RPT + RPH * f); rx.stroke();
+    });
 
-    rx.fillStyle = '#64748b'; rx.font = '9px Inter,sans-serif'; rx.textAlign = 'center';
+    /* Y axis */
+    rx.strokeStyle = '#334155'; rx.lineWidth = 1.6;
+    rx.beginPath(); rx.moveTo(RPL, RPT - 6); rx.lineTo(RPL, RPT + RPH + 1); rx.stroke();
+    /* X axis */
+    rx.beginPath(); rx.moveTo(RPL, RPT + RPH); rx.lineTo(RW - RPR + 5, RPT + RPH); rx.stroke();
+    /* Arrowheads */
+    rx.fillStyle = '#334155';
+    rx.beginPath(); rx.moveTo(RPL, RPT - 8); rx.lineTo(RPL - 3, RPT - 2); rx.lineTo(RPL + 3, RPT - 2); rx.closePath(); rx.fill();
+    rx.beginPath(); rx.moveTo(RW - RPR + 7, RPT + RPH); rx.lineTo(RW - RPR + 1, RPT + RPH - 3); rx.lineTo(RW - RPR + 1, RPT + RPH + 3); rx.closePath(); rx.fill();
+
+    /* Zero-baseline dashed */
+    rx.strokeStyle = '#94a3b8'; rx.lineWidth = 0.8; rx.setLineDash([4, 3]);
+    rx.beginPath(); rx.moveTo(RPL + 1, RBL); rx.lineTo(RW - RPR, RBL); rx.stroke();
+    rx.setLineDash([]);
+
+    /* Axis labels */
+    rx.fillStyle = '#334155'; rx.font = '10px Inter,sans-serif'; rx.textAlign = 'center';
     rx.fillText('Time →', RPL + RPW / 2, RH - 4);
     rx.save(); rx.translate(13, RPT + RPH / 2); rx.rotate(-Math.PI / 2);
+    rx.fillStyle = '#334155'; rx.font = '10px Inter,sans-serif';
     rx.fillText('Amplitude', 0, 0); rx.restore();
 
-    /* FW echo always visible */
-    drawPulse_rc(rx, FX, FH, '#0891b2');
-    rx.fillStyle = '#0369a1'; rx.font = 'bold 10px Inter,sans-serif'; rx.textAlign = 'center';
-    rx.fillText('FW', FX, RBL - FH - 8);
-
     var curX = RPL + Math.min(1, t / T_SWEEP) * RPW;
+    var bwVisible = t >= T_SWEEP;
 
-    /* Grain noise spikes */
+    /* Continuous signal trace */
+    rx.strokeStyle = '#0891b2'; rx.lineWidth = 1.8;
+    rx.save(); rx.beginPath(); rx.rect(RPL, RPT, RPW, RPH); rx.clip();
+    rx.beginPath();
+    for (var x = RPL; x <= RW - RPR; x++) {
+      var yDev = pulseAmpR(x, FX, FH) + (bwVisible ? pulseAmpR(x, BX, BH) : 0);
+      var y = RBL - yDev;
+      if (x === RPL) rx.moveTo(x, y); else rx.lineTo(x, y);
+    }
+    rx.stroke();
+    rx.restore();
+
+    /* FW label */
+    rx.fillStyle = '#0369a1'; rx.font = 'bold 10px Inter,sans-serif'; rx.textAlign = 'center';
+    rx.fillText('FW', FX, RBL - FH - 9);
+
+    /* Grain noise spikes (revealed by sweep) */
     for (var i = 0; i < NSPIKES.length; i++) {
       var sp = NSPIKES[i];
       if (curX >= sp.x) {
-        rx.strokeStyle = '#f97316'; rx.lineWidth = 1;
+        rx.strokeStyle = '#f97316'; rx.lineWidth = 1.2;
         rx.beginPath(); rx.moveTo(sp.x, RBL); rx.lineTo(sp.x, RBL - sp.h); rx.stroke();
       }
     }
 
-    /* Grain noise label bracket */
+    /* Grain noise label */
     if (curX > FX + 50) {
       var mid = (FX + Math.min(curX, BX - 10)) / 2;
-      rx.fillStyle = 'rgba(249,115,22,0.75)'; rx.font = '9px Inter,sans-serif'; rx.textAlign = 'center';
-      rx.fillText('grain noise', mid, RBL - 50);
-      rx.strokeStyle = 'rgba(249,115,22,0.4)'; rx.lineWidth = 1;
+      rx.fillStyle = 'rgba(249,115,22,0.85)'; rx.font = '9px Inter,sans-serif'; rx.textAlign = 'center';
+      rx.fillText('grain noise', mid, RBL - 55);
+      rx.strokeStyle = 'rgba(249,115,22,0.5)'; rx.lineWidth = 1;
       rx.beginPath();
-      rx.moveTo(FX + 14, RBL - 45); rx.lineTo(FX + 14, RBL - 43);
-      rx.lineTo(Math.min(curX - 6, BX - 12), RBL - 43);
-      rx.lineTo(Math.min(curX - 6, BX - 12), RBL - 45);
+      rx.moveTo(FX + 14, RBL - 50); rx.lineTo(FX + 14, RBL - 48);
+      rx.lineTo(Math.min(curX - 6, BX - 12), RBL - 48);
+      rx.lineTo(Math.min(curX - 6, BX - 12), RBL - 50);
       rx.stroke();
     }
 
-    /* BW echo appears at end of sweep */
-    if (t >= T_SWEEP) {
-      drawPulse_rc(rx, BX, BH, '#0891b2');
+    /* BW label */
+    if (bwVisible) {
       rx.fillStyle = '#0369a1'; rx.font = 'bold 10px Inter,sans-serif'; rx.textAlign = 'center';
-      rx.fillText('BW', BX, RBL - BH - 8);
+      rx.fillText('BW', BX, RBL - BH - 9);
     }
 
     /* Sweep cursor */
     if (t < T_SWEEP) {
-      rx.strokeStyle = 'rgba(0,0,0,0.30)'; rx.lineWidth = 1.2;
+      rx.strokeStyle = 'rgba(71,85,105,0.35)'; rx.lineWidth = 1;
       rx.setLineDash([5, 4]);
       rx.beginPath(); rx.moveTo(curX, RPT); rx.lineTo(curX, RPT + RPH); rx.stroke();
       rx.setLineDash([]);
