@@ -129,10 +129,9 @@
     .spectrum-wrap { margin: 1.5rem 0 1rem; }
     .spectrum-bar {
       display: flex;
-      height: 52px;
-      border-radius: 8px;
+      height: 44px;
+      border-radius: 8px 8px 0 0;
       overflow: hidden;
-      margin-bottom: .5rem;
       box-shadow: var(--shadow);
     }
     .spec-seg {
@@ -140,26 +139,74 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: .68rem;
+      font-size: .62rem;
       font-weight: 700;
-      color: rgba(255,255,255,.9);
+      color: rgba(255,255,255,.95);
       letter-spacing: .03em;
       text-transform: uppercase;
       text-align: center;
       padding: 0 4px;
     }
-    .spectrum-ticks {
-      display: flex;
+    /* Frequency tick row */
+    .spec-freq-row {
       position: relative;
-      height: 22px;
+      height: 26px;
+      background: #f1f5f9;
+      border-left: 1px solid #cbd5e1;
+      border-right: 1px solid #cbd5e1;
     }
-    .spec-tick {
+    .spec-freq-mark {
       position: absolute;
+      top: 5px;
+      font-size: .72rem;
+      font-weight: 700;
+      color: #334155;
       transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .spec-freq-mark::before {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 5px;
+      background: #94a3b8;
+      margin: 0 auto 2px;
+    }
+    /* Application cards row */
+    .spec-apps-row {
+      display: flex;
+      gap: 3px;
+      margin-top: 3px;
+      align-items: flex-start;
+    }
+    .spec-app-card {
+      border-top: 3px solid;
+      border-radius: 0 0 7px 7px;
+      padding: .55rem .5rem .5rem;
+      font-size: .72rem;
+      line-height: 1.45;
+      box-sizing: border-box;
+    }
+    .spec-app-title {
+      font-weight: 700;
       font-size: .7rem;
-      color: var(--text-muted);
-      text-align: center;
-      line-height: 1.2;
+      margin-bottom: .3rem;
+      display: block;
+    }
+    .spec-app-freq {
+      font-size: .65rem;
+      font-weight: 600;
+      opacity: .75;
+      margin-bottom: .35rem;
+      display: block;
+    }
+    .spec-app-card ul {
+      margin: 0;
+      padding-left: .95rem;
+      color: #334155;
+    }
+    .spec-app-card li {
+      margin-bottom: .12rem;
     }
     .nde-highlight {
       border: 2px solid var(--brand-cyan);
@@ -702,26 +749,80 @@
           </p>
 
           <div class="spectrum-wrap">
+            <!-- Colored frequency bar -->
             <div class="spectrum-bar">
-              <!-- Infrasound / subaudible: 0-1.3% log range → 0-22% -->
-              <div class="spec-seg" style="width:22%; background:#64748b; font-size:.62rem;">Audible &amp; below</div>
-              <!-- Low ultrasound 20kHz-100kHz: log 4.3-5.0 out of 4.3-7.7 → 0-20% of remaining -->
-              <div class="spec-seg" style="width:10%; background:#0d9488; font-size:.6rem;">Low UT</div>
-              <!-- Medical / low NDE 100kHz-1MHz: log 5.0-6.0 → 29% of remaining -->
-              <div class="spec-seg" style="width:16%; background:#0891b2; font-size:.62rem;">Medical</div>
-              <!-- NDE main 1-10 MHz -->
+              <div class="spec-seg" style="width:22%; background:#64748b;">Audible &amp; Below</div>
+              <div class="spec-seg" style="width:10%; background:#0d9488; font-size:.56rem;">Low UT</div>
+              <div class="spec-seg" style="width:16%; background:#0891b2;">Medical</div>
               <div class="spec-seg" style="width:30%; background:#1e40af; border-left:3px solid #60a5fa;">NDE Main Range</div>
-              <!-- High freq NDE 10-50 MHz -->
-              <div class="spec-seg" style="width:22%; background:#0f2d5e; font-size:.65rem;">Fine-Res NDE</div>
+              <div class="spec-seg" style="width:22%; background:#0f2d5e;">High-Res NDE</div>
             </div>
-            <!-- Tick labels (approximate log-scale positions) -->
-            <div style="position:relative; height:34px; font-size:.68rem; color:var(--text-muted);">
-              <span style="position:absolute; left:0%;">20 Hz</span>
-              <span style="position:absolute; left:22%; transform:translateX(-50%);">20 kHz</span>
-              <span style="position:absolute; left:32%; transform:translateX(-50%);">100 kHz</span>
-              <span style="position:absolute; left:48%; transform:translateX(-50%);">1 MHz</span>
-              <span style="position:absolute; left:70%; transform:translateX(-50%);">10 MHz</span>
-              <span style="position:absolute; right:0; transform:translateX(0);">50 MHz</span>
+
+            <!-- Frequency boundary markers -->
+            <div class="spec-freq-row">
+              <span class="spec-freq-mark" style="left:0%; transform:none;">20 Hz</span>
+              <span class="spec-freq-mark" style="left:22%;">20 kHz</span>
+              <span class="spec-freq-mark" style="left:32%;">100 kHz</span>
+              <span class="spec-freq-mark" style="left:48%;">1 MHz</span>
+              <span class="spec-freq-mark" style="left:78%;">10 MHz</span>
+              <span class="spec-freq-mark" style="left:100%; transform:translateX(-100%);">50 MHz</span>
+            </div>
+
+            <!-- Application cards — one per segment -->
+            <div class="spec-apps-row">
+              <!-- Audible & below — 22% -->
+              <div class="spec-app-card" style="width:22%; border-top-color:#64748b; background:#f1f5f9;">
+                <span class="spec-app-title" style="color:#475569;">Audible &amp; Below</span>
+                <span class="spec-app-freq">&lt; 20 kHz</span>
+                <ul>
+                  <li>Human hearing range</li>
+                  <li>Seismic monitoring</li>
+                  <li>SONAR (low-freq)</li>
+                </ul>
+              </div>
+              <!-- Low UT — 10% -->
+              <div class="spec-app-card" style="width:10%; border-top-color:#0d9488; background:#f0fdfa;">
+                <span class="spec-app-title" style="color:#0d9488;">Low UT</span>
+                <span class="spec-app-freq">20–100 kHz</span>
+                <ul>
+                  <li>Ultrasonic cleaning</li>
+                  <li>Welding / bonding</li>
+                  <li>Thickness gauging</li>
+                </ul>
+              </div>
+              <!-- Medical — 16% -->
+              <div class="spec-app-card" style="width:16%; border-top-color:#0891b2; background:#e0f2fe;">
+                <span class="spec-app-title" style="color:#0369a1;">Medical</span>
+                <span class="spec-app-freq">100 kHz – 1 MHz</span>
+                <ul>
+                  <li>Prenatal imaging</li>
+                  <li>Cardiac echocardiography</li>
+                  <li>Abdominal scans</li>
+                </ul>
+              </div>
+              <!-- NDE Main — 30% -->
+              <div class="spec-app-card" style="width:30%; border-top-color:#1e40af; background:#eff6ff;">
+                <span class="spec-app-title" style="color:#1e40af;">NDE Main Range &#9733;</span>
+                <span class="spec-app-freq">1 – 10 MHz</span>
+                <ul>
+                  <li>Weld inspection &amp; flaw detection</li>
+                  <li>Plate &amp; pipe thickness measurement</li>
+                  <li>Composite laminate scanning</li>
+                  <li>Corrosion mapping</li>
+                  <li>Forgings &amp; castings</li>
+                </ul>
+              </div>
+              <!-- High-Res NDE — 22% -->
+              <div class="spec-app-card" style="width:22%; border-top-color:#0f2d5e; background:#f0f4ff;">
+                <span class="spec-app-title" style="color:#0f2d5e;">High-Res NDE</span>
+                <span class="spec-app-freq">10 – 50 MHz</span>
+                <ul>
+                  <li>Microelectronics inspection</li>
+                  <li>Thin coating &amp; bond testing</li>
+                  <li>Fine-grained metal imaging</li>
+                  <li>High-resolution C-scan</li>
+                </ul>
+              </div>
             </div>
           </div>
 
