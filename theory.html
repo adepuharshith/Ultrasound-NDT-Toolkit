@@ -1559,19 +1559,94 @@
 
           <h3>Near Field (Fresnel Zone)</h3>
           <p>
-            In the near field, beam intensity varies irregularly due to constructive/destructive interference.
-            The near-field distance (Rayleigh distance) is:
+            Within the near field, wavefronts emitted from different regions of the aperture
+            arrive with varying phase at any on-axis point, producing a standing interference
+            pattern. Axial pressure oscillates between maxima and nulls — the last axial maximum
+            occurs right at <em>N</em>, after which pressure decays smoothly. Amplitude-based
+            flaw sizing in the near field is unreliable without calibration on a reference
+            reflector at the same depth, because a lateral shift of even a few millimetres can
+            swing the echo amplitude by &gt;6 dB without any change in reflector size.
+            The boundary is the Rayleigh distance:
           </p>
           <div class="eq-box">$$N = \frac{D^2}{4\lambda} = \frac{D^2 f}{4c}$$</div>
-          <p>Inspection is generally more reliable in the far field (beyond N), or at the natural focus.</p>
 
-          <h3>Far Field Beam Divergence</h3>
+          <!-- Beam profile diagram: near-field vs far-field -->
+          <svg viewBox="0 0 560 168" xmlns="http://www.w3.org/2000/svg"
+               style="width:100%;max-width:560px;height:auto;display:block;margin:1.2rem auto;"
+               role="img" aria-label="Ultrasonic beam profile showing near-field interference zone and far-field divergence with half-angle θ">
+            <!-- Background -->
+            <rect width="560" height="168" fill="#f8fafc" rx="8"/>
+            <!-- Centre axis -->
+            <line x1="44" y1="84" x2="540" y2="84" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+            <!-- Transducer body -->
+            <rect x="22" y="56" width="20" height="56" rx="3" fill="#0f2d5e"/>
+            <text x="32" y="90" text-anchor="middle" font-size="11" fill="#ffffff" font-family="serif" font-style="italic">D</text>
+            <text x="32" y="140" text-anchor="middle" font-size="9" fill="#0f2d5e" font-family="sans-serif">Xdcr</text>
+            <!-- Near-field background fill -->
+            <rect x="42" y="56" width="248" height="56" fill="#dbeafe" opacity="0.55" rx="2"/>
+            <!-- Near-field top edge — wavy to suggest interference -->
+            <polyline points="42,56 78,54 115,58 152,54 192,57 233,54 272,56 290,56" fill="none" stroke="#0891b2" stroke-width="2"/>
+            <!-- Near-field bottom edge -->
+            <polyline points="42,112 78,114 115,110 152,114 192,111 233,114 272,112 290,112" fill="none" stroke="#0891b2" stroke-width="2"/>
+            <!-- Near-field labels -->
+            <text x="166" y="76" text-anchor="middle" font-size="10" fill="#1e40af" font-family="sans-serif" font-weight="bold">Near Field</text>
+            <text x="166" y="90" text-anchor="middle" font-size="8.5" fill="#1e40af" font-family="sans-serif">irregular amplitude</text>
+            <text x="166" y="148" text-anchor="middle" font-size="8.5" fill="#64748b" font-family="monospace">N = D²f / 4c</text>
+            <!-- N boundary -->
+            <line x1="290" y1="38" x2="290" y2="130" stroke="#475569" stroke-width="1.8" stroke-dasharray="5,4"/>
+            <text x="290" y="33" text-anchor="middle" font-size="12" fill="#475569" font-family="serif" font-style="italic">N</text>
+            <!-- Far-field fill polygon -->
+            <polygon points="290,56 290,112 538,154 538,14" fill="#dcfce7" opacity="0.45"/>
+            <!-- Far-field edges -->
+            <line x1="290" y1="56" x2="538" y2="14" stroke="#059669" stroke-width="2"/>
+            <line x1="290" y1="112" x2="538" y2="154" stroke="#059669" stroke-width="2"/>
+            <!-- θ half-angle arc -->
+            <path d="M 316,84 A 26,26 0 0,0 308,62" fill="none" stroke="#b45309" stroke-width="1.5"/>
+            <text x="330" y="73" font-size="10" fill="#b45309" font-family="serif" font-style="italic">θ</text>
+            <!-- Far-field labels -->
+            <text x="415" y="76" text-anchor="middle" font-size="10" fill="#065f46" font-family="sans-serif" font-weight="bold">Far Field</text>
+            <text x="415" y="90" text-anchor="middle" font-size="8.5" fill="#065f46" font-family="sans-serif">smooth divergence</text>
+            <text x="415" y="14" text-anchor="middle" font-size="8.5" fill="#64748b" font-family="monospace">sin θ ≈ 0.514λ/D  (−6 dB)</text>
+          </svg>
+
+          <div class="callout">
+            <strong>Worked example — 5 MHz, 12.7 mm probe in steel (c<sub>L</sub> = 5&thinsp;900 m/s):</strong>
+            &lambda; = 5&thinsp;900 / 5&thinsp;&times;&thinsp;10<sup>6</sup> = 1.18 mm
+            &ensp;&bull;&ensp;
+            N = (12.7)<sup>2</sup> / (4&thinsp;&times;&thinsp;1.18) &asymp; <strong>34 mm</strong>.
+            Inspecting a 20 mm thick weld means the back-wall echo arrives at &sim;0.59&thinsp;N —
+            deep in the near field. Echo amplitude can vary &gt;6 dB with lateral position without
+            any reflector change, making amplitude-based DAC unreliable. Remedies: focus the probe
+            at mid-thickness (immersion or delay-line lens), reduce diameter, or lower frequency to
+            push <em>N</em> below the part thickness.
+          </div>
+
+          <h3>Far-Field Divergence</h3>
+          <p>
+            Beyond <em>N</em>, beam pressure decays as 1/<em>r</em> and the &minus;6 dB beam
+            edge expands at a fixed half-angle determined by aperture and wavelength:
+          </p>
           <div class="eq-box">$$\sin\!\left(\theta_{1/2}\right) \approx \frac{0.514\,\lambda}{D} \quad (-6\,\text{dB half-angle}) \qquad \sin\theta \approx \frac{1.2\,\lambda}{D} \quad (\text{Rayleigh criterion})$$</div>
+          <p>
+            A larger aperture <em>D</em> narrows the far-field cone but pushes <em>N</em> deeper —
+            there is no free parameter that simultaneously minimises near-field length and far-field
+            spread. Frequency is the only independent lever: increasing <em>f</em> shrinks &lambda;,
+            tightening both near-field axial resolution and far-field divergence at the cost of
+            higher attenuation.
+          </p>
 
           <h3>Focused Transducers</h3>
+          <p>
+            A spherically curved element or acoustic lens concentrates energy at geometric focal
+            depth <em>F</em>, yielding a diffraction-limited lateral spot:
+          </p>
           <div class="eq-box">$$d_{\text{spot}} \approx \frac{1.02\,\lambda F}{D} = \frac{1.02\,F}{f\text{-number}}$$</div>
           <div class="callout">
-            <strong>Design trade-off:</strong> Tighter focus (smaller f-number) &rarr; better lateral resolution, but shorter depth of field. For thick parts, an unfocused or weakly focused beam may be preferred.
+            <strong>Design trade-off:</strong> A tighter focus (smaller f-number) improves lateral
+            resolution but compresses the depth of field to &sim;&plusmn;(<em>d</em><sub>spot</sub>)<sup>2</sup>/&lambda;.
+            For thick welds (&gt;50 mm) an unfocused or weakly focused beam maintains sensitivity
+            throughout the volume; for thin composites or additively manufactured parts with fine
+            porosity, a focus at mid-thickness maximises lateral resolution where it matters most.
           </div>
         </div>
 
