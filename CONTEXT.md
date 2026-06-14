@@ -12,14 +12,15 @@ GitHub Pages: `https://adepuharshith.github.io/ultrasound-ndt-toolkit/`
 
 ## File map
 ```
-index.html          Landing page — hero, pathway strip, 3 section cards
-theory.html         Full theory guide — 9-step student flow + 10 advanced topics
-transducers.html    Transducer types page — piezo, anatomy, 7 transducer types
-calculators.html    10 live calculators — single-column, input-left + canvas-right
-resources.html      Filterable resource library (type buttons + search input)
-assets/css/style.css  Global tokens, nav, hero, cards, calc components
-assets/js/main.js     All calculator logic + canvas animations
-CONTEXT.md          ← this file
+index.html               Landing page — hero, pathway strip, 3 section cards
+theory.html              Full theory guide — 9-step student flow + 10 advanced topics
+transducers.html         Transducer types page — piezo, anatomy, 7 transducer types
+calculators.html         10 live calculators — single-column, input-left + canvas-right
+signal-processing.html   Signal processing deep-dive — xcorr, wavelet, spectrogram, Hilbert
+resources.html           Filterable resource library (type buttons + search input)
+assets/css/style.css     Global tokens, nav, hero, cards, calc components
+assets/js/main.js        All calculator logic + canvas animations
+CONTEXT.md               ← this file
 ```
 
 ---
@@ -110,12 +111,79 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 - Weld Inspection (`#weld-inspection`) — 2-stage approach, defect table, stainless note
 
 ### Canvas animations in theory.html (inline `<script>` at bottom)
-- `#long-canvas` — longitudinal wave, light background
+- `#long-canvas` — longitudinal wave, white background
 - `#em-canvas` — 3D EM wave (E/B fields, pseudo-3D oblique projection)
 - `#rect-canvas` 680×260 — 4-panel rectification modes (RF, +HW, -HW, Full wave)
+- `#utp-right` — live A-scan (IP / Flaw Echo / BW echoes); **white bg**; echoes drawn with `drawPulse()`
+- `#mp-speed-canvas` — speed-in-media animation (FW/BW pulses + Δt sweep); **white bg**; uses `drawPulse()`
+- `#mp-atten-canvas` — attenuation decay animation; **white bg**; uses `drawPulse()`
+- `#mp-scatter-right` — backscatter display (FW/BW echoes + 38 random grain noise spikes); **white bg**; echoes use `drawPulse_rc()`, grain spikes intentionally remain as short vertical lines (physically represent incoherent noise)
+
+#### `drawPulse(cx, h, col)` helper (added to each IIFE)
+```javascript
+// 3-cycle Gaussian-windowed |cos| burst — canonical ultrasound pulse shape
+function drawPulse(cx, h, col) {
+  var sig = 10, period = 7;
+  ctx.strokeStyle = col; ctx.lineWidth = 2.2; ctx.beginPath();
+  for (var x = cx - 35; x <= cx + 35; x++) {
+    var d = x - cx;
+    var env = Math.exp(-(d*d) / (2*sig*sig));
+    var y = BL - h * env * Math.abs(Math.cos(2*Math.PI*d / period));
+    if (x === cx - 35) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+// sig=10px controls envelope width; period=7px gives ~3 cycles across ±35px window
+// Peak is at x=cx (cos(0)=1); secondary peaks at ±7px; tertiary at ±14px
+```
+
+#### Static SVGs updated in theory.html
+- `#a-scan` SVG — spike triangles replaced with 65-point computed polylines for IP (cx=262,A=70), Flaw (cx=374,A=48), BW (cx=503,A=72); panel fill `#0d1b2a` → `#f8fafc`
+- `#b-scan` SVG — image panel `#0d1b2a` → `#f0f9ff`; surface lines `#22d3ee` → `#0891b2`
+- `#c-scan` SVG — image panel `#0d1b2a` → `#f8fafc`
+- Snell's law SVG — water region `#0a1628` → `#dbeafe`; steel `#0f1e35` → `#e2e8f0`; arrows/labels darkened for light-bg readability
+- Phased array SVG — background `#0a1628` → `#f1f5f9`; test piece `#0f1e35` → `#e2e8f0`; element gradient updated
 
 ### KaTeX
 All 13 `eq-box` elements use `$$...$$` KaTeX syntax. CDN loaded in `<head>` with auto-render.
+
+---
+
+---
+
+## signal-processing.html — structure & canvases
+
+All canvases use **white backgrounds** (`#ffffff`). CSS class `.canvas-box` controls wrapper background.
+
+### Sections
+- Hilbert envelope — static SVG showing RF signal + envelope overlay
+- Cross-correlation (`xcorr`) — two stacked canvases: `drawSignal()` (noisy + clean traces) and `drawCorr()` (correlation curve + ToF peak)
+- Wavelet analysis — two stacked canvases: `drawTimeDomain()` and `drawFFT()` (frequency bars)
+- Spectrogram — `drawSpectrogram()` canvas using `heatColor()` colormap
+
+### `heatColor(v)` — spectrogram colormap (white-background version)
+```javascript
+// v=0 → white (no signal); v=0.2 → light yellow; v=0.45 → orange; v=0.7 → red; v=1 → dark maroon
+function heatColor(v){
+  if(v<0.20){const t=v/0.20;      return[255,lerp(255,240,t),lerp(255,220,t)];}
+  if(v<0.45){const t=(v-0.20)/0.25;return[255,lerp(240,180,t),lerp(220,0,t)];}
+  if(v<0.70){const t=(v-0.45)/0.25;return[lerp(255,210,t),lerp(180,0,t),0];}
+  const t=(v-0.70)/0.30; return[lerp(210,80,t),0,lerp(0,40,t)];
+}
+```
+
+### Key color palette (signal-processing.html)
+| Role | Color |
+|---|---|
+| Canvas background | `#ffffff` |
+| Grid lines | `#e2e8f0` |
+| Primary signal / RF | `#0891b2` |
+| Noisy signal | `#b0c4d8` |
+| Envelope / attenuation | `#ea580c` |
+| Correlation curve | `#059669` |
+| Peak marker / Δt | `#d97706` |
+| Axis labels | `#334155` |
+| Spectrogram label overlays | `rgba(51,65,85,0.9)` |
 
 ---
 
@@ -133,13 +201,14 @@ attribute (`textbook | paper | software | standard | online`) and search query a
 
 ---
 
-## Git log (recent — as of 2026-06-05)
+## Git log (recent — as of 2026-06-13)
 ```
-Expand Acoustic Impedance section: interface SVG, Z table for 7 NDE materials, immersion-Al worked example, phase-inversion callout
+723a120  White backgrounds + 3-cycle Gaussian pulses site-wide (theory.html + signal-processing.html)
+         (all dark canvas/SVG backgrounds → #ffffff; all spike lines → drawPulse() Gaussian bursts)
+(prev)   Expand Acoustic Impedance section: interface SVG, Z table for 7 NDE materials, immersion-Al worked example, phase-inversion callout
 1525046  Expand Phased Arrays section: delay-law SVG, FMC/TFM math, AM inspection example, key params table
 5d3ee12  Overhaul theory: KaTeX equations, 3D EM wave, light animations, Transducers nav
 b8c35c1  Expand Signal Processing section
-7d5fbb9  Expand Snell's Law section: SVG mode-conversion diagram
 5be75da  Restructure theory page with 9-step student flow; add transducers page
 ```
 
