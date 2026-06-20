@@ -201,8 +201,11 @@ attribute (`textbook | paper | software | standard | online`) and search query a
 
 ---
 
-## Git log (recent — as of 2026-06-13)
+## Git log (recent — as of 2026-06-20)
 ```
+(latest) Restore Phased Arrays section (#phased-arrays): delay-law SVG, S-scan geometry, FMC/TFM
+         coherent-summation math, multi-mode TFM NDE example for LPBF IN718, grating-lobe callout,
+         comparison table (Conventional UT / PA S-scan / FMC-TFM)
 723a120  White backgrounds + 3-cycle Gaussian pulses site-wide (theory.html + signal-processing.html)
          (all dark canvas/SVG backgrounds → #ffffff; all spike lines → drawPulse() Gaussian bursts)
 (prev)   Expand Acoustic Impedance section: interface SVG, Z table for 7 NDE materials, immersion-Al worked example, phase-inversion callout

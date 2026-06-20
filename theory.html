@@ -1147,9 +1147,9 @@
 
           <p>
             A <strong>C-scan</strong> (Plan view scan) produces a <strong>top-down 2D map</strong> of the
-            part. The transducer is raster-scanned in X and Y, and a gated amplitude (or time-of-flight)
-            value is recorded at each position. The result looks like an aerial photograph of the
-            internal structure.
+            part. The transducer is raster-scanned in X&ndash;Y, and at each position a single scalar value
+            extracted from the A-scan within a user-defined <em>depth gate</em> is recorded as one pixel.
+            The result is a spatially registered image of the internal structure projected onto the scan plane.
           </p>
 
           <div class="scan-svg-wrap">
@@ -1178,7 +1178,6 @@
 
               <!-- Right: C-scan color map -->
               <rect x="330" y="18" width="230" height="162" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
-              <!-- Background (no-defect — dark) -->
               <!-- Defect region — bright color patch -->
               <ellipse cx="430" cy="100" rx="45" ry="30" fill="#ef4444" opacity=".7"/>
               <ellipse cx="430" cy="100" rx="28" ry="18" fill="#fbbf24" opacity=".8"/>
@@ -1201,25 +1200,184 @@
             </svg>
           </div>
 
+          <h3>Depth Gating — How One Pixel Is Formed</h3>
           <p>
-            The color (or grayscale) at each pixel represents either:
+            The <em>gate</em> is a time window set on the A-scan. Only echoes arriving within the gate
+            contribute to the C-scan pixel. This depth selectivity is the key distinction from a simple
+            reflectivity map: placing the gate at a specific depth range lets the operator image one layer
+            at a time while suppressing reflectors above and below it.
+          </p>
+
+          <!-- A-scan gating diagram -->
+          <div class="scan-svg-wrap" style="background:#f8fafc; padding:0.5rem 0;">
+            <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif" font-size="10">
+
+              <!-- LEFT PANEL: A-scan with gate -->
+              <text x="160" y="15" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">A-scan at one X&ndash;Y position</text>
+              <rect x="20" y="22" width="280" height="158" rx="4" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+
+              <!-- Gate fill -->
+              <rect x="105" y="22" width="100" height="158" fill="#fef9c3" opacity="0.85"/>
+              <line x1="105" y1="22" x2="105" y2="180" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+              <line x1="205" y1="22" x2="205" y2="180" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+              <text x="155" y="35" text-anchor="middle" fill="#b45309" font-size="8.5" font-weight="700">DEPTH GATE</text>
+              <text x="155" y="47" text-anchor="middle" fill="#b45309" font-size="8">(d&#x2081; to d&#x2082;)</text>
+
+              <!-- Baseline -->
+              <line x1="20" y1="130" x2="300" y2="130" stroke="#94a3b8" stroke-width="0.8"/>
+
+              <!-- Front-wall echo (outside gate, left) -->
+              <line x1="50" y1="130" x2="50" y2="62" stroke="#0891b2" stroke-width="2"/>
+              <polygon points="50,57 45,70 55,70" fill="#0891b2"/>
+              <text x="50" y="50" text-anchor="middle" fill="#0891b2" font-size="8.5" font-weight="700">FW</text>
+
+              <!-- Flaw echo inside gate -->
+              <line x1="155" y1="130" x2="155" y2="82" stroke="#dc2626" stroke-width="2.2"/>
+              <polygon points="155,77 150,90 160,90" fill="#dc2626"/>
+              <text x="155" y="71" text-anchor="middle" fill="#dc2626" font-size="8.5" font-weight="700">Flaw</text>
+              <line x1="162" y1="82" x2="195" y2="68" stroke="#dc2626" stroke-width="0.8" stroke-dasharray="3,2"/>
+              <text x="197" y="65" fill="#dc2626" font-size="8">peak A = 68% FSH</text>
+              <text x="197" y="76" fill="#dc2626" font-size="8">&#x2192; pixel value</text>
+
+              <!-- Back-wall echo (outside gate, right) -->
+              <line x1="260" y1="130" x2="260" y2="56" stroke="#0891b2" stroke-width="2"/>
+              <polygon points="260,51 255,64 265,64" fill="#0891b2"/>
+              <text x="260" y="47" text-anchor="middle" fill="#0891b2" font-size="8.5" font-weight="700">BW</text>
+
+              <text x="160" y="195" text-anchor="middle" fill="#64748b" font-size="9">Time-of-flight (&#x221d; depth)</text>
+              <text x="10" y="106" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(-90,10,106)">Amp.</text>
+              <text x="105" y="176" text-anchor="middle" fill="#b45309" font-size="8">d&#x2081;</text>
+              <text x="205" y="176" text-anchor="middle" fill="#b45309" font-size="8">d&#x2082;</text>
+
+              <!-- Arrow to right panel -->
+              <defs>
+                <marker id="px-arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                  <polygon points="0 0, 7 3.5, 0 7" fill="#334155"/>
+                </marker>
+              </defs>
+              <path d="M 310 101 L 355 101" stroke="#334155" stroke-width="1.8" marker-end="url(#px-arr)"/>
+              <text x="332" y="94"  text-anchor="middle" fill="#64748b" font-size="8.5">gate</text>
+              <text x="332" y="106" text-anchor="middle" fill="#64748b" font-size="8.5">peak</text>
+
+              <!-- RIGHT PANEL: C-scan map -->
+              <text x="500" y="15" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">C-scan map (X&ndash;Y plane)</text>
+              <rect x="365" y="22" width="260" height="158" rx="4" fill="#f0f9ff" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="365" y="22" width="260" height="158" fill="#dbeafe" opacity="0.3" rx="4"/>
+              <ellipse cx="480" cy="101" rx="55" ry="38" fill="#fbbf24" opacity="0.55"/>
+              <ellipse cx="475" cy="97"  rx="30" ry="20" fill="#ef4444" opacity="0.65"/>
+              <ellipse cx="478" cy="99"  rx="12" ry="8"  fill="#dc2626" opacity="0.9"/>
+
+              <!-- Active pixel -->
+              <rect x="497" y="106" width="8" height="8" fill="#dc2626" stroke="#fff" stroke-width="1.2" rx="1"/>
+              <line x1="505" y1="110" x2="530" y2="110" stroke="#dc2626" stroke-width="0.8" stroke-dasharray="3,2"/>
+              <text x="532" y="114" fill="#dc2626" font-size="8">68% FSH</text>
+
+              <!-- Colorbar -->
+              <defs>
+                <linearGradient id="cbar2" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%"   stop-color="#dc2626"/>
+                  <stop offset="50%"  stop-color="#fbbf24"/>
+                  <stop offset="100%" stop-color="#dbeafe"/>
+                </linearGradient>
+              </defs>
+              <rect x="618" y="30" width="8" height="128" fill="url(#cbar2)" rx="2"/>
+              <text x="629" y="34"  fill="#475569" font-size="7.5">100%</text>
+              <text x="629" y="97"  fill="#475569" font-size="7.5">50%</text>
+              <text x="629" y="161" fill="#475569" font-size="7.5">0%</text>
+
+              <text x="495" y="193" text-anchor="middle" fill="#64748b" font-size="9">X position (mm)</text>
+              <text x="358" y="101" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(-90,358,101)">Y</text>
+            </svg>
+          </div>
+
+          <p>
+            Two distinct C-scan modes extract different information from the gated A-scan:
           </p>
           <ul>
-            <li><strong>Gated amplitude:</strong> Peak amplitude within a depth gate — bright means strong reflection (likely a flaw or delamination).</li>
-            <li><strong>Time-of-flight (TOF):</strong> The depth of the first reflector within the gate — used for thickness mapping and contour following.</li>
+            <li>
+              <strong>Amplitude C-scan:</strong> Records the peak (or integrated) rectified amplitude within the gate.
+              A delamination or void produces a strong reflection appearing as a high-amplitude region.
+              Amplitude drop relative to a reference block enables sizing by the &minus;6&nbsp;dB or
+              &minus;14&nbsp;dB method.
+            </li>
+            <li>
+              <strong>Time-of-flight (TOF) C-scan:</strong> Records the arrival time of the first echo
+              exceeding a threshold within the gate. Converted to depth via \(d = ct/2\), this produces
+              a continuous thickness or contour map. TOF C-scans are standard for corrosion mapping and
+              thickness verification on curved geometry.
+            </li>
           </ul>
+
+          <h3>Scan Resolution and Lateral Resolution Limits</h3>
           <p>
-            C-scans are widely used for <strong>composite inspection</strong> (delamination, impact damage),
-            <strong>corrosion mapping</strong>, and production-line quality control.
-            They require automated data acquisition — typically computer-controlled immersion scanning or
-            a squirter system.
+            C-scan image fidelity is governed by two independent factors.
+            The <strong>scan step</strong> (&Delta;x, &Delta;y) is the mechanical indexing pitch — analogous
+            to pixel pitch in digital imaging. Nyquist-equivalent spatial sampling requires
+            &Delta;x &le; d<sub>spot</sub>/2, where
+            \(d_\text{spot} \approx 1.02\,\lambda F/D\) is the &minus;6&nbsp;dB focal spot diameter.
+            Undersampling misses flaws smaller than the step pitch even if the beam could resolve them.
+          </p>
+          <p>
+            The <strong>beam lateral resolution</strong> is the hard physical limit: two adjacent
+            reflectors separated by less than d<sub>spot</sub> cannot be distinguished regardless of
+            step size. In the far field of an unfocused transducer, lateral resolution degrades linearly
+            with depth, making focused immersion setups necessary for thin-section or high-resolution work.
+          </p>
+
+          <h3>NDE Example — Immersion C-scan of an L-PBF Ti-6Al-4V Coupon</h3>
+          <p>
+            Laser powder-bed fusion (L-PBF) parts contain sub-surface porosity and lack-of-fusion voids
+            whose spatial distribution governs fatigue life. A representative immersion C-scan protocol
+            for a 10 &times; 10 &times; 5&nbsp;mm coupon:
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Parameter</th><th>Value</th><th>Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Transducer</strong></td>
+                <td>25 MHz, 6 mm diam., F&nbsp;=&nbsp;25 mm (f/4)</td>
+                <td>&lambda; = 6320 / 25&times;10&#x2076; &asymp; 0.25 mm in Ti; d<sub>spot</sub> &asymp; 1.07 mm at focus</td>
+              </tr>
+              <tr>
+                <td><strong>Scan step</strong></td>
+                <td>0.1 mm &times; 0.1 mm</td>
+                <td>Well below d<sub>spot</sub>/2 &asymp; 0.54 mm; oversampled for lateral position accuracy</td>
+              </tr>
+              <tr>
+                <td><strong>Gate</strong></td>
+                <td>0.3 – 4.7 mm depth</td>
+                <td>Excludes the front-wall dead zone (&lt;0.3 mm) and back-wall reflection (&gt;4.7 mm)</td>
+              </tr>
+              <tr>
+                <td><strong>C-scan mode</strong></td>
+                <td>Amplitude + TOF (dual output)</td>
+                <td>Amplitude locates voids; TOF estimates void depth and part-thickness deviation</td>
+              </tr>
+              <tr>
+                <td><strong>Min. detectable void</strong></td>
+                <td>&sim;0.1 mm (from SDH reference at 3 mm depth)</td>
+                <td>25 MHz gives &lambda;/2 &asymp; 0.13 mm axial; lateral mapping resolution limited to &sim;1 mm by spot size</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Voids appear as amplitude drops in through-transmission or amplitude peaks in pulse-echo.
+            Through-transmission eliminates the front-wall dead zone but discards all depth information;
+            pulse-echo retains TOF depth at the cost of a near-surface blind region equal to
+            approximately one pulse length (&sim;&lambda;/2 per cycle in the burst).
           </p>
 
           <div class="callout">
             <strong>Summary of the three scanning methods:</strong><br/>
             <strong>A-scan</strong> = what echoes exist at this one spot (amplitude vs. time). &nbsp;
             <strong>B-scan</strong> = how deep is the flaw along a line (cross-section view). &nbsp;
-            <strong>C-scan</strong> = where is the flaw across the whole surface (map view).
+            <strong>C-scan</strong> = where is the flaw across the whole surface (map view). &nbsp;
+            A C-scan is a stack of gated A-scans reduced to one scalar per pixel; the gate definition
+            is the operator&rsquo;s primary tool for targeting a specific depth layer.
           </div>
         </div>
 
@@ -1813,6 +1971,228 @@
             interrogate the near-surface, mid-thickness (back wall), and near-far-surface regions
             respectively — critical for full volumetric weld coverage per ASME and AWS D1.1.
           </p>
+        </div>
+
+        <!-- Phased Arrays -->
+        <div class="theory-section" id="phased-arrays">
+          <h2>&#128267; Phased Arrays &amp; Advanced Imaging</h2>
+          <p>
+            A phased array transducer replaces a single piezoelectric element with a linear (or matrix)
+            array of small elements — typically 16 to 128 — each fired with an independently programmed
+            time delay. By controlling those delays, a single probe can steer the beam to any angle,
+            focus at any depth, and reconstruct a full cross-sectional image without moving the probe.
+            This is electronic scanning rather than mechanical scanning.
+          </p>
+
+          <h3>Delay-Law Beam Steering</h3>
+          <p>
+            For a linear array with element pitch <em>p</em> (centre-to-centre spacing), the delay
+            applied to the <em>n</em>-th element to steer the beam to angle &theta; is:
+          </p>
+          <div class="eq-box">$$\tau_n = \frac{(n-1)\,p\,\sin\theta}{c}$$</div>
+          <p>
+            Element 1 fires first; each successive element fires later by an increment
+            <em>p</em>&thinsp;sin&theta;&thinsp;/<em>c</em>. The wavefronts from all elements
+            constructively interfere along the chosen steering direction, forming a coherent beam
+            at angle &theta;. Applying a parabolic delay profile on top of the steering ramp
+            simultaneously focuses the beam at depth <em>F</em>:
+          </p>
+          <div class="eq-box">$$\tau_n^{\text{focus}} = \frac{1}{c}\!\left(F - \sqrt{F^2 + \left[(n - \tfrac{N+1}{2})\,p\right]^2}\right)$$</div>
+
+          <!-- Phased array delay-law SVG -->
+          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);">
+            <svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif" font-size="10">
+              <defs>
+                <marker id="pa-arr-b" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#0891b2"/></marker>
+              </defs>
+
+              <!-- Test piece -->
+              <rect x="60" y="155" width="500" height="110" fill="#e2e8f0" rx="4"/>
+              <text x="310" y="283" text-anchor="middle" fill="#64748b" font-size="9">Test piece</text>
+
+              <!-- Couplant layer -->
+              <rect x="60" y="82" width="500" height="73" fill="#dbeafe" opacity="0.6" rx="2"/>
+              <text x="74" y="73" fill="#1e40af" font-size="9" font-weight="700">Water path / gel couplant</text>
+
+              <!-- 10 array elements at y=70, pitch=28px, centred at x=313 -->
+              <rect x="183" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="211" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="239" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="267" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="295" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="323" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="351" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="379" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="407" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+              <rect x="435" y="60" width="20" height="14" rx="2" fill="#0f2d5e"/>
+
+              <!-- Element index labels -->
+              <text x="193" y="56" text-anchor="middle" fill="#475569" font-size="8">1</text>
+              <text x="449" y="56" text-anchor="middle" fill="#475569" font-size="8">10</text>
+
+              <!-- Staggered delay bars above elements (τ₁=0 shortest, τ₁₀ longest) -->
+              <rect x="188" y="57" width="10" height="0"  fill="#0891b2" opacity="0.75"/>
+              <rect x="216" y="55" width="10" height="2"  fill="#0891b2" opacity="0.75"/>
+              <rect x="244" y="53" width="10" height="4"  fill="#0891b2" opacity="0.75"/>
+              <rect x="272" y="51" width="10" height="6"  fill="#0891b2" opacity="0.75"/>
+              <rect x="300" y="49" width="10" height="8"  fill="#0891b2" opacity="0.75"/>
+              <rect x="328" y="47" width="10" height="10" fill="#0891b2" opacity="0.75"/>
+              <rect x="356" y="45" width="10" height="12" fill="#0891b2" opacity="0.75"/>
+              <rect x="384" y="43" width="10" height="14" fill="#0891b2" opacity="0.75"/>
+              <rect x="412" y="41" width="10" height="16" fill="#0891b2" opacity="0.75"/>
+              <rect x="440" y="39" width="10" height="18" fill="#0891b2" opacity="0.75"/>
+
+              <text x="313" y="32" text-anchor="middle" fill="#0891b2" font-size="9" font-weight="700">← τ₁ (fires first) ··· τ₁₀ (fires last) — steers beam right →</text>
+
+              <!-- Beam envelope from outer elements converging at focal spot (370, 222) -->
+              <line x1="193" y1="74" x2="370" y2="222" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.6"/>
+              <line x1="445" y1="74" x2="370" y2="222" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.6"/>
+              <!-- Central beam ray from array centroid (313,74) to focus -->
+              <line x1="313" y1="74" x2="368" y2="220" stroke="#0891b2" stroke-width="2.4" marker-end="url(#pa-arr-b)"/>
+
+              <!-- Normal line at array centroid for θ reference -->
+              <line x1="313" y1="74" x2="313" y2="148" stroke="#475569" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- θ arc -->
+              <path d="M 313 108 A 34 34 0 0 1 330 100" fill="none" stroke="#b45309" stroke-width="1.4"/>
+              <text x="340" y="103" fill="#b45309" font-size="10" font-style="italic">θ = 30°</text>
+
+              <!-- Focal spot -->
+              <circle cx="370" cy="222" r="6" fill="#dc2626" opacity="0.9"/>
+              <text x="382" y="220" fill="#dc2626" font-size="9" font-weight="700">Focal spot</text>
+
+              <!-- S-scan coverage: faint rays at 0°, 15°, 45° from array centroid -->
+              <line x1="313" y1="74" x2="313" y2="240" stroke="#7c3aed" stroke-width="1" opacity="0.30" stroke-dasharray="3,4"/>
+              <line x1="313" y1="74" x2="333" y2="240" stroke="#7c3aed" stroke-width="1" opacity="0.30" stroke-dasharray="3,4"/>
+              <line x1="313" y1="74" x2="460" y2="240" stroke="#7c3aed" stroke-width="1" opacity="0.30" stroke-dasharray="3,4"/>
+              <!-- S-scan arc -->
+              <path d="M 313 247 A 173 173 0 0 1 460 247" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.55"/>
+              <text x="386" y="265" text-anchor="middle" fill="#7c3aed" font-size="9" font-weight="600">S-scan coverage sector (electronically swept)</text>
+
+              <!-- Depth marker T on right -->
+              <line x1="578" y1="155" x2="578" y2="265" stroke="#64748b" stroke-width="1"/>
+              <line x1="572" y1="155" x2="584" y2="155" stroke="#64748b" stroke-width="1"/>
+              <line x1="572" y1="265" x2="584" y2="265" stroke="#64748b" stroke-width="1"/>
+              <text x="592" y="213" fill="#334155" font-size="10" font-weight="700">T</text>
+
+              <!-- Legend -->
+              <line x1="70" y1="293" x2="95" y2="293" stroke="#0891b2" stroke-width="2.2"/>
+              <text x="98"  y="296" fill="#0891b2" font-size="9">Active beam (30°, focused)</text>
+              <line x1="245" y1="293" x2="270" y2="293" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2"/>
+              <text x="273" y="296" fill="#7c3aed" font-size="9">Other S-scan angles</text>
+              <circle cx="420" cy="293" r="5" fill="#dc2626"/>
+              <text x="428" y="296" fill="#dc2626" font-size="9">Focal spot / indication</text>
+            </svg>
+          </div>
+          <p style="font-size:0.82rem;color:#64748b;margin-top:0.3rem;">
+            Ten-element array with staggered transmit delays (blue bars, proportional to &tau;<sub>n</sub>) steering a
+            focused beam to 30°. Purple dashed rays represent the full S-scan sector swept electronically
+            without moving the probe.
+          </p>
+
+          <h3>Sectorial Scan (S-scan)</h3>
+          <p>
+            In an S-scan, the delay law is updated in real time to sweep the beam through a preset
+            angular range — typically 40° to 70° for shear-wave weld inspection — while simultaneously
+            adjusting the focus depth at each angle. Each angular position yields one A-scan; stacking
+            them produces a cross-sectional image where steering angle maps to lateral position and
+            time-of-flight to depth. A single probe placed beside the weld delivers the full volumetric
+            image that conventional UT would require three separate angle-wedge setups to achieve.
+          </p>
+
+          <h3>Full Matrix Capture &amp; Total Focusing Method (FMC/TFM)</h3>
+          <p>
+            FMC is an acquisition mode in which every transmit–receive pair is recorded independently:
+            element 1 transmits while all N elements receive; then element 2 transmits; and so on.
+            For an N-element array, FMC yields N² A-scans. TFM then reconstructs an image by coherent
+            delay-and-sum over every pixel (x,&thinsp;z):
+          </p>
+          <div class="eq-box">$$I(x,z) = \left|\sum_{t=1}^{N}\sum_{r=1}^{N} s_{tr}\!\left(\frac{\sqrt{(x-x_t)^2+z^2}+\sqrt{(x-x_r)^2+z^2}}{c}\right)\right|^2$$</div>
+          <p>
+            Because each pixel is reconstructed with its own exact delay law, TFM achieves
+            diffraction-limited focusing uniformly across the image — not only at the single depth
+            a conventional focused probe can target. The N² summation also suppresses incoherent
+            grain noise by approximately &radic;N² = N relative to a coherent flaw signal,
+            improving SNR by ~20 log<sub>10</sub>(N) dB; for N = 64 that is 36 dB.
+            The computational cost is substantial — a 64-element, 10 MHz array over a
+            50&times;50 mm image at 0.1 mm pixel pitch requires O(10<sup>9</sup>)
+            multiply-accumulate operations per frame, typically handled by GPU or FPGA.
+          </p>
+
+          <h3>NDE Example — Inspection of Metal Additive Manufactured Parts</h3>
+          <p>
+            Laser powder-bed fusion (LPBF) components present a demanding inspection scenario:
+            sub-millimetre lack-of-fusion (LOF) voids and keyhole pores (10–200 &micro;m diameter),
+            columnar grain texture aligned with the build direction, and near-net-shape surfaces.
+            Conventional pulse-echo at 5–10 MHz detects pores &gt; ~0.5 mm in diameter reasonably
+            well, but planar LOF defects oriented parallel to the build layers — the highest-risk
+            flaw type in fatigue-critical components — return amplitudes well below a standard
+            DAC curve because their specular reflection is directed away from the transducer.
+          </p>
+          <p>
+            Multi-mode TFM (LL, LT, TT propagation paths) addresses both limitations. Longitudinal–
+            Longitudinal (LL) mode at near-normal incidence minimises mode-conversion noise from
+            the textured grains; Longitudinal–Transverse (LT) and TT modes illuminate LOF faces
+            at oblique incidence, returning an amplitude that is far less sensitive to defect
+            tilt angle. For an LPBF IN718 coupon (c<sub>L</sub> &asymp; 5&thinsp;700 m/s,
+            &alpha; &asymp; 0.3 dB/mm at 10 MHz), a 64-element, 10 MHz, 0.6 mm-pitch immersion
+            array achieves a focal spot d<sub>spot</sub> = 1.02&lambda;F/D &asymp; 0.35 mm at
+            15 mm depth — resolving individual 250 &micro;m LOF defects invisible to conventional
+            single-element UT. Qualification per ASTM E2700 and ASME Code Case 2541 requires
+            demonstrating detection of 0.8 mm FBH equivalents at T/4, T/2, and 3T/4 across
+            the inspection volume.
+          </p>
+
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Conventional UT</th>
+                <th>PA S-scan</th>
+                <th>FMC/TFM</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Beam steering</strong></td>
+                <td>Mechanical (swap wedge)</td>
+                <td>Electronic (delay law)</td>
+                <td>Post-processing (all angles)</td>
+              </tr>
+              <tr>
+                <td><strong>Focusing</strong></td>
+                <td>Fixed depth (lens)</td>
+                <td>Dynamic per angle</td>
+                <td class="hi">Optimal at every pixel</td>
+              </tr>
+              <tr>
+                <td><strong>Data per position</strong></td>
+                <td>1 A-scan</td>
+                <td>N<sub>angles</sub> A-scans</td>
+                <td>N² A-scans</td>
+              </tr>
+              <tr>
+                <td><strong>Lateral resolution</strong></td>
+                <td>Beam width at one focus</td>
+                <td>Varies with depth</td>
+                <td class="hi">Diffraction-limited everywhere</td>
+              </tr>
+              <tr>
+                <td><strong>Grain-noise suppression</strong></td>
+                <td>Baseline</td>
+                <td>Moderate</td>
+                <td class="hi">+20 log<sub>10</sub>(N) dB</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <strong>Grating lobe criterion:</strong> Element pitch <em>p</em> must satisfy
+            <em>p</em> &le; &lambda;/2 to avoid grating lobes — spurious off-axis beams at
+            angles where element-to-element path differences equal whole wavelengths.
+            For 5 MHz in steel (&lambda; = 1.18 mm), <em>p</em> &le; 0.6 mm.
+            Active aperture D&nbsp;=&nbsp;N&middot;p governs near-field length and far-field
+            divergence identically to a single-element probe of the same diameter.
+          </div>
         </div>
 
         <!-- Calibration & DAC -->
