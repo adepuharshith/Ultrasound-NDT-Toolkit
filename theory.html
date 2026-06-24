@@ -552,9 +552,11 @@
           <h2>Key Differences — Speed, Medium &amp; Energy Loss</h2>
 
           <p>
-            The animations show <em>how</em> the two waves look. Here is what matters for NDE:
-            how fast each wave travels in different materials, what it can pass through,
-            and how much energy it loses along the way.
+            The animations show <em>how</em> the two waves look. Three practical consequences
+            follow from the speed hierarchy: refraction angles at every material interface are
+            fixed by speed ratios (Snell's law); water-path timing in immersion rigs must account
+            for the ~4× speed jump between water and steel; and depth-sizing accuracy is bounded
+            directly by how well the wave speed in the test piece is known.
           </p>
 
           <div class="vs-grid">
@@ -586,6 +588,114 @@
             <div class="vs-cell vs-sound">Attenuates with distance &amp; frequency<br/><small>&alpha; &asymp; 0.5&ndash;2 dB/(mm&middot;MHz) in steel — higher frequency loses energy faster</small></div>
             <div class="vs-cell vs-em">Zero loss in vacuum or transparent media<br/><small>Fully absorbed or reflected at any metal surface — cannot inspect inside metals</small></div>
           </div>
+
+          <!-- Sound speed in NDE-relevant media — horizontal bar chart -->
+          <h3 style="margin-top:1.5rem;">Sound Speed in NDE-Relevant Media</h3>
+
+          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);padding:1.2rem 0.5rem 0.8rem;">
+            <svg viewBox="0 0 560 255" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+
+              <!-- Light vertical grid lines (1 000 m/s steps) -->
+              <!-- Scale: x=140 (0 m/s) → x=530 (7 000 m/s); 390px / 7000 = 0.05571 px per m/s -->
+              <!-- 1000 → 196; 2000 → 251; 3000 → 307; 4000 → 363; 5000 → 418; 6000 → 474 -->
+              <g stroke="#e2e8f0" stroke-width="1">
+                <line x1="196" y1="10" x2="196" y2="222"/>
+                <line x1="251" y1="10" x2="251" y2="222"/>
+                <line x1="307" y1="10" x2="307" y2="222"/>
+                <line x1="363" y1="10" x2="363" y2="222"/>
+                <line x1="418" y1="10" x2="418" y2="222"/>
+                <line x1="474" y1="10" x2="474" y2="222"/>
+              </g>
+
+              <!-- X-axis baseline -->
+              <line x1="140" y1="222" x2="535" y2="222" stroke="#475569" stroke-width="1.8"/>
+
+              <!-- X-axis tick labels -->
+              <text x="140" y="236" text-anchor="middle" fill="#64748b" font-size="9">0</text>
+              <text x="196" y="236" text-anchor="middle" fill="#64748b" font-size="9">1 000</text>
+              <text x="251" y="236" text-anchor="middle" fill="#64748b" font-size="9">2 000</text>
+              <text x="307" y="236" text-anchor="middle" fill="#64748b" font-size="9">3 000</text>
+              <text x="418" y="236" text-anchor="middle" fill="#64748b" font-size="9">5 000</text>
+              <text x="474" y="236" text-anchor="middle" fill="#64748b" font-size="9">6 000</text>
+              <text x="338" y="252" text-anchor="middle" fill="#334155" font-size="11" font-weight="600">Longitudinal wave speed  (m/s)</text>
+
+              <!-- Bar: Air — 343 m/s → 19 px -->
+              <rect x="140" y="18" width="19" height="22" fill="#94a3b8" rx="2"/>
+              <text x="134" y="33" text-anchor="end" fill="#475569" font-size="10.5">Air</text>
+              <text x="163"  y="33" fill="#94a3b8" font-size="9.5">343 m/s</text>
+
+              <!-- Bar: Water — 1 480 m/s → 82 px -->
+              <rect x="140" y="52" width="82" height="22" fill="#0d9488" rx="2"/>
+              <text x="134" y="67" text-anchor="end" fill="#475569" font-size="10.5">Water</text>
+              <text x="226"  y="67" fill="#0d9488" font-size="9.5">1 480 m/s</text>
+
+              <!-- Bar: PMMA / Lucite — 2 730 m/s → 152 px -->
+              <rect x="140" y="86" width="152" height="22" fill="#0891b2" rx="2"/>
+              <text x="134" y="101" text-anchor="end" fill="#475569" font-size="10.5">PMMA</text>
+              <text x="296"  y="101" fill="#0891b2" font-size="9.5">2 730 m/s  (delay-line wedge)</text>
+
+              <!-- Bar: Steel L-wave — 5 900 m/s → 328 px -->
+              <rect x="140" y="120" width="328" height="22" fill="#1e40af" rx="2"/>
+              <text x="134" y="135" text-anchor="end" fill="#475569" font-size="10.5">Steel (L)</text>
+              <text x="472"  y="135" fill="#1e40af" font-size="9.5">5 900 m/s</text>
+
+              <!-- Bar: Titanium L-wave — 6 100 m/s → 340 px -->
+              <rect x="140" y="154" width="340" height="22" fill="#334155" rx="2"/>
+              <text x="134" y="169" text-anchor="end" fill="#475569" font-size="10.5">Ti (L)</text>
+              <text x="484"  y="169" fill="#334155" font-size="9.5">6 100 m/s</text>
+
+              <!-- Bar: Aluminium L-wave — 6 320 m/s → 352 px -->
+              <rect x="140" y="188" width="352" height="22" fill="#0f2d5e" rx="2"/>
+              <text x="134" y="203" text-anchor="end" fill="#475569" font-size="10.5">Al (L)</text>
+              <text x="496"  y="203" fill="#0f2d5e" font-size="9.5">6 320 m/s</text>
+
+              <!-- Annotation: EM waves blocked label -->
+              <text x="530" y="128" text-anchor="end" fill="#dc2626" font-size="9" font-style="italic">EM blocked</text>
+              <text x="530" y="140" text-anchor="end" fill="#dc2626" font-size="9" font-style="italic">at metal surface</text>
+            </svg>
+          </div>
+          <p style="font-size:0.82rem;color:#64748b;margin-top:0.3rem;">
+            Longitudinal (L-wave) speeds for common NDE couplants and structural metals.
+            EM radiation cannot penetrate metals — its inspection depth is zero.
+          </p>
+
+          <!-- Worked NDE example -->
+          <h3>Worked NDE Example — Immersion Scan TOF Calculation</h3>
+          <p>
+            A 25 mm steel plate (c<sub>L</sub> = 5 900 m/s) is scanned in a water tank
+            with a 10 mm standoff (c<sub>w</sub> = 1 480 m/s). Three echoes appear on the A-scan:
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Echo</th><th>Propagation path</th><th>Arrival time</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Front-wall (FW)</strong></td>
+                <td>2 &times; 10 mm in water</td>
+                <td>2 &times; 10 / 1 480 = <strong>13.5 &micro;s</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Back-wall (BW)</strong></td>
+                <td>Water round-trip + steel round-trip</td>
+                <td>13.5 + 2 &times; 25 / 5 900 = <strong>22.0 &micro;s</strong></td>
+              </tr>
+              <tr>
+                <td><strong>&Delta;T (FW &rarr; BW)</strong></td>
+                <td>Steel round-trip only</td>
+                <td>22.0 &minus; 13.5 = 8.5 &micro;s &rarr; d = 5 900 &times; 8.5&times;10<sup>&minus;6</sup> / 2 = <strong>25.0 mm</strong> &#10003;</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            If c<sub>L</sub> is misassumed as 5 800 m/s — plausible when an alloy grade is
+            unverified — the depth computed from the same 8.5 &micro;s interval is 24.6 mm,
+            an error of 0.4 mm. Scaled to a 100 mm pressure-vessel wall, the same 1.7 % velocity
+            error produces a 1.7 mm depth bias, exceeding the half-wavelength axial resolution
+            of a 5 MHz probe (&lambda;/2 &asymp; 0.6 mm) and invalidating remaining-wall
+            thickness calculations used in fitness-for-service assessments. Velocity must always
+            be verified on a reference block of the same material lot.
+          </p>
 
           <div class="callout">
             <strong>Why sound wins for metal inspection:</strong> EM waves (radio, microwave, visible light)
@@ -960,16 +1070,146 @@
           <h3>The Pulse-Echo Principle</h3>
           <p>
             In most NDE setups, the transducer fires a short burst of ultrasound and then
-            listens for echoes. Reflections return from:
+            listens for echoes. Reflections return from the front surface (initial pulse / entry echo),
+            any internal flaws (defect echo), and the back wall. Time-of-flight is converted to depth
+            via <strong>d = c &times; t / 2</strong> — dividing by 2 because the wave travels the
+            path twice (down and back).
           </p>
-          <ul>
-            <li>The front surface (initial pulse / entry echo)</li>
-            <li>Any internal flaws (defect echo)</li>
-            <li>The back wall of the part (back-wall echo)</li>
-          </ul>
+
+          <h3>Pulse Bandwidth &amp; Axial Resolution</h3>
           <p>
-            The time between sending and receiving each echo, multiplied by the wave speed and
-            divided by 2 (round-trip), gives the <strong>depth</strong> of each reflector.
+            Every transducer is characterised by its centre frequency f<sub>c</sub> and fractional
+            &minus;6 dB bandwidth (BW / f<sub>c</sub>). Because the transmitted burst is finite,
+            pulse duration sets a hard limit on <em>axial</em> (depth) resolution — the minimum
+            separation at which two reflectors produce distinct echoes:
+          </p>
+          <div class="eq-box">$$\delta z \;=\; \frac{c}{2\,\Delta f_{-6\,\text{dB}}} \;\approx\; \frac{c\,\tau_p}{2}$$</div>
+          <p>
+            Wide bandwidth (high backing impedance → short ring-down) gives fine axial resolution.
+            Low damping lets the element ring for many cycles, merging echoes from closely spaced
+            interfaces. The diagram below contrasts the two regimes for two reflectors at identical
+            depth separation:
+          </p>
+
+          <!-- Wideband vs narrowband pulse resolution SVG -->
+          <svg viewBox="0 0 560 215" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif"
+               style="width:100%;max-width:560px;height:auto;display:block;margin:1.2rem auto;"
+               role="img" aria-label="Wideband short pulse resolves two close reflectors; narrowband long pulse merges them">
+            <defs>
+              <marker id="bw-arr-r" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                <polygon points="0 0,7 3.5,0 7" fill="#0891b2"/>
+              </marker>
+              <marker id="bw-arr-l" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto">
+                <polygon points="7 0,0 3.5,7 7" fill="#0891b2"/>
+              </marker>
+            </defs>
+
+            <!-- Background -->
+            <rect width="560" height="215" fill="#f8fafc" rx="8" stroke="#e2e8f0" stroke-width="1.2"/>
+            <!-- Panel divider -->
+            <line x1="280" y1="8" x2="280" y2="207" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+            <!-- ── LEFT PANEL: WIDEBAND ── -->
+            <text x="140" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="#0f2d5e">Wideband (high damping)</text>
+            <text x="140" y="37" text-anchor="middle" font-size="9" fill="#64748b">Short pulse · fine axial resolution</text>
+            <!-- Baseline -->
+            <line x1="15" y1="140" x2="268" y2="140" stroke="#94a3b8" stroke-width="1.2"/>
+            <!-- Reflector tick marks -->
+            <line x1="92"  y1="140" x2="92"  y2="154" stroke="#334155" stroke-width="1.5"/>
+            <line x1="152" y1="140" x2="152" y2="154" stroke="#334155" stroke-width="1.5"/>
+            <!-- Pulse 1: narrow Gaussian bump centred x=92, peak y=68 -->
+            <path d="M 68,140 C 74,140 80,138 84,112 C 88,84 90,68 92,68 C 94,68 96,84 100,112 C 104,138 110,140 116,140"
+                  fill="rgba(8,145,178,0.14)" stroke="#0891b2" stroke-width="2"/>
+            <!-- Pulse 2: narrow Gaussian bump centred x=152, peak y=78 -->
+            <path d="M 128,140 C 134,140 140,138 144,114 C 148,90 150,78 152,78 C 154,78 156,90 160,114 C 164,138 170,140 176,140"
+                  fill="rgba(8,145,178,0.14)" stroke="#0891b2" stroke-width="2"/>
+            <!-- Gap callout -->
+            <text x="122" y="109" text-anchor="middle" font-size="8" fill="#475569">gap</text>
+            <line x1="116" y1="112" x2="128" y2="112" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2,2"/>
+            <!-- δz double-headed arrow -->
+            <line x1="92" y1="160" x2="92"  y2="160" stroke="#0891b2" stroke-width="0"/>
+            <line x1="95" y1="160" x2="149" y2="160"
+                  stroke="#0891b2" stroke-width="1.4"
+                  marker-end="url(#bw-arr-r)" marker-start="url(#bw-arr-l)"/>
+            <text x="122" y="173" text-anchor="middle" font-size="8.5" fill="#0891b2" font-weight="600">δz resolved</text>
+            <!-- Resolved badge -->
+            <rect x="99" y="51" width="62" height="14" rx="3" fill="#dcfce7"/>
+            <text x="130" y="61" text-anchor="middle" font-size="10" fill="#16a34a" font-weight="700">✓ Resolved</text>
+            <!-- Time axis label -->
+            <text x="141" y="204" text-anchor="middle" font-size="9" fill="#64748b">Time of flight →</text>
+
+            <!-- ── RIGHT PANEL: NARROWBAND ── -->
+            <text x="420" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="#7c3aed">Narrowband (low damping)</text>
+            <text x="420" y="37" text-anchor="middle" font-size="9" fill="#64748b">Long ring-down · poor axial resolution</text>
+            <!-- Baseline -->
+            <line x1="291" y1="140" x2="548" y2="140" stroke="#94a3b8" stroke-width="1.2"/>
+            <!-- Same reflector positions shifted +280 -->
+            <line x1="372" y1="140" x2="372" y2="154" stroke="#334155" stroke-width="1.5"/>
+            <line x1="432" y1="140" x2="432" y2="154" stroke="#334155" stroke-width="1.5"/>
+            <!-- Wide pulse 1 centred x=372 (same offset as wideband) -->
+            <path d="M 308,140 C 320,140 336,136 348,110 C 360,84 366,68 372,68 C 378,68 384,84 396,110 C 408,136 424,140 436,140"
+                  fill="rgba(124,58,237,0.09)" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <!-- Wide pulse 2 centred x=432 — overlapping -->
+            <path d="M 368,140 C 380,140 396,136 408,110 C 420,84 426,68 432,68 C 438,68 444,84 456,110 C 468,136 484,140 496,140"
+                  fill="rgba(124,58,237,0.09)" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <!-- Merged envelope (solid line) -->
+            <path d="M 308,140 C 324,140 342,132 356,106 C 368,82 376,65 402,62 C 428,65 436,80 448,104 C 460,128 476,140 496,140"
+                  fill="rgba(124,58,237,0.16)" stroke="#7c3aed" stroke-width="2.2"/>
+            <!-- Cannot resolve badge -->
+            <rect x="368" y="46" width="96" height="14" rx="3" fill="#fee2e2"/>
+            <text x="416" y="56" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="700">✗ Cannot resolve</text>
+            <!-- Same δz annotation (dashed) -->
+            <line x1="375" y1="160" x2="429" y2="160" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="402" y="173" text-anchor="middle" font-size="8.5" fill="#dc2626">same δz — merged</text>
+            <!-- Time axis label -->
+            <text x="420" y="204" text-anchor="middle" font-size="9" fill="#64748b">Time of flight →</text>
+          </svg>
+
+          <div class="callout">
+            <strong>Bandwidth rule of thumb:</strong> A broadband element (&gt;60 % fractional BW,
+            e.g., a 5 MHz probe with &minus;6 dB bandwidth spanning 3–7 MHz) delivers
+            &tau;<sub>p</sub> &lt; 0.5 &micro;s — resolving reflectors separated by &ge; ~1.5 mm in steel.
+            An underdamped element (&lt;20 % BW) can ring for 2–5 &micro;s, merging echoes from
+            reflectors up to 6–15 mm apart. Specify backing impedance and fractional bandwidth explicitly
+            when thin-section or fine-defect axial resolution is the primary inspection requirement.
+          </div>
+
+          <h3>Worked NDE Example — Probe Selection for LPBF Ti-6Al-4V</h3>
+          <p>
+            A laser powder-bed fusion (LPBF) Ti-6Al-4V build, 30 mm thick, must be screened for
+            lack-of-fusion (LoF) voids in the build direction. Target flaw size: 0.1–0.5 mm axial
+            extent. Material properties: c<sub>L</sub> = 6 100 m/s, attenuation
+            &alpha; &asymp; 0.5 dB/(mm&thinsp;&middot;&thinsp;MHz) (columnar prior-&beta; grain structure).
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Parameter</th><th>10 MHz probe</th><th>5 MHz probe</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Wavelength &lambda; = c/f</td><td>0.61 mm</td><td>1.22 mm</td>
+              </tr>
+              <tr>
+                <td>Near field N (D = 6 mm)</td><td>~15 mm</td><td>~7.4 mm</td>
+              </tr>
+              <tr>
+                <td>Two-way attenuation at 30 mm</td><td>~30 dB</td><td>~15 dB</td>
+              </tr>
+              <tr>
+                <td>Min. resolvable flaw size (&sim;&lambda;/2)</td>
+                <td class="hi"><strong>~0.3 mm</strong> ← meets target</td>
+                <td>~0.6 mm — misses &lt;0.5 mm LoF</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            The 10 MHz probe meets the resolution target but accumulates ~30 dB two-way attenuation
+            across the 30 mm build — approaching the dynamic range limit of most pulser-receivers and
+            leaving little margin for a DAC correction. The practical solution is a <strong>10 MHz focused
+            immersion probe</strong> (focal depth F = 20 mm, water-path corrected via WP = F &minus;
+            d&thinsp;&times;&thinsp;c<sub>w</sub>/c<sub>s</sub>) with TCG applied to restore uniform
+            sensitivity across depth. Sensitivity is validated against a reference coupon of the same
+            build orientation containing calibrated 0.5 mm flat-bottom holes at 10, 20, and 30 mm depths.
           </p>
 
           <a href="transducers.html" class="transducer-link-card">
@@ -1132,10 +1372,173 @@
           <p>
             B-scans are excellent for showing <strong>flaw depth</strong> and <strong>through-thickness extent</strong>.
             They are commonly used for corrosion mapping, weld root inspection, and in-service thickness profiling.
+            Each column of the B-scan image is one rectified or envelope-detected A-scan, with the time axis
+            converted to depth and mapped to pixel brightness. A strong echo (high amplitude) produces a bright
+            vertical stripe at that scan position.
+          </p>
+
+          <!-- A-scan → B-scan pixel formation diagram -->
+          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);padding:0.5rem 0;">
+            <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif" font-size="10">
+
+              <!-- Title -->
+              <text x="320" y="14" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">How A-scans are stacked to form a B-scan column</text>
+
+              <!-- ── LEFT: three A-scans at positions x1, x2 (over flaw), x3 ── -->
+              <!-- Shared baseline label -->
+              <text x="5" y="115" fill="#64748b" font-size="8.5" transform="rotate(-90,5,115)">Amplitude</text>
+
+              <!-- A-scan #1 (left of flaw, x=55–125): only FW + BW echoes -->
+              <rect x="40" y="25" width="80" height="150" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="0.8"/>
+              <line x1="40" y1="100" x2="120" y2="100" stroke="#94a3b8" stroke-width="0.7"/>
+              <!-- FW spike -->
+              <line x1="55"  y1="100" x2="55"  y2="52"  stroke="#0891b2" stroke-width="2"/>
+              <polygon points="55,47 50,60 60,60" fill="#0891b2"/>
+              <!-- BW spike -->
+              <line x1="105" y1="100" x2="105" y2="50"  stroke="#0891b2" stroke-width="2"/>
+              <polygon points="105,45 100,58 110,58" fill="#0891b2"/>
+              <text x="80" y="185" text-anchor="middle" fill="#64748b" font-size="8.5">Position x₁</text>
+              <text x="80" y="195" text-anchor="middle" fill="#64748b" font-size="8">(no flaw)</text>
+              <!-- Depth-time axis ticks -->
+              <text x="37" y="53"  text-anchor="end" fill="#0891b2" font-size="7.5">FW</text>
+              <text x="37" y="51"  text-anchor="end" fill="#0891b2" font-size="7.5" dy="10">BW</text>
+
+              <!-- A-scan #2 (over flaw, x=215–285): FW + flaw echo + BW -->
+              <rect x="200" y="25" width="80" height="150" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="0.8"/>
+              <line x1="200" y1="100" x2="280" y2="100" stroke="#94a3b8" stroke-width="0.7"/>
+              <!-- FW spike -->
+              <line x1="215" y1="100" x2="215" y2="52"  stroke="#0891b2" stroke-width="2"/>
+              <polygon points="215,47 210,60 220,60" fill="#0891b2"/>
+              <!-- Flaw echo (red, mid-depth) -->
+              <line x1="248" y1="100" x2="248" y2="65"  stroke="#dc2626" stroke-width="2.2"/>
+              <polygon points="248,60 243,73 253,73" fill="#dc2626"/>
+              <text x="256" y="70" fill="#dc2626" font-size="7.5" font-weight="700">flaw</text>
+              <!-- BW spike (attenuated — partial shadow) -->
+              <line x1="265" y1="100" x2="265" y2="72"  stroke="#0891b2" stroke-width="1.6" opacity="0.55"/>
+              <polygon points="265,67 260,80 270,80" fill="#0891b2" opacity="0.55"/>
+              <text x="240" y="185" text-anchor="middle" fill="#64748b" font-size="8.5">Position x₂</text>
+              <text x="240" y="195" text-anchor="middle" fill="#64748b" font-size="8">(flaw present)</text>
+
+              <!-- A-scan #3 (right of flaw, x=375–445): only FW + BW -->
+              <rect x="360" y="25" width="80" height="150" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="0.8"/>
+              <line x1="360" y1="100" x2="440" y2="100" stroke="#94a3b8" stroke-width="0.7"/>
+              <!-- FW spike -->
+              <line x1="375" y1="100" x2="375" y2="52"  stroke="#0891b2" stroke-width="2"/>
+              <polygon points="375,47 370,60 380,60" fill="#0891b2"/>
+              <!-- BW spike -->
+              <line x1="425" y1="100" x2="425" y2="50"  stroke="#0891b2" stroke-width="2"/>
+              <polygon points="425,45 420,58 430,58" fill="#0891b2"/>
+              <text x="400" y="185" text-anchor="middle" fill="#64748b" font-size="8.5">Position x₃</text>
+              <text x="400" y="195" text-anchor="middle" fill="#64748b" font-size="8">(no flaw)</text>
+
+              <!-- Arrow from A-scans to B-scan -->
+              <defs>
+                <marker id="bs-arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                  <polygon points="0 0, 7 3.5, 0 7" fill="#475569"/>
+                </marker>
+              </defs>
+              <path d="M 455 100 L 502 100" stroke="#475569" stroke-width="2" marker-end="url(#bs-arr)"/>
+              <text x="478" y="93" text-anchor="middle" fill="#64748b" font-size="8.5">stack &amp;</text>
+              <text x="478" y="105" text-anchor="middle" fill="#64748b" font-size="8.5">encode</text>
+
+              <!-- ── RIGHT: resulting B-scan image ── -->
+              <text x="575" y="14" text-anchor="middle" fill="#334155" font-size="9.5" font-weight="700">B-scan</text>
+              <rect x="515" y="25" width="120" height="150" rx="4" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
+              <!-- Front-wall line (bright, full width) -->
+              <rect x="515" y="46" width="120" height="5" fill="#0891b2" opacity="0.85" rx="1"/>
+              <text x="640" y="51" fill="#0891b2" font-size="7.5" dx="2">FW</text>
+              <!-- Flaw pixel column (x2 position only → centre third of image) -->
+              <rect x="555" y="62" width="18" height="22" fill="#dc2626" opacity="0.8" rx="1"/>
+              <text x="564" y="58" text-anchor="middle" fill="#dc2626" font-size="7.5" font-weight="700">flaw</text>
+              <!-- Back-wall line (full width, dimmer where flaw shadows) -->
+              <rect x="515" y="158" width="120" height="4" fill="#0891b2" opacity="0.75" rx="1"/>
+              <!-- Shadow region below flaw (dimmer BW in x2 column) -->
+              <rect x="555" y="158" width="18" height="4" fill="#0891b2" opacity="0.30" rx="1"/>
+              <text x="640" y="162" fill="#0891b2" font-size="7.5" dx="2">BW</text>
+              <!-- Depth axis -->
+              <text x="512" y="51"  text-anchor="end" fill="#64748b" font-size="7.5">0</text>
+              <text x="512" y="163" text-anchor="end" fill="#64748b" font-size="7.5">T</text>
+              <text x="510" y="100" text-anchor="end" fill="#64748b" font-size="7.5" transform="rotate(-90,510,100)">Depth</text>
+              <!-- Scan position axis -->
+              <text x="575" y="207" text-anchor="middle" fill="#64748b" font-size="8.5">Scan position X</text>
+              <!-- x1, x2, x3 tick marks aligned with A-scan columns -->
+              <line x1="532" y1="175" x2="532" y2="180" stroke="#64748b" stroke-width="1"/>
+              <text x="532" y="190" text-anchor="middle" fill="#64748b" font-size="7.5">x₁</text>
+              <line x1="564" y1="175" x2="564" y2="180" stroke="#64748b" stroke-width="1"/>
+              <text x="564" y="190" text-anchor="middle" fill="#64748b" font-size="7.5">x₂</text>
+              <line x1="610" y1="175" x2="610" y2="180" stroke="#64748b" stroke-width="1"/>
+              <text x="610" y="190" text-anchor="middle" fill="#64748b" font-size="7.5">x₃</text>
+            </svg>
+          </div>
+
+          <h3>Axial and Lateral Resolution in B-scan</h3>
+          <p>
+            Two independent length scales govern what a B-scan can resolve:
+          </p>
+          <div class="eq-box">$$\delta_z = \frac{c}{2\,\text{BW}} \approx \frac{c\,\tau_p}{2} \quad \text{(axial)} \qquad \delta_x \approx \frac{1.02\,\lambda F}{D} \quad \text{(lateral, at focus)}$$</div>
+          <p>
+            Here <em>BW</em> is the &minus;6 dB bandwidth of the pulse, &tau;<sub>p</sub> is the pulse
+            duration, and the lateral expression is the focal spot diameter for a focused transducer
+            at depth <em>F</em> (same as for C-scan). Axial resolution is governed by pulse length —
+            higher bandwidth (shorter pulse, higher damping on the pulser) gives finer depth
+            discrimination. Lateral resolution degrades away from focus, because the beam expands
+            in the far field at half-angle sin&thinsp;&theta; &asymp; 0.514&lambda;/<em>D</em>.
+            In unfocused contact scanning, two vertical flaws separated by less than the &minus;6 dB
+            beam diameter at their depth will appear as a single blurred column in the B-scan —
+            an artefact misread as a single large reflector.
+          </p>
+
+          <h3>NDE Example — Pipeline Corrosion Mapping with B-scan</h3>
+          <p>
+            A common application is in-service corrosion mapping of oil and gas pipelines.
+            A 5 MHz, 25 mm diameter contact transducer is scanned longitudinally along a
+            steel pipe section (nominal wall thickness T = 12 mm, c<sub>L</sub> = 5 900 m/s,
+            &lambda; = 1.18 mm). The B-scan is recorded at a 0.5 mm index step.
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr><th>Parameter</th><th>Value</th><th>Physical meaning</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Axial resolution &delta;<sub>z</sub></strong></td>
+                <td>&asymp; 0.6 mm</td>
+                <td>Distinguishes FW from BW echoes in this 12 mm wall (TOF difference = 4.1 &micro;s &gg; pulse length &asymp; 0.2 &micro;s — no issue here; limit matters for thin-wall &lt; 3 mm)</td>
+              </tr>
+              <tr>
+                <td><strong>Lateral resolution &delta;<sub>x</sub></strong></td>
+                <td>&asymp; 10–15 mm at 12 mm depth</td>
+                <td>Unfocused beam in the far field (N = D²f/4c = 25² × 5×10⁶ / (4 × 5900) &asymp; 132 mm; 12 mm is well in near field — beam stays collimated &asymp; 25 mm diameter)</td>
+              </tr>
+              <tr>
+                <td><strong>What the B-scan shows</strong></td>
+                <td>BW echo arrival time vs. scan position</td>
+                <td>Local BW arrival early &rarr; wall thinned by corrosion. A 3 mm pit appears as a region where the BW echo rises from 4.1 &micro;s (12 mm) to 3.1 &micro;s (9 mm), visible as an upward bulge in the BW line</td>
+              </tr>
+              <tr>
+                <td><strong>Minimum detectable wall loss</strong></td>
+                <td>&asymp; &delta;<sub>z</sub>/2 &asymp; 0.3 mm</td>
+                <td>Set by the axial resolution (pulse bandwidth); confirmed on a step-machined reference block</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            The primary output from this scan is a <strong>TOF B-scan</strong>: the back-wall echo arrival
+            time at each scan position is converted to remaining wall thickness via
+            \(t_\text{BW} = 2d/c\). Regions of corrosion appear as bright upward-displaced BW-echo
+            columns — a direct map of wall thinning without sectioning the pipe.
+            For a pipe under internal pressure, the minimum remaining wall thickness (MWT) read from
+            the B-scan feeds directly into fitness-for-service calculations per API 579-1 / ASME FFS-1
+            Level 1 assessment.
           </p>
 
           <div class="callout">
-            <strong>Limitation:</strong> A large near-surface reflector can "shadow" smaller, deeper reflectors in the same beam path because the beam cannot see past a strong reflector. For complex geometries, multiple scan directions or phased-array volumetric methods are preferred.
+            <strong>Limitation — acoustic shadowing:</strong> A large near-surface reflector (e.g. a
+            delamination) can shadow smaller, deeper reflectors in the same beam path.
+            Multiply-reflected "ghost" echoes between two parallel reflectors also produce spurious
+            B-scan columns at multiples of the true depth — visible in thick-walled parts at high
+            PRF or gain. For complex geometries, multiple scan directions or phased-array volumetric
+            methods are preferred over a single-angle B-scan.
           </div>
         </div>
 
@@ -2429,19 +2832,21 @@
         <div class="theory-section" id="tofd">
           <h2>&#128400; TOFD — Time-of-Flight Diffraction</h2>
           <p>
-            Conventional pulse-echo measures <em>reflection amplitude</em> to size flaws — but amplitude
-            depends on crack orientation, roughness, and coupling, making accurate sizing unreliable.
-            <strong>TOFD</strong> instead measures the <em>time difference</em> between diffracted
-            signals from the crack tip and crack base, giving a direct geometric measurement of
-            crack height independent of amplitude.
+            Conventional pulse-echo sizes flaws by <em>amplitude</em> — but amplitude depends on
+            crack orientation, surface roughness, and coupling, none of which correlate reliably
+            with crack height. <strong>TOFD</strong> sidesteps amplitude entirely: it measures the
+            <em>time difference</em> between diffracted signals from the crack tip and crack base,
+            yielding a geometry-based crack height that is independent of reflectivity and
+            orientation. Sizing accuracy of &plusmn;0.5–1 mm is routinely achieved on welds where
+            pulse-echo would give &plusmn;2–4 mm.
           </p>
 
-          <!-- TOFD SVG diagram -->
+          <!-- TOFD probe geometry SVG -->
           <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);">
             <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
               <!-- Material block -->
               <rect x="60" y="80" width="480" height="120" fill="#e2e8f0" rx="4"/>
-              <text x="300" y="210" text-anchor="middle" fill="#64748b" font-size="10">Test Piece (thickness T)</text>
+              <text x="300" y="210" text-anchor="middle" fill="#64748b" font-size="10">Test Piece (thickness T) — separation 2S between probe centres</text>
 
               <!-- Crack -->
               <line x1="300" y1="100" x2="300" y2="170" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
@@ -2450,13 +2855,21 @@
               <text x="310" y="141" fill="#dc2626" font-size="11" font-weight="800">a</text>
               <line x1="303" y1="100" x2="308" y2="175" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,2"/>
 
-              <!-- Transmitter T -->
+              <!-- Transmitter -->
               <rect x="90" y="45" width="60" height="28" rx="5" fill="#0f2d5e"/>
               <text x="120" y="63" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">TX</text>
 
-              <!-- Receiver R -->
+              <!-- Receiver -->
               <rect x="450" y="45" width="60" height="28" rx="5" fill="#0e7490"/>
               <text x="480" y="63" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">RX</text>
+
+              <!-- 2S dimension arrow -->
+              <line x1="120" y1="38" x2="480" y2="38" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr-tofd-r)" marker-start="url(#arr-tofd-l)"/>
+              <defs>
+                <marker id="arr-tofd-r" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0,6 3,0 6" fill="#94a3b8"/></marker>
+                <marker id="arr-tofd-l" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto"><polygon points="6 0,0 3,6 6" fill="#94a3b8"/></marker>
+              </defs>
+              <text x="300" y="34" text-anchor="middle" fill="#64748b" font-size="9">2S</text>
 
               <!-- Lateral wave -->
               <path d="M150,58 Q300,20 450,58" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,3"/>
@@ -2464,14 +2877,13 @@
 
               <!-- TX to crack tip -->
               <line x1="150" y1="73" x2="300" y2="100" stroke="#0891b2" stroke-width="1.8"/>
-              <!-- Crack tip to RX -->
               <line x1="300" y1="100" x2="450" y2="73" stroke="#0891b2" stroke-width="1.8"/>
-              <text x="210" y="87" fill="#0891b2" font-size="9" font-weight="600">tip signal (shorter path, arrives first)</text>
+              <text x="205" y="83" fill="#0891b2" font-size="9" font-weight="600">tip signal — shorter path, earlier arrival</text>
 
               <!-- TX to crack base -->
               <line x1="150" y1="73" x2="300" y2="170" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2"/>
               <line x1="300" y1="170" x2="450" y2="73" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2"/>
-              <text x="215" y="162" fill="#7c3aed" font-size="9" font-weight="600">base signal (longer path)</text>
+              <text x="215" y="162" fill="#7c3aed" font-size="9" font-weight="600">base signal — longer path, later arrival</text>
 
               <!-- θ angle label -->
               <text x="162" y="93" fill="#475569" font-size="10">&theta;</text>
@@ -2479,14 +2891,110 @@
           </div>
 
           <p>
-            From the geometry of the two right triangles, the crack height is:
+            From the geometry of the two pitch-catch propagation paths:
           </p>
-          <div class="eq-box">$$a = \cos\theta \times \frac{(t_{\text{base}} - t_{\text{tip}})\; v}{2}$$</div>
+          <div class="eq-box">$$a = \cos\theta \times \frac{(t_{\text{base}} - t_{\text{tip}})\, v}{2}$$</div>
           <p>
-            where &theta; is the probe half-angle, <em>v</em> is the wave velocity in the material,
-            and the time difference <em>&Delta;t = t<sub>base</sub> &minus; t<sub>tip</sub></em> is read
-            directly from the TOFD B-scan display. Division by 2 converts round-trip time to
-            one-way path length.
+            where &theta;&nbsp;=&nbsp;arctan(<em>S</em>/<em>d</em>) is the beam half-angle
+            (half the probe separation <em>S</em> divided by the reflector depth <em>d</em>),
+            <em>v</em> is the longitudinal wave velocity, and
+            &Delta;t&nbsp;=&nbsp;t<sub>base</sub>&nbsp;&minus;&nbsp;t<sub>tip</sub> is measured
+            directly from the TOFD B-scan. Division by 2 is correct here — unlike pulse-echo,
+            TOFD uses a pitch-catch geometry so the measured time is a one-way path, not a
+            round-trip; the factor of 2 in the denominator converts one-way path length to
+            crack height via the cosine projection.
+          </p>
+
+          <!-- TOFD B-scan display SVG -->
+          <h3>Reading a TOFD B-Scan</h3>
+          <p>
+            As the TX/RX pair translates along the weld, four characteristic signal traces build
+            up in the time-position (B-scan) display. Recognising all four — and understanding
+            why three of them are hyperbolic — is essential for correct interpretation:
+          </p>
+
+          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);padding:0.5rem 0;">
+            <svg viewBox="0 0 580 248" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif"
+                 role="img" aria-label="Schematic TOFD B-scan showing lateral wave, tip diffraction hyperbola, base diffraction hyperbola, and backwall, with dead zone and delta-t annotation">
+
+              <!-- Plot background -->
+              <rect x="48" y="18" width="504" height="210" fill="#ffffff" rx="4" stroke="#e2e8f0" stroke-width="1"/>
+
+              <!-- Dead zone shading (above lateral wave) -->
+              <rect x="48" y="18" width="504" height="47" fill="#fef2f2" rx="4"/>
+              <text x="300" y="35" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="700">DEAD ZONE</text>
+              <text x="300" y="47" text-anchor="middle" fill="#dc2626" font-size="8">(lateral wave masks near-surface region)</text>
+
+              <!-- Lateral wave — flat line at y=65 -->
+              <line x1="48" y1="65" x2="552" y2="65" stroke="#475569" stroke-width="2.2"/>
+              <text x="556" y="68" fill="#475569" font-size="9" font-weight="700">Lateral wave (t<tspan dy="3" font-size="7">lat</tspan><tspan dy="-3">)</tspan></text>
+
+              <!-- Crack position marker (vertical dashed) -->
+              <line x1="300" y1="18" x2="300" y2="228" stroke="#dc2626" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+              <text x="300" y="243" text-anchor="middle" fill="#dc2626" font-size="8">crack position</text>
+
+              <!-- Tip diffraction hyperbola — apex (300,96), k=0.00035 -->
+              <!-- points computed as y = 96 + 0.00035*(x-300)^2 -->
+              <polyline
+                points="48,116 80,112 120,106 160,102 200,99 240,97 280,96 300,96 320,96 360,97 400,99 440,102 480,106 520,112 552,116"
+                fill="none" stroke="#0891b2" stroke-width="2.5" stroke-linejoin="round"/>
+              <text x="80" y="112" fill="#0891b2" font-size="9" font-weight="700">Tip diffraction</text>
+              <text x="80" y="122" fill="#0891b2" font-size="8">(hyperbola, same phase as lateral wave)</text>
+
+              <!-- Base diffraction hyperbola — apex (300,148), k=0.00035 -->
+              <!-- points: y = 148 + 0.00035*(x-300)^2 -->
+              <polyline
+                points="48,168 80,164 120,158 160,154 200,151 240,149 280,148 300,148 320,148 360,149 400,151 440,154 480,158 520,164 552,168"
+                fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6,2" stroke-linejoin="round"/>
+              <text x="80" y="162" fill="#7c3aed" font-size="9" font-weight="700">Base diffraction</text>
+              <text x="80" y="172" fill="#7c3aed" font-size="8">(hyperbola, phase-inverted relative to tip)</text>
+
+              <!-- Backwall — flat line at y=192 -->
+              <line x1="48" y1="192" x2="552" y2="192" stroke="#334155" stroke-width="2"/>
+              <text x="556" y="195" fill="#334155" font-size="9" font-weight="700">Backwall (t<tspan dy="3" font-size="7">bw</tspan><tspan dy="-3">)</tspan></text>
+
+              <!-- Δt bracket between tip apex and base apex at x=300 -->
+              <line x1="312" y1="96" x2="312" y2="148" stroke="#b45309" stroke-width="1.5"/>
+              <line x1="308" y1="96"  x2="316" y2="96"  stroke="#b45309" stroke-width="1.5"/>
+              <line x1="308" y1="148" x2="316" y2="148" stroke="#b45309" stroke-width="1.5"/>
+              <text x="326" y="127" fill="#b45309" font-size="10" font-weight="700">&Delta;t</text>
+              <text x="326" y="138" fill="#b45309" font-size="8">→ crack height <tspan font-style="italic">a</tspan></text>
+
+              <!-- Axes -->
+              <line x1="48" y1="228" x2="552" y2="228" stroke="#334155" stroke-width="1.5"/>
+              <line x1="48" y1="18"  x2="48"  y2="228" stroke="#334155" stroke-width="1.5"/>
+
+              <!-- Axis labels -->
+              <text x="300" y="242" text-anchor="middle" fill="#334155" font-size="10" font-weight="600">Scan position along weld →</text>
+              <text transform="rotate(-90,14,123)" x="14" y="123" text-anchor="middle" fill="#334155" font-size="10" font-weight="600">Time-of-flight (depth) ↓</text>
+            </svg>
+          </div>
+
+          <p>
+            The two diffraction hyperbolas are <strong>phase-inverted</strong> relative to each other:
+            the tip signal leads with the same polarity as the lateral wave (compression arriving first),
+            while the base signal is inverted (rarefaction arriving first). This phase reversal is
+            a direct consequence of diffraction geometry — the wavefront wraps around opposite edges
+            of the crack — and serves as an internal consistency check. If both signals show the
+            same phase, one is likely a geometric artefact rather than a true tip/base pair.
+          </p>
+
+          <h3>Worked Example — Weld Root Crack Sizing</h3>
+          <p>
+            Butt weld in low-alloy steel (c<sub>L</sub>&nbsp;=&nbsp;5&thinsp;900&thinsp;m/s),
+            probe separation 2S&nbsp;=&nbsp;100&thinsp;mm. An indication is observed near the weld
+            root at estimated depth d&nbsp;&asymp;&nbsp;25&thinsp;mm.
+            Beam half-angle: &theta;&nbsp;=&nbsp;arctan(50&thinsp;mm&thinsp;/&thinsp;25&thinsp;mm)&nbsp;=&nbsp;63.4°,
+            cos&thinsp;&theta;&nbsp;=&nbsp;0.447.
+            Measured separation between tip and base hyperbola apices: &Delta;t&nbsp;=&nbsp;2.1&thinsp;&mu;s.
+          </p>
+          <div class="eq-box">$$a = 0.447 \times \frac{2.1\!\times\!10^{-6}\;\text{s} \;\times\; 5\,900\;\text{m/s}}{2} = 0.447 \times 6.195\;\text{mm} \approx \mathbf{2.8\;mm}$$</div>
+          <p>
+            For a pipe wall of 12.7&thinsp;mm nominal thickness, 2.8&thinsp;mm represents
+            ~22&thinsp;% through-wall — above the typical ASME Code Case 2235 accept/reject
+            threshold (&sim;14&thinsp;% for this geometry), triggering disposition.
+            A supplementary PA or TOFD scan at finer index pitch would then characterise
+            the axial extent before fitness-for-service (FFS) assessment.
           </p>
 
           <table class="compare-table">
@@ -2501,9 +3009,11 @@
           </table>
 
           <div class="callout">
-            <strong>Practical note:</strong> TOFD is paired with pulse-echo in modern weld inspections
-            (TOFD gives crack height; pulse-echo gives lateral position). The combination, known as
-            "TOFD + PA", is now standard in nuclear and pressure-vessel inspections per ASME Section V.
+            <strong>Practical note:</strong> TOFD provides accurate crack height but cannot locate
+            the crack laterally (it only knows the probe is somewhere in the scan range when &Delta;t
+            is maximum). Pairing TOFD with phased-array pulse-echo — now standard in nuclear and
+            pressure-vessel inspections per ASME Section V — gives height (TOFD) and lateral
+            position (PA) simultaneously from a single encoded scan pass.
           </div>
         </div>
 
