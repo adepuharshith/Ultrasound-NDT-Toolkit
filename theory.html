@@ -510,7 +510,7 @@
           <p>
             Before diving into ultrasound, it is essential to understand what makes sound fundamentally
             different from light and radio waves. The animations below contrast a
-            <strong>longitudinal pressure wave</strong> (sound) with an
+            <strong>longitudinal pressure wave</strong> (sound / elastic wave) with an
             <strong>electromagnetic wave</strong> (light, radio, X-ray) — two completely different
             physical phenomena.
           </p>
@@ -518,7 +518,7 @@
           <div class="wave-pair">
             <div class="wave-demo">
               <div class="wave-demo-header">
-                <span>&#127759; Sound — longitudinal pressure wave</span>
+                <span>&#127759; Sound — longitudinal pressure wave / elastic wave</span>
                 <button class="wave-demo-btn" id="long-playpause">&#9646;&#9646; Pause</button>
               </div>
               <canvas id="long-canvas" class="wave-canvas" width="380" height="200"></canvas>
@@ -588,114 +588,6 @@
             <div class="vs-cell vs-sound">Attenuates with distance &amp; frequency<br/><small>&alpha; &asymp; 0.5&ndash;2 dB/(mm&middot;MHz) in steel — higher frequency loses energy faster</small></div>
             <div class="vs-cell vs-em">Zero loss in vacuum or transparent media<br/><small>Fully absorbed or reflected at any metal surface — cannot inspect inside metals</small></div>
           </div>
-
-          <!-- Sound speed in NDE-relevant media — horizontal bar chart -->
-          <h3 style="margin-top:1.5rem;">Sound Speed in NDE-Relevant Media</h3>
-
-          <div class="scan-svg-wrap" style="background:#f8fafc;border:1px solid var(--border);padding:1.2rem 0.5rem 0.8rem;">
-            <svg viewBox="0 0 560 255" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
-
-              <!-- Light vertical grid lines (1 000 m/s steps) -->
-              <!-- Scale: x=140 (0 m/s) → x=530 (7 000 m/s); 390px / 7000 = 0.05571 px per m/s -->
-              <!-- 1000 → 196; 2000 → 251; 3000 → 307; 4000 → 363; 5000 → 418; 6000 → 474 -->
-              <g stroke="#e2e8f0" stroke-width="1">
-                <line x1="196" y1="10" x2="196" y2="222"/>
-                <line x1="251" y1="10" x2="251" y2="222"/>
-                <line x1="307" y1="10" x2="307" y2="222"/>
-                <line x1="363" y1="10" x2="363" y2="222"/>
-                <line x1="418" y1="10" x2="418" y2="222"/>
-                <line x1="474" y1="10" x2="474" y2="222"/>
-              </g>
-
-              <!-- X-axis baseline -->
-              <line x1="140" y1="222" x2="535" y2="222" stroke="#475569" stroke-width="1.8"/>
-
-              <!-- X-axis tick labels -->
-              <text x="140" y="236" text-anchor="middle" fill="#64748b" font-size="9">0</text>
-              <text x="196" y="236" text-anchor="middle" fill="#64748b" font-size="9">1 000</text>
-              <text x="251" y="236" text-anchor="middle" fill="#64748b" font-size="9">2 000</text>
-              <text x="307" y="236" text-anchor="middle" fill="#64748b" font-size="9">3 000</text>
-              <text x="418" y="236" text-anchor="middle" fill="#64748b" font-size="9">5 000</text>
-              <text x="474" y="236" text-anchor="middle" fill="#64748b" font-size="9">6 000</text>
-              <text x="338" y="252" text-anchor="middle" fill="#334155" font-size="11" font-weight="600">Longitudinal wave speed  (m/s)</text>
-
-              <!-- Bar: Air — 343 m/s → 19 px -->
-              <rect x="140" y="18" width="19" height="22" fill="#94a3b8" rx="2"/>
-              <text x="134" y="33" text-anchor="end" fill="#475569" font-size="10.5">Air</text>
-              <text x="163"  y="33" fill="#94a3b8" font-size="9.5">343 m/s</text>
-
-              <!-- Bar: Water — 1 480 m/s → 82 px -->
-              <rect x="140" y="52" width="82" height="22" fill="#0d9488" rx="2"/>
-              <text x="134" y="67" text-anchor="end" fill="#475569" font-size="10.5">Water</text>
-              <text x="226"  y="67" fill="#0d9488" font-size="9.5">1 480 m/s</text>
-
-              <!-- Bar: PMMA / Lucite — 2 730 m/s → 152 px -->
-              <rect x="140" y="86" width="152" height="22" fill="#0891b2" rx="2"/>
-              <text x="134" y="101" text-anchor="end" fill="#475569" font-size="10.5">PMMA</text>
-              <text x="296"  y="101" fill="#0891b2" font-size="9.5">2 730 m/s  (delay-line wedge)</text>
-
-              <!-- Bar: Steel L-wave — 5 900 m/s → 328 px -->
-              <rect x="140" y="120" width="328" height="22" fill="#1e40af" rx="2"/>
-              <text x="134" y="135" text-anchor="end" fill="#475569" font-size="10.5">Steel (L)</text>
-              <text x="472"  y="135" fill="#1e40af" font-size="9.5">5 900 m/s</text>
-
-              <!-- Bar: Titanium L-wave — 6 100 m/s → 340 px -->
-              <rect x="140" y="154" width="340" height="22" fill="#334155" rx="2"/>
-              <text x="134" y="169" text-anchor="end" fill="#475569" font-size="10.5">Ti (L)</text>
-              <text x="484"  y="169" fill="#334155" font-size="9.5">6 100 m/s</text>
-
-              <!-- Bar: Aluminium L-wave — 6 320 m/s → 352 px -->
-              <rect x="140" y="188" width="352" height="22" fill="#0f2d5e" rx="2"/>
-              <text x="134" y="203" text-anchor="end" fill="#475569" font-size="10.5">Al (L)</text>
-              <text x="496"  y="203" fill="#0f2d5e" font-size="9.5">6 320 m/s</text>
-
-              <!-- Annotation: EM waves blocked label -->
-              <text x="530" y="128" text-anchor="end" fill="#dc2626" font-size="9" font-style="italic">EM blocked</text>
-              <text x="530" y="140" text-anchor="end" fill="#dc2626" font-size="9" font-style="italic">at metal surface</text>
-            </svg>
-          </div>
-          <p style="font-size:0.82rem;color:#64748b;margin-top:0.3rem;">
-            Longitudinal (L-wave) speeds for common NDE couplants and structural metals.
-            EM radiation cannot penetrate metals — its inspection depth is zero.
-          </p>
-
-          <!-- Worked NDE example -->
-          <h3>Worked NDE Example — Immersion Scan TOF Calculation</h3>
-          <p>
-            A 25 mm steel plate (c<sub>L</sub> = 5 900 m/s) is scanned in a water tank
-            with a 10 mm standoff (c<sub>w</sub> = 1 480 m/s). Three echoes appear on the A-scan:
-          </p>
-          <table class="compare-table">
-            <thead>
-              <tr><th>Echo</th><th>Propagation path</th><th>Arrival time</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Front-wall (FW)</strong></td>
-                <td>2 &times; 10 mm in water</td>
-                <td>2 &times; 10 / 1 480 = <strong>13.5 &micro;s</strong></td>
-              </tr>
-              <tr>
-                <td><strong>Back-wall (BW)</strong></td>
-                <td>Water round-trip + steel round-trip</td>
-                <td>13.5 + 2 &times; 25 / 5 900 = <strong>22.0 &micro;s</strong></td>
-              </tr>
-              <tr>
-                <td><strong>&Delta;T (FW &rarr; BW)</strong></td>
-                <td>Steel round-trip only</td>
-                <td>22.0 &minus; 13.5 = 8.5 &micro;s &rarr; d = 5 900 &times; 8.5&times;10<sup>&minus;6</sup> / 2 = <strong>25.0 mm</strong> &#10003;</td>
-              </tr>
-            </tbody>
-          </table>
-          <p>
-            If c<sub>L</sub> is misassumed as 5 800 m/s — plausible when an alloy grade is
-            unverified — the depth computed from the same 8.5 &micro;s interval is 24.6 mm,
-            an error of 0.4 mm. Scaled to a 100 mm pressure-vessel wall, the same 1.7 % velocity
-            error produces a 1.7 mm depth bias, exceeding the half-wavelength axial resolution
-            of a 5 MHz probe (&lambda;/2 &asymp; 0.6 mm) and invalidating remaining-wall
-            thickness calculations used in fitness-for-service assessments. Velocity must always
-            be verified on a reference block of the same material lot.
-          </p>
 
           <div class="callout">
             <strong>Why sound wins for metal inspection:</strong> EM waves (radio, microwave, visible light)
