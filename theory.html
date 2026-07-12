@@ -342,6 +342,66 @@
     .app-card li { margin-bottom: .4rem; font-size: .9rem; color: var(--text-muted); }
     .app-card li strong { color: var(--text); }
 
+    /* ---- Elastic wave type lattice cards ---- */
+    .elastic-wave-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 1.4rem 0 1.25rem;
+    }
+    .elastic-wave-card {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+    .elastic-wave-head { padding: 1rem 1rem .75rem; }
+    .elastic-wave-head h3 { margin: 0 0 .25rem; font-size: 1rem; color: var(--text); }
+    .elastic-wave-head p { margin: 0; font-size: .79rem; line-height: 1.45; }
+    .elastic-wave-tag {
+      display: inline-block;
+      margin-bottom: .5rem;
+      padding: .18rem .5rem;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .elastic-wave-card:nth-child(2) .elastic-wave-tag { background: #ede9fe; color: #6d28d9; }
+    .elastic-wave-card:nth-child(3) .elastic-wave-tag { background: #dcfce7; color: #15803d; }
+    .elastic-wave-canvas { display: block; width: 100%; height: auto; background: #f8fafc; }
+    .elastic-wave-note {
+      min-height: 5.8rem;
+      padding: .75rem 1rem 1rem;
+      border-top: 1px solid var(--border);
+      font-size: .78rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+    .elastic-wave-note strong { color: var(--text); }
+    .elastic-key {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .75rem;
+      padding: .9rem 1rem;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      font-size: .8rem;
+      color: var(--text-muted);
+    }
+    .elastic-key strong { display: block; margin-bottom: .1rem; color: var(--text); }
+    @media (max-width: 900px) {
+      .elastic-wave-grid { grid-template-columns: 1fr; }
+      .elastic-wave-card { max-width: 620px; width: 100%; margin: 0 auto; }
+      .elastic-wave-note { min-height: 0; }
+    }
+    @media (max-width: 560px) { .elastic-key { grid-template-columns: 1fr; } }
+
     /* ---- VS comparison grid ---- */
     .vs-grid {
       display: grid;
@@ -486,6 +546,7 @@
     <a href="#wave-types"            class="sec-nav-btn">Sound vs EM</a>
     <a href="#speed-comparison"      class="sec-nav-btn">Key Differences</a>
     <a href="#applications"          class="sec-nav-btn">Applications</a>
+    <a href="#elastic-wave-types"   class="sec-nav-btn">Elastic Wave Types</a>
     <a href="#ut-principle"          class="sec-nav-btn">UT Principle</a>
     <a href="#material-props"        class="sec-nav-btn">Material Props</a>
     <a href="#ultrasound-spectrum"   class="sec-nav-btn">UT Spectrum</a>
@@ -630,6 +691,66 @@
                 <li><strong>Optical fiber</strong> — high-bandwidth data transmission via light pulses in glass fiber</li>
               </ul>
             </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             ELASTIC WAVE TYPES — particle-motion introduction
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="elastic-wave-types">
+          <h2>Types of Elastic Waves</h2>
+          <p>
+            In a solid, atoms are linked by elastic bonds. A disturbance can move through that
+            lattice in several ways, classified by how the particles move relative to the
+            <strong>wave direction</strong>. The dots below show particle motion; the wave itself
+            always travels from left to right.
+          </p>
+
+          <div class="elastic-wave-grid">
+            <article class="elastic-wave-card">
+              <div class="elastic-wave-head">
+                <span class="elastic-wave-tag">Bulk wave</span>
+                <h3>1. Longitudinal (L)</h3>
+                <p>Particles move parallel to propagation.</p>
+              </div>
+              <canvas id="elastic-long" class="elastic-wave-canvas" width="360" height="230" aria-label="Animated longitudinal elastic wave in a three-dimensional particle lattice"></canvas>
+              <div class="elastic-wave-note">
+                Alternating <strong>compression and rarefaction</strong> pass through the volume.
+                L-waves travel in solids, liquids, and gases and are the fastest elastic wave in a solid.
+              </div>
+            </article>
+
+            <article class="elastic-wave-card">
+              <div class="elastic-wave-head">
+                <span class="elastic-wave-tag">Bulk wave</span>
+                <h3>2. Shear (S): SH &amp; SV</h3>
+                <p>Particles move perpendicular to propagation.</p>
+              </div>
+              <canvas id="elastic-shear" class="elastic-wave-canvas" width="360" height="230" aria-label="Animated shear horizontal and shear vertical elastic waves in a three-dimensional particle lattice"></canvas>
+              <div class="elastic-wave-note">
+                <strong>SH</strong> motion is horizontal and side-to-side; <strong>SV</strong> motion is vertical.
+                Both require shear stiffness, so they propagate in solids but not in fluids.
+              </div>
+            </article>
+
+            <article class="elastic-wave-card">
+              <div class="elastic-wave-head">
+                <span class="elastic-wave-tag">Surface wave</span>
+                <h3>3. Rayleigh (R)</h3>
+                <p>Particles trace ellipses near a free surface.</p>
+              </div>
+              <canvas id="elastic-rayleigh" class="elastic-wave-canvas" width="360" height="230" aria-label="Animated Rayleigh surface wave in a three-dimensional particle lattice"></canvas>
+              <div class="elastic-wave-note">
+                Coupled longitudinal and vertical motion produces a <strong>rolling elliptical path</strong>.
+                Motion is strongest at the surface and decays rapidly with depth.
+              </div>
+            </article>
+          </div>
+
+          <div class="elastic-key">
+            <div><strong>Parallel motion</strong>L-wave: particle motion ∥ travel</div>
+            <div><strong>Perpendicular motion</strong>S-wave: particle motion ⟂ travel</div>
+            <div><strong>Elliptical motion</strong>Rayleigh: surface-localized rolling</div>
           </div>
         </div>
 
@@ -4460,6 +4581,105 @@
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+})();
+
+/* ============================================================
+   ELASTIC WAVE TYPES — pseudo-3D particle lattices
+   L: parallel motion; S: split SH/SV views; R: surface ellipse.
+   ============================================================ */
+(function () {
+  var specs = [
+    { id: 'elastic-long', type: 'long' },
+    { id: 'elastic-shear', type: 'shear' },
+    { id: 'elastic-rayleigh', type: 'rayleigh' }
+  ];
+
+  function start(spec) {
+    var canvas = document.getElementById(spec.id);
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height;
+    var frame = 0;
+
+    function arrow(x1, y1, x2, y2, color) {
+      var a = Math.atan2(y2-y1, x2-x1), s = 6;
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.7;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x2,y2);
+      ctx.lineTo(x2-s*Math.cos(a-.55),y2-s*Math.sin(a-.55));
+      ctx.lineTo(x2-s*Math.cos(a+.55),y2-s*Math.sin(a+.55));
+      ctx.closePath(); ctx.fill();
+    }
+
+    function point(x, row, depth, phase, mode, half) {
+      var py = 58 + row * 23 + depth * 8;
+      var px = 30 + x * 37 - depth * 8;
+      var amp = 7, decay = 1, dx = 0, dy = 0;
+      if (mode === 'long') dx = amp * Math.sin(phase);
+      if (mode === 'sh') {
+        /* out-of-plane horizontal motion, projected diagonally in the top view */
+        dx = -amp * .75 * Math.sin(phase);
+        py += amp * .42 * Math.sin(phase);
+      }
+      if (mode === 'sv') { py += amp * Math.sin(phase); px += depth * 1.2; }
+      if (mode === 'rayleigh') {
+        decay = Math.exp(-row * .55);
+        dx = -amp * .75 * decay * Math.cos(phase);
+        dy = amp * decay * Math.sin(phase);
+      }
+      return { x:px+dx+(half||0), y:py+dy, fade:decay };
+    }
+
+    function lattice(mode, x0, cols, rows, label) {
+      var t = frame * .045, pts = [], depths = mode === 'sh' ? 3 : 2;
+      for (var d=depths-1; d>=0; d--) {
+        for (var r=0; r<rows; r++) {
+          for (var c=0; c<cols; c++) {
+            var ph = c * .82 - t;
+            pts.push(point(c,r,d,ph,mode,x0));
+          }
+        }
+      }
+      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = .7;
+      for (var i=0; i<pts.length; i++) {
+        var p=pts[i];
+        ctx.beginPath(); ctx.arc(p.x,p.y,2.35,0,Math.PI*2);
+        ctx.fillStyle = mode === 'rayleigh'
+          ? 'rgba(5,150,105,' + (.25 + .7*p.fade) + ')'
+          : (mode === 'long' ? '#0891b2' : '#7c3aed');
+        ctx.fill();
+      }
+      if (label) {
+        ctx.fillStyle='#475569'; ctx.font='700 10px Inter,sans-serif'; ctx.textAlign='center';
+        ctx.fillText(label, x0 + (cols-1)*18.5 + 18, 27);
+      }
+    }
+
+    function draw() {
+      ctx.fillStyle='#f8fafc'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#e2e8f0'; ctx.fillRect(18,43,W-36,132);
+      ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(18,43); ctx.lineTo(W-18,43); ctx.stroke();
+
+      if (spec.type === 'long') lattice('long', 0, 9, 5, 'compression ↔ rarefaction');
+      if (spec.type === 'shear') {
+        ctx.strokeStyle='#cbd5e1'; ctx.beginPath(); ctx.moveTo(W/2,38); ctx.lineTo(W/2,178); ctx.stroke();
+        lattice('sh', 0, 4, 5, 'SH · top view');
+        lattice('sv', W/2+10, 4, 5, 'SV · front view');
+      }
+      if (spec.type === 'rayleigh') {
+        lattice('rayleigh', 0, 9, 5, 'free surface');
+        ctx.strokeStyle='#059669'; ctx.setLineDash([4,3]);
+        ctx.beginPath(); ctx.moveTo(18,52); ctx.lineTo(W-18,52); ctx.stroke(); ctx.setLineDash([]);
+      }
+
+      arrow(32,201,W-34,201,'#0f2d5e');
+      ctx.fillStyle='#0f2d5e'; ctx.font='700 10px Inter,sans-serif'; ctx.textAlign='center';
+      ctx.fillText('wave propagation',W/2,220);
+      frame++; requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  }
+  specs.forEach(start);
 })();
 </script>
 </body>

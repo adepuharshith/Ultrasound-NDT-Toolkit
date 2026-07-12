@@ -113,6 +113,7 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 ### Canvas animations in theory.html (inline `<script>` at bottom)
 - `#long-canvas` — longitudinal wave, white background
 - `#em-canvas` — 3D EM wave (E/B fields, pseudo-3D oblique projection)
+- `#elastic-long`, `#elastic-shear`, `#elastic-rayleigh` — responsive pseudo-3D particle-lattice introduction to elastic wave types; shear canvas splits SH top view and SV front view; Rayleigh motion decays with depth
 - `#rect-canvas` 680×260 — 4-panel rectification modes (RF, +HW, -HW, Full wave)
 - `#utp-right` — live A-scan (IP / Flaw Echo / BW echoes); **white bg**; echoes drawn with `drawPulse()`
 - `#mp-speed-canvas` — speed-in-media animation (FW/BW pulses + Δt sweep); **white bg**; uses `drawPulse()`
