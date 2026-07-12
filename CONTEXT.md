@@ -201,9 +201,11 @@ attribute (`textbook | paper | software | standard | online`) and search query a
 
 ---
 
-## Git log (recent — as of 2026-06-20)
+## Git log (recent — as of 2026-06-21)
 ```
-(latest) Restore Phased Arrays section (#phased-arrays): delay-law SVG, S-scan geometry, FMC/TFM
+(latest) Expand B-scan section: A-scan stacking SVG, axial/lateral resolution equations,
+         pipeline corrosion worked example (TOF B-scan, δz/δx formulas, API 579-1 FFS note)
+(prev)   Restore Phased Arrays section (#phased-arrays): delay-law SVG, S-scan geometry, FMC/TFM
          coherent-summation math, multi-mode TFM NDE example for LPBF IN718, grating-lobe callout,
          comparison table (Conventional UT / PA S-scan / FMC-TFM)
 723a120  White backgrounds + 3-cycle Gaussian pulses site-wide (theory.html + signal-processing.html)
