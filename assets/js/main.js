@@ -717,8 +717,6 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
 /* ============================================================
    8. WATER PATH CALCULATOR + ANIMATION
    ============================================================ */
-let _wpPhase  = 0;
-let _wpAnimId = null;
 let _wpP = { f: 75, mp: 15, cs: 5900, cw: 1495, WP: 15.81, matThick: 30, valid: true };
 
 function calcWaterPath() {
@@ -747,15 +745,7 @@ function calcWaterPath() {
     }
   }
 
-  if (!_wpAnimId) _wpResume();
-}
-
-function _wpResume() {
-  if (_wpAnimId || !document.getElementById('wp-canvas')) return;
-  (function loop() { _wpPhase += 1.35; _wpDraw(); _wpAnimId = requestAnimationFrame(loop); })();
-}
-function _wpPause() {
-  if (_wpAnimId) { cancelAnimationFrame(_wpAnimId); _wpAnimId = null; }
+  _wpDraw();
 }
 
 function _wpDraw() {
@@ -764,152 +754,125 @@ function _wpDraw() {
   const ctx = canvas.getContext('2d');
   const { f, mp, cs, cw, WP, matThick, valid } = _wpP;
 
-  const CW = canvas.width, CH = canvas.height, cx = CW / 2;
+  const CW = canvas.width, CH = canvas.height;
   ctx.clearRect(0, 0, CW, CH);
+  ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
 
   if (!valid) {
-    ctx.fillStyle = '#f0f9ff'; ctx.fillRect(0, 0, CW, CH);
     ctx.fillStyle = '#ef4444'; ctx.font = '12px Inter,sans-serif'; ctx.textAlign = 'center';
     const msgs = WP <= 0
-      ? ['Water path ≤ 0', 'Increase focal length or', 'reduce focus depth.']
-      : ['Focus depth > thickness', 'Reduce mp or increase', 'material thickness.'];
-    msgs.forEach((m, i) => ctx.fillText(m, cx, CH / 2 - 16 + i * 20));
+      ? ['Water path ≤ 0', 'Increase focal length or reduce focus depth.']
+      : ['Focus depth > thickness', 'Reduce mp or increase material thickness.'];
+    msgs.forEach((m, i) => ctx.fillText(m, CW / 2, CH / 2 - 10 + i * 22));
     return;
   }
 
-  /* Layout */
-  const PAD_T = 18, PAD_B = 14, TRANS_H = 24, TRANS_W = 56;
-  const BELOW   = matThick * 0.18;
-  const totalPh = WP + matThick + BELOW;
-  const drawH   = CH - PAD_T - TRANS_H - PAD_B;
-  const scale   = drawH / totalPh;
+  /* ── Horizontal layout: transducer | water | material | tail ── */
+  const PAD_L = 12, PAD_R = 16, PAD_T = 26, PAD_B = 38;
+  const TRANS_W = 16;
+  const x0    = PAD_L + TRANS_W;       // left edge of beam region
+  const xEnd  = CW - PAD_R;            // right edge
+  const drawW = xEnd - x0;
+  const BEAM_H = CH - PAD_T - PAD_B;
+  const cy    = PAD_T + BEAM_H / 2;
 
-  const transY0 = PAD_T;
-  const transY1 = PAD_T + TRANS_H;
-  const matTopY = transY1 + WP * scale;
-  const matBotY = matTopY + matThick * scale;
-  const focusY  = matTopY + mp * scale;
-  const bottomY = CH - PAD_B;
+  const TAIL     = matThick * 0.15;
+  const totalLen = WP + matThick + TAIL;
+  const scale    = drawW / totalLen;
 
-  /* Backgrounds */
-  const wg = ctx.createLinearGradient(0, transY1, 0, matTopY);
+  const xIF    = x0 + WP * scale;      // water/material interface
+  const xFocus = xIF + mp * scale;     // focal point
+  const dimY   = CH - PAD_B + 12;     // y for dimension line
+  const textY  = dimY - 6;            // y for dimension labels
+
+  /* ── Beam geometry (piecewise linear, two-stage convergence) ── */
+  const BH0    = BEAM_H * 0.72;        // full beam height at transducer face
+  const BHF    = 5;                    // full beam height at focus
+  const BH_IF  = BH0 * 0.70;          // at interface (slow taper in water)
+  const BH_END = BH0 * 0.40;          // diverged beam at right edge past focus
+
+  /* ── Backgrounds ── */
+  const wg = ctx.createLinearGradient(x0, 0, xIF, 0);
   wg.addColorStop(0, 'rgba(186,230,253,.90)'); wg.addColorStop(1, 'rgba(147,210,246,.80)');
-  ctx.fillStyle = wg; ctx.fillRect(0, transY1, CW, matTopY - transY1);
+  ctx.fillStyle = wg; ctx.fillRect(x0, PAD_T, xIF - x0, BEAM_H);
 
-  const mg = ctx.createLinearGradient(0, matTopY, 0, matBotY);
-  mg.addColorStop(0, 'rgba(203,213,225,.90)'); mg.addColorStop(1, 'rgba(148,163,184,.75)');
-  ctx.fillStyle = mg; ctx.fillRect(0, matTopY, CW, matBotY - matTopY);
+  const mg = ctx.createLinearGradient(xIF, 0, xEnd, 0);
+  mg.addColorStop(0, 'rgba(203,213,225,.90)'); mg.addColorStop(1, 'rgba(148,163,184,.70)');
+  ctx.fillStyle = mg; ctx.fillRect(xIF, PAD_T, xEnd - xIF, BEAM_H);
 
-  ctx.fillStyle = 'rgba(248,250,252,.60)'; ctx.fillRect(0, matBotY, CW, bottomY - matBotY);
-
-  /* Region labels */
-  ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'left';
-  if (matTopY - transY1 > 22) { ctx.fillStyle = '#1e40af'; ctx.fillText('Water', 7, transY1 + 14); }
-  if (matBotY - matTopY > 22) { ctx.fillStyle = '#334155'; ctx.fillText('Material', 7, matTopY + 14); }
-
-  /* Interface lines */
+  /* ── Interface line ── */
   ctx.save(); ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
   ctx.strokeStyle = 'rgba(30,64,175,.75)';
-  ctx.beginPath(); ctx.moveTo(0, matTopY); ctx.lineTo(CW, matTopY); ctx.stroke();
-  ctx.strokeStyle = 'rgba(51,65,85,.75)';
-  ctx.beginPath(); ctx.moveTo(0, matBotY); ctx.lineTo(CW, matBotY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(xIF, PAD_T); ctx.lineTo(xIF, PAD_T + BEAM_H); ctx.stroke();
   ctx.setLineDash([]); ctx.restore();
 
-  /* Beam geometry — two-stage: gradual in water, sharp convergence in material */
-  const BW0 = 50, BWF = 2.5;
-  const waterLen = Math.max(matTopY - transY1, 1);
-  const matLen   = Math.max(focusY  - matTopY, 1);
-  const BW_IF    = BW0 - (BW0 - BWF) * 0.28;  /* beam half-width at water/material interface */
-  const convW    = (BW0 - BW_IF) / waterLen;   /* slow taper in water */
-  const convM    = (BW_IF - BWF) / matLen;     /* fast taper in material */
-  function bHW(y) {
-    if (y <= transY1) return BW0;
-    if (y <= matTopY) return BW0 - convW * (y - transY1);
-    if (y <= focusY)  return BW_IF - convM * (y - matTopY);
-    return BWF + convM * (y - focusY);
-  }
-  const bwBot = bHW(bottomY);
+  /* ── Region labels ── */
+  ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#1e40af'; ctx.fillText('Water', x0 + (xIF - x0) / 2, PAD_T + 14);
+  ctx.fillStyle = '#334155'; ctx.fillText('Material', xIF + (xEnd - xIF) / 2, PAD_T + 14);
 
-  /* Beam clip + fill */
+  /* ── Beam fill (clipped to beam shape) ── */
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(cx - BW0,    transY1);
-  ctx.lineTo(cx - BW_IF,  matTopY);
-  ctx.lineTo(cx - BWF,    focusY);
-  ctx.lineTo(cx - bwBot,  bottomY);
-  ctx.lineTo(cx + bwBot,  bottomY);
-  ctx.lineTo(cx + BWF,    focusY);
-  ctx.lineTo(cx + BW_IF,  matTopY);
-  ctx.lineTo(cx + BW0,    transY1);
+  ctx.moveTo(x0, cy - BH0 / 2);
+  ctx.lineTo(xIF, cy - BH_IF / 2);
+  ctx.lineTo(xFocus, cy - BHF / 2);
+  ctx.lineTo(xEnd, cy - BH_END / 2);
+  ctx.lineTo(xEnd, cy + BH_END / 2);
+  ctx.lineTo(xFocus, cy + BHF / 2);
+  ctx.lineTo(xIF, cy + BH_IF / 2);
+  ctx.lineTo(x0, cy + BH0 / 2);
   ctx.closePath(); ctx.clip();
-
-  const btg = ctx.createLinearGradient(cx, transY1, cx, focusY + 20);
-  btg.addColorStop(0, 'rgba(8,145,178,.20)'); btg.addColorStop(0.85, 'rgba(8,145,178,.35)'); btg.addColorStop(1, 'rgba(8,145,178,.12)');
-  ctx.fillStyle = btg; ctx.fillRect(0, transY1, CW, bottomY - transY1);
-
-  /* Wavefronts */
-  const SPACING = 22, totLen = bottomY - transY1;
-  const off = _wpPhase % SPACING;
-  for (let k = 0; k * SPACING < totLen + SPACING; k++) {
-    const y = transY1 + off + k * SPACING;
-    if (y < transY1 + 0.5 || y > bottomY - 0.5) continue;
-    const hw = bHW(y); if (hw < 0.5) continue;
-    const isC = k % 2 === 0;
-    const distF = Math.abs(y - focusY), maxD = Math.max(focusY - transY1, bottomY - focusY, 1);
-    const fade  = 0.55 + 0.45 * Math.pow(1 - distF / maxD, 2);
-    const sag   = y < focusY
-      ? Math.min(hw * hw / (2 * Math.max(focusY - y, 1)), 10)
-      : Math.min(hw * hw / (2 * Math.max(y - focusY, 1)), 10);
-    ctx.beginPath();
-    ctx.moveTo(cx - hw, y); ctx.quadraticCurveTo(cx, y + Math.max(sag, 1.5), cx + hw, y);
-    ctx.strokeStyle = isC ? `rgba(8,145,178,${(0.95*fade).toFixed(2)})` : `rgba(186,230,253,${(0.72*fade).toFixed(2)})`;
-    ctx.lineWidth   = isC ? 1.8 : 1.0;
-    ctx.stroke();
-  }
+  const btg = ctx.createLinearGradient(x0, 0, xFocus, 0);
+  btg.addColorStop(0, 'rgba(8,145,178,.14)'); btg.addColorStop(0.85, 'rgba(8,145,178,.30)'); btg.addColorStop(1, 'rgba(8,145,178,.10)');
+  ctx.fillStyle = btg; ctx.fillRect(x0, PAD_T, xEnd - x0, BEAM_H);
   ctx.restore();
 
-  /* Beam boundary dashes — kink at water/material interface shows refraction */
-  ctx.save(); ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
-  ctx.strokeStyle = 'rgba(8,145,178,.70)';
-  ctx.beginPath(); ctx.moveTo(cx - BW0, transY1); ctx.lineTo(cx - BW_IF, matTopY); ctx.lineTo(cx - BWF, focusY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx + BW0, transY1); ctx.lineTo(cx + BW_IF, matTopY); ctx.lineTo(cx + BWF, focusY); ctx.stroke();
-  ctx.strokeStyle = 'rgba(8,145,178,.45)'; ctx.setLineDash([2, 5]);
-  ctx.beginPath(); ctx.moveTo(cx - BWF, focusY); ctx.lineTo(cx - bwBot, bottomY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx + BWF, focusY); ctx.lineTo(cx + bwBot, bottomY); ctx.stroke();
+  /* ── Beam boundary dashes — kink at interface shows refraction ── */
+  ctx.save(); ctx.lineWidth = 1.4; ctx.setLineDash([4, 3]);
+  ctx.strokeStyle = 'rgba(8,145,178,.75)';
+  ctx.beginPath(); ctx.moveTo(x0, cy - BH0 / 2); ctx.lineTo(xIF, cy - BH_IF / 2); ctx.lineTo(xFocus, cy - BHF / 2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x0, cy + BH0 / 2); ctx.lineTo(xIF, cy + BH_IF / 2); ctx.lineTo(xFocus, cy + BHF / 2); ctx.stroke();
+  ctx.strokeStyle = 'rgba(8,145,178,.40)'; ctx.setLineDash([2, 5]);
+  ctx.beginPath(); ctx.moveTo(xFocus, cy - BHF / 2); ctx.lineTo(xEnd, cy - BH_END / 2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(xFocus, cy + BHF / 2); ctx.lineTo(xEnd, cy + BH_END / 2); ctx.stroke();
   ctx.setLineDash([]); ctx.restore();
 
-  /* Focus glow */
-  const pulse = 0.82 + 0.18 * Math.sin(_wpPhase * 0.06);
-  const glow  = ctx.createRadialGradient(cx, focusY, 0, cx, focusY, 16 * pulse);
-  glow.addColorStop(0, `rgba(250,204,21,${(0.95*pulse).toFixed(2)})`);
-  glow.addColorStop(0.4, `rgba(250,204,21,${(0.50*pulse).toFixed(2)})`);
-  glow.addColorStop(1, 'rgba(250,204,21,0)');
-  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(cx, focusY, 16 * pulse, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(cx, focusY, 2.8, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#78350f'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'left';
-  ctx.fillText('focus', cx + 8, focusY + 4);
+  /* ── Focus glow (static) ── */
+  const glow = ctx.createRadialGradient(xFocus, cy, 0, xFocus, cy, 13);
+  glow.addColorStop(0, 'rgba(250,204,21,.95)'); glow.addColorStop(0.4, 'rgba(250,204,21,.50)'); glow.addColorStop(1, 'rgba(250,204,21,0)');
+  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(xFocus, cy, 13, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(xFocus, cy, 2.5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#78350f'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('focus', xFocus, cy + 15);
 
-  /* Dimension annotations */
-  const AX = CW - 5; ctx.textAlign = 'right'; ctx.font = '10px Inter,sans-serif';
-  if (WP * scale > 24) {
-    const label = `WP = ${fmt(WP, 3)} mm`, lw = 88;
-    ctx.fillStyle = '#1e40af'; ctx.fillText(label, AX, transY1 + WP * scale / 2 + 4);
-    const bx = AX - lw;
-    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1; ctx.setLineDash([1, 2]);
-    ctx.beginPath(); ctx.moveTo(bx, transY1); ctx.lineTo(bx, matTopY); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.beginPath(); ctx.moveTo(bx, transY1); ctx.lineTo(bx + 4, transY1); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx, matTopY); ctx.lineTo(bx + 4, matTopY); ctx.stroke();
-  }
-  if (mp * scale > 20) { ctx.fillStyle = '#475569'; ctx.fillText(`mp = ${fmt(mp, 3)} mm`, AX, matTopY + mp * scale / 2 + 4); }
-
-  /* Transducer */
-  const tg = ctx.createLinearGradient(cx, transY0, cx, transY1);
+  /* ── Transducer block (left side) ── */
+  const tg = ctx.createLinearGradient(PAD_L, 0, PAD_L + TRANS_W, 0);
   tg.addColorStop(0, '#233d6b'); tg.addColorStop(1, '#0f2d5e');
-  ctx.fillStyle = tg; _rRect(ctx, cx - TRANS_W / 2, transY0, TRANS_W, TRANS_H - 4, 5); ctx.fill();
-  ctx.fillStyle = '#0891b2'; ctx.fillRect(cx - TRANS_W / 2, transY1 - 5, TRANS_W, 5);
-  ctx.fillStyle = '#bae6fd'; ctx.font = 'bold 8px Inter,sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('TRANSDUCER', cx, transY0 + 13);
+  ctx.fillStyle = tg; _rRect(ctx, PAD_L, cy - BH0 / 2, TRANS_W - 4, BH0, 4); ctx.fill();
+  ctx.fillStyle = '#0891b2'; ctx.fillRect(PAD_L + TRANS_W - 5, cy - BH0 / 2, 5, BH0);
+  ctx.save(); ctx.translate(PAD_L + 5, cy); ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = '#bae6fd'; ctx.font = 'bold 7px Inter,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('TX', 0, 3); ctx.restore();
+
+  /* ── Dimension annotations ── */
+  ctx.lineWidth = 1;
+  if (xIF - x0 > 24) {
+    ctx.strokeStyle = '#3b82f6';
+    ctx.beginPath(); ctx.moveTo(x0, dimY); ctx.lineTo(xIF, dimY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0,  dimY - 4); ctx.lineTo(x0,  dimY + 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xIF, dimY - 4); ctx.lineTo(xIF, dimY + 4); ctx.stroke();
+    ctx.fillStyle = '#1e40af'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(`WP = ${fmt(WP, 3)} mm`, x0 + (xIF - x0) / 2, textY);
+  }
+  if (xFocus - xIF > 24) {
+    ctx.strokeStyle = '#64748b';
+    ctx.beginPath(); ctx.moveTo(xIF, dimY); ctx.lineTo(xFocus, dimY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xIF,    dimY - 4); ctx.lineTo(xIF,    dimY + 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xFocus, dimY - 4); ctx.lineTo(xFocus, dimY + 4); ctx.stroke();
+    ctx.fillStyle = '#475569'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(`mp = ${fmt(mp, 3)} mm`, xIF + (xFocus - xIF) / 2, textY);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────
