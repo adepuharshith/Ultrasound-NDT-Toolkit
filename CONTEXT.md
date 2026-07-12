@@ -87,19 +87,18 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 
 ## theory.html — structure
 
-### 9-step student flow (sidebar "Student Path")
+### Introductory student flow
 1. Sound Waves vs EM Waves (`#wave-types`) — light canvas animations + EM 3D wave
 2. Speed in Media (`#speed-comparison`)
-3. Energy Loss / Attenuation (`#energy-loss`)
-4. Why Longitudinal? (`#why-longitudinal`)
-5. Ultrasound Spectrum (`#ultrasound-spectrum`)
-6. Generating Ultrasound / Piezoelectric (`#generating-ultrasound`)
-7. A-scan (`#a-scan`)
-8. B-scan (`#b-scan`)
-9. C-scan (`#c-scan`)
+3. Applications (`#applications`)
+4. Elastic Wave Types (`#elastic-wave-types`) — animated L, SH/SV, and Rayleigh particle lattices
+5. Acoustic Impedance (`#acoustic-impedance`) — moved at runtime from its former Advanced Topics position so the detailed section remains a single DOM node
+6. Creating Elastic Waves (`#wave-generation`) — water/solid normal incidence, oblique mode conversion, and Rayleigh critical-angle diagrams
+7. UT Principle and Material Properties
+8. Ultrasound Spectrum and Piezoelectric Generation
+9. A-scan, B-scan, and C-scan
 
-### Advanced topics (sidebar "Advanced Topics")
-- Acoustic Impedance (`#acoustic-impedance`) — Z = ρc, R and T formulas, interface SVG, Z table for 7 NDE materials, immersion-Al worked example, phase-inversion diagnostic callout
+### Advanced topics
 - Attenuation — Detailed (`#attenuation`) — frequency dependence, Rayleigh/stochastic
 - Beam Physics (`#beam-physics`) — wave velocity from material props (V_L, V_S), near field, divergence, focus
 - Snell's Law & Mode Conversion (`#snell`) — critical angle table, SVG mode-conversion diagram

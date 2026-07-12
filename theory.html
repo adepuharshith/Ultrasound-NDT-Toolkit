@@ -402,6 +402,43 @@
     }
     @media (max-width: 560px) { .elastic-key { grid-template-columns: 1fr; } }
 
+    /* ---- Wave generation at a liquid-solid interface ---- */
+    .mode-conversion-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 1.4rem 0 1rem;
+    }
+    .mode-conversion-card {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+    .mode-conversion-card h3 { margin: 0; padding: 1rem 1rem .25rem; font-size: 1rem; color: var(--text); }
+    .mode-conversion-card > p { min-height: 4.6rem; margin: 0; padding: .25rem 1rem 1rem; font-size: .8rem; line-height: 1.5; }
+    .mode-conversion-card svg { display: block; width: 100%; height: auto; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .mode-result { padding: .8rem 1rem 1rem; font-size: .78rem; line-height: 1.5; color: var(--text-muted); }
+    .mode-result strong { color: var(--text); }
+    .wave-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem 1.1rem;
+      align-items: center;
+      padding: .75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-size: .78rem;
+    }
+    .wave-legend i { display:inline-block; width:18px; height:3px; margin-right:.3rem; vertical-align:middle; border-radius:2px; }
+    @media (max-width: 900px) {
+      .mode-conversion-grid { grid-template-columns: 1fr; }
+      .mode-conversion-card { max-width: 620px; width: 100%; margin: 0 auto; }
+      .mode-conversion-card > p { min-height: 0; }
+    }
+
     /* ---- VS comparison grid ---- */
     .vs-grid {
       display: grid;
@@ -547,6 +584,8 @@
     <a href="#speed-comparison"      class="sec-nav-btn">Key Differences</a>
     <a href="#applications"          class="sec-nav-btn">Applications</a>
     <a href="#elastic-wave-types"   class="sec-nav-btn">Elastic Wave Types</a>
+    <a href="#acoustic-impedance"   class="sec-nav-btn">Impedance</a>
+    <a href="#wave-generation"      class="sec-nav-btn">Creating Waves</a>
     <a href="#ut-principle"          class="sec-nav-btn">UT Principle</a>
     <a href="#material-props"        class="sec-nav-btn">Material Props</a>
     <a href="#ultrasound-spectrum"   class="sec-nav-btn">UT Spectrum</a>
@@ -751,6 +790,101 @@
             <div><strong>Parallel motion</strong>L-wave: particle motion ∥ travel</div>
             <div><strong>Perpendicular motion</strong>S-wave: particle motion ⟂ travel</div>
             <div><strong>Elliptical motion</strong>Rayleigh: surface-localized rolling</div>
+          </div>
+        </div>
+
+        <!-- Acoustic Impedance is moved here from Advanced Topics by the inline
+             script so the existing detailed section remains the single source. -->
+
+        <!-- ══════════════════════════════════════════════
+             CREATING ELASTIC WAVES — liquid-solid interface
+             ══════════════════════════════════════════════ -->
+        <div class="theory-section" id="wave-generation">
+          <h2>How Are Different Elastic Waves Created?</h2>
+          <p>
+            Consider a longitudinal wave traveling through <strong>water</strong> toward a
+            <strong>solid</strong>. Water cannot support shear stress, so the incident and reflected
+            waves in the water are always longitudinal. Changing the incident angle controls which
+            wave modes receive energy inside — or along the surface of — the solid.
+          </p>
+
+          <div class="mode-conversion-grid">
+            <article class="mode-conversion-card">
+              <h3>1. Normal incidence</h3>
+              <p>The beam strikes perpendicular to the interface: &theta;<sub>i</sub> = 0&deg;.</p>
+              <svg viewBox="0 0 340 270" role="img" aria-label="Normal incidence from water into a solid producing reflected and transmitted longitudinal waves">
+                <defs><marker id="mc-a1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="context-stroke"/></marker></defs>
+                <rect width="340" height="130" fill="#dbeafe"/><rect y="130" width="340" height="140" fill="#e2e8f0"/>
+                <line x1="0" y1="130" x2="340" y2="130" stroke="#334155" stroke-width="2"/>
+                <text x="16" y="22" fill="#0369a1" font-size="12" font-weight="700">WATER · longitudinal only</text>
+                <text x="16" y="255" fill="#475569" font-size="12" font-weight="700">SOLID</text>
+                <line x1="170" y1="35" x2="170" y2="121" stroke="#0891b2" stroke-width="4" marker-end="url(#mc-a1)"/>
+                <text x="179" y="66" fill="#0369a1" font-size="10">incident L</text>
+                <line x1="158" y1="119" x2="158" y2="52" stroke="#dc2626" stroke-width="3" marker-end="url(#mc-a1)"/>
+                <text x="91" y="97" fill="#dc2626" font-size="10">reflected L</text>
+                <line x1="170" y1="139" x2="170" y2="222" stroke="#16a34a" stroke-width="4" marker-end="url(#mc-a1)"/>
+                <text x="179" y="190" fill="#15803d" font-size="10">transmitted L</text>
+              </svg>
+              <div class="mode-result"><strong>Result:</strong> reflected L + transmitted L. Symmetry prevents shear-wave generation.</div>
+            </article>
+
+            <article class="mode-conversion-card">
+              <h3>2. Oblique incidence</h3>
+              <p>An angled beam breaks the symmetry and causes mode conversion.</p>
+              <svg viewBox="0 0 340 270" role="img" aria-label="Oblique incidence from water into a solid producing longitudinal and shear vertical waves">
+                <defs><marker id="mc-a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="context-stroke"/></marker></defs>
+                <rect width="340" height="130" fill="#dbeafe"/><rect y="130" width="340" height="140" fill="#e2e8f0"/>
+                <line x1="0" y1="130" x2="340" y2="130" stroke="#334155" stroke-width="2"/>
+                <line x1="170" y1="92" x2="170" y2="168" stroke="#94a3b8" stroke-dasharray="4 3"/>
+                <text x="16" y="22" fill="#0369a1" font-size="12" font-weight="700">WATER · L only</text><text x="16" y="255" fill="#475569" font-size="12" font-weight="700">SOLID · L + SV</text>
+                <line x1="72" y1="36" x2="164" y2="124" stroke="#0891b2" stroke-width="4" marker-end="url(#mc-a2)"/>
+                <text x="72" y="67" fill="#0369a1" font-size="10">incident L</text>
+                <line x1="164" y1="124" x2="255" y2="38" stroke="#dc2626" stroke-width="3" marker-end="url(#mc-a2)"/>
+                <text x="230" y="76" fill="#dc2626" font-size="10">reflected L</text>
+                <line x1="174" y1="136" x2="232" y2="225" stroke="#16a34a" stroke-width="4" marker-end="url(#mc-a2)"/>
+                <text x="224" y="198" fill="#15803d" font-size="10">L</text>
+                <line x1="174" y1="136" x2="203" y2="235" stroke="#7c3aed" stroke-width="4" marker-end="url(#mc-a2)"/>
+                <text x="178" y="211" fill="#6d28d9" font-size="10">SV</text>
+                <path d="M170 105 A25 25 0 0 0 151 112" fill="none" stroke="#475569"/><text x="144" y="101" fill="#475569" font-size="10">&theta;ᵢ</text>
+              </svg>
+              <div class="mode-result"><strong>Result:</strong> reflected L in water; refracted L and SV waves in the solid at different Snell-law angles.</div>
+            </article>
+
+            <article class="mode-conversion-card">
+              <h3>3. Rayleigh critical angle</h3>
+              <p>The incident angle is tuned so energy travels along the free surface.</p>
+              <svg viewBox="0 0 340 270" role="img" aria-label="Critical-angle incidence producing a Rayleigh surface wave in a solid">
+                <defs><marker id="mc-a3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="context-stroke"/></marker></defs>
+                <rect width="340" height="130" fill="#dbeafe"/><rect y="130" width="340" height="140" fill="#e2e8f0"/>
+                <line x1="0" y1="130" x2="340" y2="130" stroke="#334155" stroke-width="2"/>
+                <text x="16" y="22" fill="#0369a1" font-size="12" font-weight="700">WATER</text><text x="16" y="255" fill="#475569" font-size="12" font-weight="700">SOLID</text>
+                <line x1="58" y1="48" x2="151" y2="124" stroke="#0891b2" stroke-width="4" marker-end="url(#mc-a3)"/>
+                <text x="55" y="76" fill="#0369a1" font-size="10">incident L</text>
+                <line x1="151" y1="124" x2="246" y2="47" stroke="#dc2626" stroke-width="3" marker-end="url(#mc-a3)"/>
+                <text x="222" y="80" fill="#dc2626" font-size="10">reflected L</text>
+                <path d="M158 135 C176 116 192 154 210 135 S244 154 262 135 S296 154 316 135" fill="none" stroke="#059669" stroke-width="5" marker-end="url(#mc-a3)"/>
+                <path d="M165 146 C183 132 199 160 217 146 S251 160 269 146" fill="none" stroke="#10b981" stroke-width="2.5" opacity=".5"/>
+                <text x="235" y="177" fill="#047857" font-size="11" font-weight="700">Rayleigh surface wave</text>
+                <text x="235" y="191" fill="#64748b" font-size="9">elliptical motion decays with depth</text>
+              </svg>
+              <div class="mode-result"><strong>Result:</strong> a Rayleigh wave is launched along the solid surface; its energy remains within roughly one wavelength of the surface.</div>
+            </article>
+          </div>
+
+          <div class="wave-legend">
+            <span><i style="background:#0891b2"></i>Incident L</span>
+            <span><i style="background:#dc2626"></i>Reflected L</span>
+            <span><i style="background:#16a34a"></i>Transmitted L</span>
+            <span><i style="background:#7c3aed"></i>Transmitted SV</span>
+            <span><i style="background:#059669"></i>Rayleigh</span>
+          </div>
+
+          <div class="callout">
+            <strong>The control knob is angle:</strong> Snell&rsquo;s law links every refracted mode to
+            its wave speed. Increasing the incident angle first changes the L and SV directions,
+            then drives bulk modes to their critical conditions; tuning to the Rayleigh condition
+            concentrates energy at the surface. In practice, wedges are often used instead of water
+            to set these angles precisely.
           </div>
         </div>
 
@@ -1804,7 +1938,7 @@
           <span>Advanced Topics</span>
         </div>
 
-        <!-- Acoustic Impedance -->
+        <!-- Acoustic Impedance (rendered in the introductory flow via script below) -->
         <div class="theory-section" id="acoustic-impedance">
           <h2>&#128260; Acoustic Impedance</h2>
           <p>
@@ -3388,6 +3522,16 @@
 
 <script src="assets/js/main.js"></script>
 <script>
+/* Move the existing detailed impedance section into the introductory sequence.
+   Keeping one DOM node avoids duplicated equations, IDs, and maintenance. */
+(function () {
+  var impedance = document.getElementById('acoustic-impedance');
+  var generation = document.getElementById('wave-generation');
+  if (impedance && generation && generation.parentNode) {
+    generation.parentNode.insertBefore(impedance, generation);
+  }
+})();
+
 /* ============================================================
    LONGITUDINAL WAVE ANIMATION  —  theory.html
    Particles oscillate horizontally (parallel to wave travel).
