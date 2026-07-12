@@ -588,7 +588,7 @@
     <a href="#wave-generation"      class="sec-nav-btn">Creating Waves</a>
     <a href="#ut-principle"          class="sec-nav-btn">UT Principle</a>
     <a href="#material-props"        class="sec-nav-btn">Material Props</a>
-    <a href="#ultrasound-spectrum"   class="sec-nav-btn">UT Spectrum</a>
+    <a href="#ultrasound-spectrum"   class="sec-nav-btn">Acoustic Spectrum</a>
     <a href="#generating-ultrasound" class="sec-nav-btn">Generating UT</a>
     <a href="#a-scan"                class="sec-nav-btn">A-scan</a>
     <a href="#b-scan"                class="sec-nav-btn">B-scan</a>
@@ -994,15 +994,16 @@
         </div>
 
         <!-- ══════════════════════════════════════════════
-             SECTION 5 — Ultrasound Spectrum
+             ACOUSTIC SPECTRUM FOR INSPECTION
              ══════════════════════════════════════════════ -->
         <div class="theory-section" id="ultrasound-spectrum">
-          <h2>The Ultrasound Spectrum for Inspection</h2>
+          <h2>The Acoustic Spectrum for Inspection</h2>
 
           <p>
-            "Ultrasound" simply means sound above the human hearing limit of ~20 kHz.
-            For industrial NDE, the useful range extends from <strong>0.1 MHz to 50 MHz</strong> —
-            frequencies far beyond anything audible.
+            Acoustic waves span the full frequency range from infrasound, through audible sound,
+            to ultrasound. Inspection methods occupy several parts of this spectrum; conventional
+            industrial ultrasonic NDE most often uses <strong>0.1 MHz to 50 MHz</strong>, trading
+            penetration at low frequency against resolution at high frequency.
           </p>
 
           <div class="spectrum-wrap">
@@ -3522,13 +3523,17 @@
 
 <script src="assets/js/main.js"></script>
 <script>
-/* Move the existing detailed impedance section into the introductory sequence.
-   Keeping one DOM node avoids duplicated equations, IDs, and maintenance. */
+/* Move the existing impedance and acoustic-spectrum sections into the
+   introductory sequence. Keeping one DOM node for each avoids duplication. */
 (function () {
   var impedance = document.getElementById('acoustic-impedance');
   var generation = document.getElementById('wave-generation');
+  var spectrum = document.getElementById('ultrasound-spectrum');
   if (impedance && generation && generation.parentNode) {
     generation.parentNode.insertBefore(impedance, generation);
+  }
+  if (spectrum && generation && generation.parentNode) {
+    generation.parentNode.insertBefore(spectrum, generation.nextSibling);
   }
 })();
 

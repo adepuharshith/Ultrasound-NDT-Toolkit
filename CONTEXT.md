@@ -94,8 +94,8 @@ _wpResume() / _wpPause()  // used with visibilitychange event
 4. Elastic Wave Types (`#elastic-wave-types`) — animated L, SH/SV, and Rayleigh particle lattices
 5. Acoustic Impedance (`#acoustic-impedance`) — moved at runtime from its former Advanced Topics position so the detailed section remains a single DOM node
 6. Creating Elastic Waves (`#wave-generation`) — water/solid normal incidence, oblique mode conversion, and Rayleigh critical-angle diagrams
-7. UT Principle and Material Properties
-8. Ultrasound Spectrum and Piezoelectric Generation
+7. Acoustic Spectrum for Inspection (`#ultrasound-spectrum`) — covers infrasound, audible sound, and ultrasound; moved at runtime directly after wave generation
+8. UT Principle, Material Properties, and Piezoelectric Generation
 9. A-scan, B-scan, and C-scan
 
 ### Advanced topics
