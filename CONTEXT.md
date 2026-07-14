@@ -14,7 +14,7 @@ GitHub Pages: `https://adepuharshith.github.io/ultrasound-ndt-toolkit/`
 ```
 index.html               Landing page — hero, pathway strip, 3 section cards
 theory.html              Full theory guide — 9-step student flow + 10 advanced topics
-transducers.html         Transducer types page — piezo, anatomy, 7 transducer types
+transducers.html         Experiments route — intentionally blank content area; shared nav + footer only
 calculators.html         10 live calculators — single-column, input-left + canvas-right
 signal-processing.html   Signal processing deep-dive — xcorr, wavelet, spectrogram, Hilbert
 resources.html           Filterable resource library (type buttons + search input)
@@ -38,7 +38,13 @@ CONTEXT.md               ← this file
 ---
 
 ## Navigation (all pages)
-All 5 pages share the same nav: Home → Theory → Transducers → Calculators → Resources
+All pages share the main nav. `assets/js/main.js` enhances the Theory item at runtime with a four-group mega-menu:
+- Wave Foundations
+- Interfaces & Frequency
+- Inspection & Imaging
+- Advanced Topics
+
+The menu opens on hover/focus for desktop and via a chevron toggle on mobile. Menu links target section anchors in `theory.html`.
 
 ---
 

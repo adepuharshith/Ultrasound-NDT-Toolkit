@@ -14,6 +14,74 @@ document.addEventListener('DOMContentLoaded', () => {
     if (a.getAttribute('href') === page) a.classList.add('active');
   });
 
+  /* Group the growing Theory page into one site-wide hover/focus menu. */
+  const theoryLink = document.querySelector('.nav-links > li > a[href="theory.html"]');
+  if (theoryLink) {
+    const item = theoryLink.parentElement;
+    item.classList.add('theory-menu');
+    const groups = [
+      ['Wave Foundations', [
+        ['Sound vs EM', 'wave-types'], ['Key Differences', 'speed-comparison'],
+        ['Applications', 'applications'], ['Elastic Wave Types', 'elastic-wave-types']
+      ]],
+      ['Interfaces & Frequency', [
+        ['Acoustic Impedance', 'acoustic-impedance'], ['Creating Elastic Waves', 'wave-generation'],
+        ['Acoustic Spectrum', 'ultrasound-spectrum'], ['Generating Ultrasound', 'generating-ultrasound']
+      ]],
+      ['Inspection & Imaging', [
+        ['UT Principle', 'ut-principle'], ['Material Properties', 'material-props'],
+        ['A-scan', 'a-scan'], ['B-scan', 'b-scan'], ['C-scan', 'c-scan']
+      ]],
+      ['Advanced Topics', [
+        ['Attenuation', 'attenuation'], ['Beam Physics', 'beam-physics'], ['Snell’s Law', 'snell'],
+        ['Phased Arrays', 'phased-arrays'], ['Calibration & DAC', 'calibration'],
+        ['Pulser–Receiver', 'pulser-receiver'], ['TOFD', 'tofd'], ['Weld Inspection', 'weld-inspection']
+      ]]
+    ];
+
+    const toggle = document.createElement('button');
+    toggle.className = 'theory-menu-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-label', 'Show Theory topics');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    const menu = document.createElement('div');
+    menu.className = 'theory-dropdown';
+    menu.setAttribute('aria-label', 'Theory topics');
+    groups.forEach(([title, links]) => {
+      const group = document.createElement('div');
+      group.className = 'theory-dropdown-group';
+      const heading = document.createElement('span');
+      heading.className = 'theory-dropdown-title';
+      heading.textContent = title;
+      group.appendChild(heading);
+      links.forEach(([label, id]) => {
+        const link = document.createElement('a');
+        link.href = `theory.html#${id}`;
+        link.textContent = label;
+        group.appendChild(link);
+      });
+      menu.appendChild(group);
+    });
+    item.append(toggle, menu);
+
+    const setOpen = open => {
+      item.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+    toggle.addEventListener('click', event => {
+      event.stopPropagation();
+      setOpen(!item.classList.contains('open'));
+    });
+    document.addEventListener('click', event => {
+      if (!item.contains(event.target)) setOpen(false);
+    });
+    item.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { setOpen(false); theoryLink.focus(); }
+    });
+  }
+
   /* Sidebar scroll-spy (theory page) */
   const sections  = document.querySelectorAll('.theory-section[id]');
   const sideLinks = document.querySelectorAll('.topic-sidebar a[href^="#"]');
