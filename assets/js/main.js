@@ -39,6 +39,32 @@ function fmt(val, sig = 4) {
   return parseFloat(val.toPrecision(sig)).toLocaleString('en-US', { maximumSignificantDigits: sig });
 }
 
+/* Prepare a canvas at its actual rendered size and device pixel ratio while
+   preserving the original width/height attributes as logical drawing units.
+   This prevents canvas labels and thin lines from becoming blurry when a
+   calculator visualization is wider than its native bitmap. */
+function _setupHiDPICanvas(canvas) {
+  if (!canvas.dataset.logicalWidth) {
+    canvas.dataset.logicalWidth = canvas.getAttribute('width') || '600';
+    canvas.dataset.logicalHeight = canvas.getAttribute('height') || '300';
+  }
+  const CW = Number(canvas.dataset.logicalWidth);
+  const CH = Number(canvas.dataset.logicalHeight);
+  const rect = canvas.getBoundingClientRect();
+  const cssW = rect.width || CW;
+  const cssH = cssW * CH / CW;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const pixelW = Math.max(1, Math.round(cssW * dpr));
+  const pixelH = Math.max(1, Math.round(cssH * dpr));
+  if (canvas.width !== pixelW || canvas.height !== pixelH) {
+    canvas.width = pixelW;
+    canvas.height = pixelH;
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(pixelW / CW, 0, 0, pixelH / CH, 0, 0);
+  return { ctx, CW, CH };
+}
+
 /* Cross-browser rounded rect path (avoids ctx.roundRect compat issues) */
 function _rRect(ctx, x, y, w, h, r) {
   r = Math.min(r, w / 2, h / 2);
@@ -100,8 +126,7 @@ function _wlStart() {
 function _wlDraw() {
   const canvas = document.getElementById('wl-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   const { f, c1, c2 } = _wlP;
 
   ctx.clearRect(0, 0, CW, CH);
@@ -216,8 +241,7 @@ function calcNearField() {
 function _drawNFViz(D_mm, N_mm) {
   const canvas = document.getElementById('nf-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
 
   /* Beam propagates LEFT → RIGHT */
@@ -302,8 +326,7 @@ function calcDepth() {
 function _drawTOFViz(tof, v, depth_mm) {
   const canvas = document.getElementById('tof-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
 
   const PAD = 18, transH = 22, cx = CW / 2;
@@ -380,8 +403,7 @@ function calcAttenuation() {
 function _drawAttViz(alpha, f, d, total_dB) {
   const canvas = document.getElementById('att-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
 
   const PAD_L = 32, PAD_R = 20, PAD_T = 16, PAD_B = 28;
@@ -464,8 +486,7 @@ function calcSnell() {
 function _drawSnellViz(theta1, v1, v2, sinT2) {
   const canvas = document.getElementById('sn-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
 
   const isTIR = Math.abs(sinT2) > 1;
@@ -545,8 +566,7 @@ function calcImpedance() {
 function _drawZViz(Z1, Z2, R, T) {
   const canvas = document.getElementById('z-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
 
   const ix = CW / 2, cy = CH / 2;   /* interface x, center y */
@@ -621,8 +641,7 @@ function calcBeamDiv() {
 function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
   const canvas = document.getElementById('bd-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
 
   const PAD = 18;
@@ -751,10 +770,11 @@ function calcWaterPath() {
 function _wpDraw() {
   const canvas = document.getElementById('wp-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
+  const prepared = _setupHiDPICanvas(canvas);
+  const ctx = prepared.ctx;
   const { f, mp, cs, cw, WP, matThick, valid } = _wpP;
 
-  const CW = canvas.width, CH = canvas.height;
+  const CW = prepared.CW, CH = prepared.CH;
   ctx.clearRect(0, 0, CW, CH);
   ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
 
@@ -907,8 +927,7 @@ function calcWaveVel() {
   /* ── Canvas bar chart ── */
   const canvas = document.getElementById('wv-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
   ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
 
@@ -963,8 +982,7 @@ function calcTOFD() {
   /* ── Canvas: TOFD geometry diagram ── */
   const canvas = document.getElementById('tofd-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const CW = canvas.width, CH = canvas.height;
+  const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH); ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
 
   const MAT_TOP = 60, MAT_H = 110, CX = CW / 2;

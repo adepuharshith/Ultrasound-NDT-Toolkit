@@ -45,9 +45,10 @@ All 5 pages share the same nav: Home → Theory → Transducers → Calculators 
 ## calculators.html — layout rules
 - `.calc-grid` — `grid-template-columns: 1fr` (one card per row, full width)
 - `.calc-inner` — **flex row**: `.calc-inputs` gets `width: min(360px, 42%)`, `.calc-viz` gets `flex:1 1 auto`
-- `.calc-viz canvas` — `width:100%; height:auto` (fills viz column, scales proportionally)
+- `.calc-viz` and `.calc-visual` — consistent 2:1 visualization frames; canvases use `object-fit: contain` so their logical drawing aspect ratios are preserved without distortion
+- All 10 calculator canvases use `_setupHiDPICanvas()` in `main.js`, sizing the backing bitmap to the rendered width × device pixel ratio while retaining their original logical coordinates; this keeps labels and thin lines sharp on Retina/high-DPI displays
 - Water path uses `.calc-inputs-wide` → `width: min(400px, 44%)`
-- Stacks to single column at `max-width: 720px`
+- Both `.calc-inner` and `.calc-layout` stack to a single column at `max-width: 720px`
 - **Init**: calculators are called DIRECTLY at bottom of `<body>` (no load event listener)
 
 ---
