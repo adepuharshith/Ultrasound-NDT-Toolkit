@@ -26,14 +26,32 @@ CONTEXT.md               ← this file
 ---
 
 ## CSS design tokens (style.css)
-| Token | Value | Use |
-|---|---|---|
-| `--brand-navy` | `#0f2d5e` | Nav, transducer, headings |
-| `--brand-cyan` | `#0891b2` | Accent, section labels, result borders |
-| `--brand-blue` | `#1e40af` | Links, active states |
-| `--bg` | `#f8fafc` | Page background |
-| `--border` | `#e2e8f0` | Card borders |
-| `--radius` | `10px` | Card corners |
+| Token | Value (light) | Value (dark) | Use |
+|---|---|---|---|
+| `--brand-navy` | `#0f2d5e` | (same) | Nav, footer, hero, page-header — fixed chrome, doesn't invert |
+| `--brand-cyan` | `#0891b2` | (same) | Accent, section labels, result borders — legible on both themes |
+| `--brand-blue` | `#1e40af` | (same) | Links, active states (paired with light backgrounds only) |
+| `--bg` | `#f8fafc` | `#0a1120` | Page background |
+| `--bg-card` | `#ffffff` | `#131d31` | Card / panel surfaces |
+| `--text` / `--text-muted` | `#0f172a` / `#64748b` | `#e7edf6` / `#94a3b8` | Body text |
+| `--border` | `#e2e8f0` | `#223049` | Card/table borders |
+| `--heading-accent` | `var(--brand-navy)` | `#7dd3fc` | Headings/result values that sit on `--bg-card` (navy is unreadable on a dark card, so this token lifts to a light blue in dark mode) |
+| `--surface-canvas` / `--surface-screen` | `#ffffff` / `#edf6ff` | `#eef2f7` / `#dbe8f7` | Backing for `<canvas>` / inline-SVG diagrams. **Stays light in both themes** — the JS drawing routines and SVG markup hardcode dark-on-light colors, so only the wrapper needs a safe paper tone, never inverted text on top of it |
+| `--pastel-{blue,green,purple,orange}-{bg,border,text}` | light pastel | translucent-on-dark + light text | Callouts, tags, concept chips, comparison-table tinted cells — inverts with theme |
+| `--radius` | `10px` | — | Card corners |
+
+Theme is toggled via `document.documentElement.setAttribute('data-theme', 'dark'|'light')`; all dark values above live under the `:root[data-theme="dark"]` selector in `style.css`.
+
+**Rule of thumb when adding new colored UI:** if the text on top of a background already uses a themed `var(--text*)`/`var(--brand-*)` token, the background should also invert (`var(--bg)`, `var(--bg-card)`, or a `--pastel-*` token). If the element hosts fixed-color canvas/SVG/KaTeX content, keep the background on `--surface-canvas`/`--surface-screen` and never assign it a themed text color.
+
+---
+
+## Light / dark theme system
+- **Toggle**: a button (`.theme-toggle`, sun/moon SVG) is injected into every page's `.nav` at runtime by `assets/js/main.js` — not hand-authored per page, following the same "enhance nav via JS" convention as the Theory mega-menu.
+- **Persistence**: click handler sets `localStorage.theme` and flips `data-theme` on `<html>`. If the user has never toggled, the site follows `prefers-color-scheme` live (listener on the media query).
+- **No flash of wrong theme**: every page's `<head>` has a tiny inline `<script>` (before the stylesheet link) that reads `localStorage.theme` (or falls back to system preference) and sets `data-theme` on `<html>` synchronously before first paint. This snippet is duplicated across all 7 HTML files intentionally — it must run before CSS renders, so it can't live in the deferred `main.js`.
+- **KaTeX/canvas/SVG content is never re-themed** — those draw fixed dark-on-light colors (JS `ctx.fillStyle`, inline SVG `fill=`/`stroke=`, KaTeX `currentColor`). Only their container backgrounds use `--surface-canvas`/`--surface-screen` so they read as intentional "paper" cards floating on a dark page, rather than trying to invert every pixel of hand-tuned diagram code.
+- Small fixed-color infographics that mix inline `background` + inline text color (e.g. the acoustic-spectrum segments/app-cards in `theory.html`, badge chips) are left as-is — self-contained and legible in both themes without edits.
 
 ---
 
@@ -45,6 +63,8 @@ All pages share the main nav. `assets/js/main.js` enhances the Theory item at ru
 - Advanced Topics
 
 The menu opens on hover/focus for desktop and via a chevron toggle on mobile. Menu links target section anchors in `theory.html`.
+
+The theme-toggle button is inserted just before `.nav-hamburger`. On mobile (`≤768px`), `.nav` padding/gap tighten and `.nav-brand .sub` ("Purdue NDT Lab") is hidden to keep the brand + toggle + hamburger from overflowing 375–390px viewports.
 
 ---
 
@@ -231,3 +251,4 @@ b8c35c1  Expand Signal Processing section
 - Add calculators: focal spot size, SNR estimator, dispersion curves
 - GitHub Pages: Settings → Pages → main branch (not yet enabled)
 - Content sourced from NDE-ED (nde-ed.org) + Purdue lab experience
+- Pre-existing (not introduced by the theme work): navigating client-side into `calculators.html` from another page throws `Cannot read properties of null (reading 'value')` in the console — reproduces on the original code too. Calculator init code at the bottom of `<body>` likely queries an element before/without a guard; harmless (calculators still work) but worth a root-cause pass.

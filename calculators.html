@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f2d5e" />
+  <script>(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <title>Calculators — Ultrasound &amp; NDT Toolkit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -48,7 +50,7 @@
       flex: 1 1 auto;
       min-width: 0;
       aspect-ratio: 2 / 1;
-      background: #f0f9ff;
+      background: var(--surface-screen);
       border: 1.5px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
@@ -71,8 +73,8 @@
       border-radius: 6px;
       font-size: .93rem;
       color: var(--text);
-      background: #fff;
-      transition: border-color .15s;
+      background: var(--bg-card);
+      transition: border-color .15s, var(--transition-theme);
       box-sizing: border-box;
     }
     .calc-layout input[type="number"]:focus {
@@ -86,8 +88,8 @@
       flex: 1 1 auto;
       min-width: 0;            /* allow flex shrinking */
       aspect-ratio: 2 / 1;     /* consistent frame across all calculators */
-      background: #edf6ff;
-      border: 1.5px solid #cbd5e1;
+      background: var(--surface-screen);
+      border: 1.5px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
       line-height: 0;
@@ -108,7 +110,7 @@
       color: var(--brand-cyan);
       margin-bottom: .2rem;
     }
-    .calc-box h3 { font-size: 1.05rem; color: var(--brand-navy); margin-bottom: .85rem; }
+    .calc-box h3 { font-size: 1.05rem; color: var(--heading-accent); margin-bottom: .85rem; }
 
     /* ---- Tighten form-group spacing ---- */
     .form-group { margin-bottom: .6rem; }
@@ -123,10 +125,10 @@
       border-left: 4px solid var(--brand-cyan);
     }
     .calc-result .result-label { font-size: .72rem; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: .06em; }
-    .calc-result .result-value { font-size: 1.45rem; font-weight: 800; color: var(--brand-navy); }
+    .calc-result .result-value { font-size: 1.45rem; font-weight: 800; color: var(--heading-accent); }
     .calc-result .result-unit  { font-size: .88rem; font-weight: 500; color: var(--text-muted); margin-left: .25rem; }
-    .calc-formula { margin-top: .5rem; padding: .5rem .85rem; background: #f1f5f9; border-radius: 6px; font-family: 'Courier New',monospace; font-size: .86rem; color: #334155; }
-    .calc-desc { font-size: .79rem; color: #475569; margin-top: .4rem; line-height: 1.5; }
+    .calc-formula { margin-top: .5rem; padding: .5rem .85rem; background: var(--bg); border-radius: 6px; font-family: var(--font-mono); font-size: .86rem; color: var(--text-muted); }
+    .calc-desc { font-size: .79rem; color: var(--text-muted); margin-top: .4rem; line-height: 1.5; }
 
     /* ---- Dual-result row (wavelength) ---- */
     .result-row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .6rem; }
@@ -136,7 +138,7 @@
     .z-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .55rem; }
     .z-cell { background: var(--accent-light); border-radius: 8px; padding: .55rem .8rem; text-align: center; }
     .z-cell .z-label { font-size: .68rem; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: .05em; }
-    .z-cell .z-val   { font-size: 1.1rem;  font-weight: 800; color: var(--brand-navy); margin-top: .1rem; }
+    .z-cell .z-val   { font-size: 1.1rem;  font-weight: 800; color: var(--heading-accent); margin-top: .1rem; }
 
     /* ---- Material table ---- */
     .mat-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: .75rem; }

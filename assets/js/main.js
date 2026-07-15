@@ -2,8 +2,54 @@
    Ultrasound & NDT Toolkit — Shared JS
    ============================================================ */
 
-/* Hamburger menu toggle */
+/* Light/dark theme toggle — injected into every page's nav bar.
+   The active theme is applied synchronously by an inline snippet in
+   <head> (before first paint) so there's no flash; this only wires up
+   the visible button + persistence + live system-preference syncing. */
 document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.querySelector('.nav');
+  if (nav) {
+    const toggle = document.createElement('button');
+    toggle.className = 'theme-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-label', 'Toggle light / dark theme');
+    toggle.innerHTML =
+      '<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+        '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/>' +
+      '</svg>' +
+      '<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M20.5 14.6A8.5 8.5 0 1 1 9.4 3.5a7 7 0 0 0 11.1 11.1Z"/>' +
+      '</svg>';
+
+    const hamburger = nav.querySelector('.nav-hamburger');
+    if (hamburger) nav.insertBefore(toggle, hamburger); else nav.appendChild(toggle);
+
+    const root = document.documentElement;
+    toggle.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+
+    /* If the user never explicitly chose a theme, keep following the OS setting live. */
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        let stored = null;
+        try { stored = localStorage.getItem('theme'); } catch (err) {}
+        if (!stored) root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      });
+    }
+  }
+
+  /* Nav gains a stronger shadow once the page scrolls under it */
+  const navEl = document.querySelector('.nav');
+  if (navEl) {
+    const onScroll = () => navEl.classList.toggle('scrolled', window.scrollY > 4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  /* Hamburger menu toggle */
   const btn   = document.querySelector('.nav-hamburger');
   const links = document.querySelector('.nav-links');
   if (btn && links) btn.addEventListener('click', () => links.classList.toggle('open'));

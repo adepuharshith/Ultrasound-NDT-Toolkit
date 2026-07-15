@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f2d5e" />
+  <script>(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <title>Signal Processing — Ultrasound &amp; NDT Toolkit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -13,7 +15,7 @@
 
     /* ── Section nav ── */
     .sec-nav {
-      background: #fff;
+      background: var(--bg-card);
       border-bottom: 1px solid var(--border);
       padding: .7rem 2rem;
       position: sticky;
@@ -30,7 +32,7 @@
       padding: .28rem .85rem;
       border-radius: 999px;
       border: 1.5px solid var(--border);
-      background: #f8fafc;
+      background: var(--bg);
       font-size: .78rem;
       font-weight: 600;
       color: var(--text-muted);
@@ -39,11 +41,11 @@
       transition: all .15s;
       white-space: nowrap;
     }
-    .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--brand-blue); text-decoration: none; }
+    .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); text-decoration: none; }
 
     /* ── Block cards ── */
     .sp-block {
-      background: #fff;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 16px;
       box-shadow: var(--shadow);
@@ -82,9 +84,9 @@
       border-radius: 999px;
       letter-spacing: .01em;
     }
-    .concept-chip.orange { background: #fff7ed; color: #c2410c; }
-    .concept-chip.purple { background: #f5f3ff; color: #6d28d9; }
-    .concept-chip.green  { background: #f0fdf4; color: #15803d; }
+    .concept-chip.orange { background: var(--pastel-orange-bg); color: var(--pastel-orange-text); }
+    .concept-chip.purple { background: var(--pastel-purple-bg); color: var(--pastel-purple-text); }
+    .concept-chip.green  { background: var(--pastel-green-bg); color: var(--pastel-green-text); }
 
     /* ── Split layout (text | canvas) ── */
     .sp-split {
@@ -98,11 +100,12 @@
 
     /* ── Canvas container ── */
     .canvas-box {
-      background: #ffffff;
+      background: var(--surface-canvas);
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
       position: relative;
+      transition: var(--transition-theme);
     }
     .canvas-box canvas { display: block; width: 100%; }
     .canvas-label {
@@ -111,7 +114,7 @@
       left: .75rem;
       font-size: .7rem;
       font-weight: 700;
-      color: #475569;
+      color: var(--surface-canvas-text);
       letter-spacing: .06em;
       text-transform: uppercase;
     }
@@ -128,14 +131,14 @@
       padding: .4rem 1.1rem;
       border-radius: 8px;
       border: 1.5px solid var(--border);
-      background: #f8fafc;
+      background: var(--bg);
       font-size: .84rem;
       font-weight: 600;
       color: var(--text);
       cursor: pointer;
       transition: all .15s;
     }
-    .ctrl-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--brand-blue); }
+    .ctrl-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); }
     .ctrl-btn.primary { background: var(--brand-cyan); border-color: var(--brand-cyan); color: #fff; }
     .ctrl-btn.primary:hover { background: var(--brand-blue); border-color: var(--brand-blue); }
     .ctrl-label { font-size: .84rem; font-weight: 600; color: var(--text-muted); }
@@ -143,7 +146,7 @@
 
     /* ── Formula box ── */
     .formula-box {
-      background: #f8fafc;
+      background: var(--bg);
       border: 1px solid var(--border);
       border-left: 3px solid var(--brand-cyan);
       border-radius: 0 10px 10px 0;
@@ -162,7 +165,7 @@
       display: flex;
       gap: .85rem;
       align-items: flex-start;
-      background: #f8fafc;
+      background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: .75rem 1rem;
@@ -189,18 +192,19 @@
       display: flex;
       gap: .85rem;
       align-items: flex-start;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
+      background: var(--pastel-green-bg);
+      border: 1px solid var(--pastel-green-border);
       border-radius: 10px;
       padding: .9rem 1.1rem;
       margin: 1rem 0;
+      transition: var(--transition-theme);
     }
     .insight-icon { font-size: 1.3rem; flex-shrink: 0; }
-    .insight p { font-size: .88rem; color: #166534; margin: 0; line-height: 1.65; }
-    .insight.blue { background: #eff6ff; border-color: #bfdbfe; }
-    .insight.blue p { color: #1e3a8a; }
-    .insight.purple { background: #faf5ff; border-color: #ddd6fe; }
-    .insight.purple p { color: #5b21b6; }
+    .insight p { font-size: .88rem; color: var(--pastel-green-text); margin: 0; line-height: 1.65; }
+    .insight.blue { background: var(--pastel-blue-bg); border-color: var(--pastel-blue-border); }
+    .insight.blue p { color: var(--pastel-blue-text); }
+    .insight.purple { background: var(--pastel-purple-bg); border-color: var(--pastel-purple-border); }
+    .insight.purple p { color: var(--pastel-purple-text); }
 
     /* ── Full-width canvas plots ── */
     .plot-row {
@@ -220,11 +224,12 @@
 
     /* ── SVG wrapper ── */
     .scan-svg-wrap {
-      background: #ffffff;
+      background: var(--surface-canvas);
       border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
       margin: 1.25rem 0 1.75rem;
+      transition: var(--transition-theme);
     }
     .scan-svg-wrap svg { display: block; width: 100%; height: auto; }
 
@@ -253,7 +258,7 @@
       vertical-align: top;
     }
     .compare-table tr:last-child td { border-bottom: none; }
-    .compare-table tr:nth-child(even) td { background: #f8fafc; }
+    .compare-table tr:nth-child(even) td { background: var(--bg); }
     .compare-table .hi { color: var(--brand-cyan); font-weight: 700; }
     .compare-table strong { color: var(--text); }
   </style>

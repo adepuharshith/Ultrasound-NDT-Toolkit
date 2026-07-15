@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f2d5e" />
+  <script>(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <title>Resources — Ultrasound &amp; NDT Toolkit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -20,7 +22,7 @@
       padding: .35rem .9rem;
       border-radius: 999px;
       border: 1.5px solid var(--border);
-      background: #fff;
+      background: var(--bg-card);
       color: var(--text-muted);
       font-size: .82rem;
       font-weight: 600;

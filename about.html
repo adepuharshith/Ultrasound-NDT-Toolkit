@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f2d5e" />
+  <script>(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <title>About — Ultrasound &amp; NDT Toolkit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,7 +14,7 @@
 
     /* Profile card */
     .profile-card {
-      background: #fff;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 20px;
       box-shadow: var(--shadow);
@@ -82,7 +84,7 @@
       font-weight: 600;
       text-decoration: none !important;
       border: 1.5px solid var(--border);
-      background: #f8fafc;
+      background: var(--bg);
       color: var(--text);
       transition: all .15s;
     }
@@ -90,7 +92,7 @@
 
     /* About sections */
     .about-section {
-      background: #fff;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 16px;
       box-shadow: var(--shadow);
@@ -116,7 +118,7 @@
       margin-top: .75rem;
     }
     .tech-item {
-      background: #f8fafc;
+      background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: .75rem 1rem;
@@ -135,7 +137,7 @@
       margin-top: .75rem;
     }
     .research-item {
-      background: #f8fafc;
+      background: var(--bg);
       border: 1px solid var(--border);
       border-left: 3px solid var(--brand-cyan);
       border-radius: 0 10px 10px 0;
@@ -150,7 +152,7 @@
       align-items: flex-start;
       gap: 1rem;
       padding: 1rem;
-      background: #f8fafc;
+      background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 10px;
       margin-bottom: .75rem;
@@ -334,15 +336,15 @@
   </div>
 
   <!-- CONTACT / FEEDBACK -->
-  <div class="about-section" style="background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);border-color:#bae6fd;">
-    <h2 style="border-color:#bae6fd;">Get in Touch</h2>
+  <div class="about-section" style="background:var(--pastel-blue-bg);border-color:var(--pastel-blue-border);">
+    <h2 style="border-color:var(--pastel-blue-border);">Get in Touch</h2>
     <p>
       Questions, corrections, or suggestions for new calculators and content are welcome.
       Reach out by email or open an issue on GitHub — contributions and feedback help make this a better resource for everyone in the NDT community.
     </p>
     <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;">
       <a href="mailto:adepuharshithkumar@gmail.com" class="btn btn-primary" style="text-decoration:none;">✉ Send Email</a>
-      <a href="https://github.com/adepuharshith/ultrasound-ndt-toolkit/issues" class="btn btn-outline" style="color:var(--brand-navy);border-color:var(--brand-cyan);" target="_blank" rel="noopener">Open GitHub Issue</a>
+      <a href="https://github.com/adepuharshith/ultrasound-ndt-toolkit/issues" class="btn btn-outline" style="color:var(--pastel-blue-text);border-color:var(--brand-cyan);" target="_blank" rel="noopener">Open GitHub Issue</a>
     </div>
   </div>
 
