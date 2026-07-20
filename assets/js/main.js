@@ -213,13 +213,19 @@ function _arrow(ctx, x1, y1, x2, y2, hs = 7) {
 let _wlPhase  = 0;
 let _wlAnimId = null;
 let _wlP = { f: 5, c1: 1480, c2: 5900 };
+let _wlReveal = null;
 
 function calcWavelength() {
   const f  = parseFloat(document.getElementById('wl-freq').value) || 5;
   const c1 = parseFloat(document.getElementById('wl-c1').value)   || 1480;
   const c2 = parseFloat(document.getElementById('wl-c2').value)   || 5900;
 
-  _wlP = { f, c1, c2 };
+  if (_wlReveal) {
+    ManimViz.tweenValues(_wlP, { f, c1, c2 }, 480);
+  } else {
+    _wlP = { f, c1, c2 };
+    _wlReveal = ManimViz.createReveal(document.getElementById('wl-canvas'), 900);
+  }
 
   const lam1_mm = c1 / (f * 1e6) * 1000;
   const lam2_mm = c2 / (f * 1e6) * 1000;
@@ -257,8 +263,9 @@ function _wlDraw() {
   const lPx1   = lam1 * scale;          /* visual wavelength of medium 1 */
   const lPx2   = lam2 * scale;          /* visual wavelength of medium 2 */
 
-  /* Wave amplitude & center */
-  const amp = CH * 0.21;
+  /* Wave amplitude & center — amplitude grows in from flat on first view */
+  const reveal = _wlReveal ? _wlReveal.value : 1;
+  const amp = CH * 0.21 * Math.max(reveal, 0.001);
   const cy  = CH * 0.55;
 
   /* Temporal phase: same ω for both media → waves are phase-matched at interface */
@@ -307,8 +314,9 @@ function _wlDraw() {
   }
   ctx.stroke();
 
-  /* ---- wavelength brackets ---- */
-  const BY = cy + amp + 16;   /* y position of bracket */
+  /* ---- wavelength brackets (fade in with the reveal) ---- */
+  const BY = cy + CH * 0.21 + 16;   /* y position of bracket, independent of amp grow-in */
+  ctx.save(); ctx.globalAlpha = reveal;
 
   /* Medium 1 bracket */
   const b1x1 = 8, b1x2 = b1x1 + Math.min(lPx1, half - 12);
@@ -317,6 +325,7 @@ function _wlDraw() {
   /* Medium 2 bracket */
   const b2x1 = half + 8, b2x2 = Math.min(b2x1 + lPx2, CW - 6);
   _wlBracket(ctx, b2x1, b2x2, BY, `λ₂ = ${fmt(lam2, 3)} mm`, '#374151');
+  ctx.restore();
 }
 
 function _wlBracket(ctx, x1, x2, y, label, color) {
@@ -349,14 +358,16 @@ function calcNearField() {
     res.querySelector('.result-value').textContent = fmt(N);
     res.querySelector('.result-unit').textContent  = 'mm';
   }
-  _drawNFViz(D, N);
+  ManimViz.animate('nf', { D_mm: D, N_mm: N }, _drawNFViz, { canvas: document.getElementById('nf-canvas') });
 }
 
-function _drawNFViz(D_mm, N_mm) {
+function _drawNFViz(p, state) {
+  const { D_mm, N_mm } = p;
   const canvas = document.getElementById('nf-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
+  const prog = state.progress;
 
   /* Beam propagates LEFT → RIGHT */
   const PAD = 18;
@@ -370,12 +381,13 @@ function _drawNFViz(D_mm, N_mm) {
   const cy = CH / 2;
   const beamHalf = Math.min(D_mm * sc / 2, CH / 3);
 
-  /* Near-field shaded region */
+  /* Near-field shaded region — grows in from the transducer on entrance */
+  const NpxGrow = Npx * prog;
   const nfGrad = ctx.createLinearGradient(transX, 0, transX + Npx, 0);
   nfGrad.addColorStop(0, 'rgba(8,145,178,.40)');
   nfGrad.addColorStop(1, 'rgba(8,145,178,.14)');
   ctx.fillStyle = nfGrad;
-  ctx.fillRect(transX, cy - beamHalf, Npx, beamHalf * 2);
+  ctx.fillRect(transX, cy - beamHalf, NpxGrow, beamHalf * 2);
 
   /* Transducer face */
   ctx.fillStyle = '#0f2d5e';
@@ -386,39 +398,43 @@ function _drawNFViz(D_mm, N_mm) {
   /* Near-field top/bottom edges */
   ctx.strokeStyle = 'rgba(8,145,178,.78)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
   ctx.beginPath();
-  ctx.moveTo(transX, cy - beamHalf); ctx.lineTo(transX + Npx, cy - beamHalf);
-  ctx.moveTo(transX, cy + beamHalf); ctx.lineTo(transX + Npx, cy + beamHalf);
+  ctx.moveTo(transX, cy - beamHalf); ctx.lineTo(transX + NpxGrow, cy - beamHalf);
+  ctx.moveTo(transX, cy + beamHalf); ctx.lineTo(transX + NpxGrow, cy + beamHalf);
   ctx.stroke(); ctx.setLineDash([]);
 
-  /* Far-field diverging lines */
+  /* Far-field diverging lines — trace on after the near-field region fills in */
   const divAngle = 0.18;   /* rad, ~10° */
   const farEnd   = CW - PAD;
   const farLen   = farEnd - (transX + Npx);
-  ctx.strokeStyle = 'rgba(8,145,178,.52)'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 5]);
-  ctx.beginPath();
-  ctx.moveTo(transX + Npx, cy - beamHalf);
-  ctx.lineTo(farEnd, cy - beamHalf - farLen * Math.tan(divAngle));
-  ctx.moveTo(transX + Npx, cy + beamHalf);
-  ctx.lineTo(farEnd, cy + beamHalf + farLen * Math.tan(divAngle));
-  ctx.stroke(); ctx.setLineDash([]);
+  const rayProg  = ManimViz.stagger(prog, 0.35, 1);
+  ManimViz.tracePath(ctx, [[transX + Npx, cy - beamHalf], [farEnd, cy - beamHalf - farLen * Math.tan(divAngle)]], rayProg,
+    { color: 'rgba(8,145,178,.62)', width: 1.2, dash: [3, 5], dot: false });
+  ManimViz.tracePath(ctx, [[transX + Npx, cy + beamHalf], [farEnd, cy + beamHalf + farLen * Math.tan(divAngle)]], rayProg,
+    { color: 'rgba(8,145,178,.62)', width: 1.2, dash: [3, 5], dot: false });
 
   /* N marker (vertical dashed line + label) */
+  ctx.save(); ctx.globalAlpha = prog;
   ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
   ctx.beginPath(); ctx.moveTo(transX + Npx, cy - beamHalf - 10); ctx.lineTo(transX + Npx, cy + beamHalf + 10); ctx.stroke();
-  ctx.setLineDash([]);
+  ctx.setLineDash([]); ctx.restore();
 
-  /* Labels */
+  /* Labels — pop in last */
+  const labelProg = ManimViz.stagger(prog, 0.6, 1);
   ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
   const nfMidX = transX + Npx / 2;
-  ctx.fillStyle = '#0891b2'; ctx.fillText('Near Field', nfMidX, 14);
-  ctx.fillStyle = 'rgba(8,145,178,.90)'; ctx.fillText('Far Field', transX + Npx + farLen / 2, 14);
+  ManimViz.popIn(ctx, labelProg, () => { ctx.fillStyle = '#0891b2'; ctx.fillText('Near Field', nfMidX, 14); });
+  ManimViz.popIn(ctx, labelProg, () => { ctx.fillStyle = 'rgba(8,145,178,.90)'; ctx.fillText('Far Field', transX + Npx + farLen / 2, 14); });
 
-  ctx.fillStyle = '#0891b2'; ctx.font = 'bold 11px Inter,sans-serif';
-  ctx.fillText(`N = ${fmt(N_mm, 3)} mm`, transX + Npx, cy + beamHalf + 22);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#0891b2'; ctx.font = 'bold 11px Inter,sans-serif';
+    ctx.fillText(`N = ${fmt(N_mm, 3)} mm`, transX + Npx, cy + beamHalf + 22);
+  });
 
-  ctx.fillStyle = '#475569'; ctx.font = '10px Inter,sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText(`D = ${document.getElementById('nf-diam').value} mm`, PAD + 2, 14);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#475569'; ctx.font = '10px Inter,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`D = ${fmt(D_mm, 3)} mm`, PAD + 2, 14);
+  });
 }
 
 /* ============================================================
@@ -434,14 +450,16 @@ function calcDepth() {
     res.querySelector('.result-value').textContent = fmt(depth_mm);
     res.querySelector('.result-unit').textContent  = 'mm';
   }
-  _drawTOFViz(tof, v, depth_mm);
+  ManimViz.animate('tof', { tof, v, depth_mm }, _drawTOFViz, { canvas: document.getElementById('tof-canvas') });
 }
 
-function _drawTOFViz(tof, v, depth_mm) {
+function _drawTOFViz(p, state) {
+  const { tof, v, depth_mm } = p;
   const canvas = document.getElementById('tof-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
+  const prog = state.progress;
 
   const PAD = 18, transH = 22, cx = CW / 2;
   const drawH = CH - PAD - transH - 20;
@@ -458,30 +476,39 @@ function _drawTOFViz(tof, v, depth_mm) {
   mg.addColorStop(0, 'rgba(203,213,225,.88)'); mg.addColorStop(1, 'rgba(148,163,184,.72)');
   ctx.fillStyle = mg; ctx.fillRect(20, matTopY, CW - 40, CH - matTopY - 10);
 
-  /* Depth arrow (center, down to defect) */
+  /* Depth arrow — traces down toward the defect on entrance */
+  const arrowProg = ManimViz.stagger(prog, 0, 0.6);
   ctx.strokeStyle = '#e11d48'; ctx.fillStyle = '#e11d48'; ctx.lineWidth = 1.8;
-  _arrow(ctx, cx, transY1 + 4, cx, defectY - 4);
+  _arrow(ctx, cx, transY1 + 4, cx, ManimViz.lerp(transY1 + 4, defectY - 4, arrowProg));
 
-  /* Defect marker */
-  ctx.fillStyle = '#fbbf24';
-  ctx.beginPath(); ctx.arc(cx, defectY, 5, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.2;
-  ctx.beginPath(); ctx.arc(cx, defectY, 5, 0, Math.PI * 2); ctx.stroke();
+  /* Defect marker — pops in once the arrow arrives */
+  const defectProg = ManimViz.stagger(prog, 0.55, 0.8);
+  if (defectProg > 0) {
+    ctx.save(); ctx.globalAlpha = defectProg;
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath(); ctx.arc(cx, defectY, 5 * defectProg, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(cx, defectY, 5 * defectProg, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
 
-  /* Return path (dashed, offset slightly right) */
-  ctx.strokeStyle = 'rgba(225,29,72,.65)'; ctx.lineWidth = 1.2; ctx.setLineDash([4, 3]);
-  ctx.beginPath(); ctx.moveTo(cx + 6, defectY); ctx.lineTo(cx + 6, transY1 + 4); ctx.stroke();
-  ctx.setLineDash([]);
+  /* Return path (dashed, offset slightly right) — traces back up */
+  const returnProg = ManimViz.stagger(prog, 0.65, 1);
+  ManimViz.tracePath(ctx, [[cx + 6, defectY], [cx + 6, transY1 + 4]], returnProg,
+    { color: 'rgba(225,29,72,.65)', width: 1.2, dash: [4, 3], dot: false });
 
-  /* Depth label */
-  ctx.fillStyle = '#e11d48'; ctx.font = 'bold 10px Inter,sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText(`d = ${fmt(depth_mm, 3)} mm`, cx + 12, matTopY + depth_mm * sc / 2 + 4);
-
-  /* TOF label on side */
-  ctx.fillStyle = '#475569'; ctx.font = '10px Inter,sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText(`TOF = ${tof} µs`, CW - 22, matTopY + depth_mm * sc / 2);
+  /* Depth + TOF labels — pop in last */
+  const labelProg = ManimViz.stagger(prog, 0.75, 1);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#e11d48'; ctx.font = 'bold 10px Inter,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`d = ${fmt(depth_mm, 3)} mm`, cx + 12, matTopY + depth_mm * sc / 2 + 4);
+  });
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#475569'; ctx.font = '10px Inter,sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`TOF = ${fmt(tof, 3)} µs`, CW - 22, matTopY + depth_mm * sc / 2);
+  });
 
   /* Transducer */
   const tg = ctx.createLinearGradient(cx, PAD, cx, transY1);
@@ -511,14 +538,16 @@ function calcAttenuation() {
     res.querySelector('.result-value').textContent = fmt(total_dB);
     res.querySelector('.result-unit').textContent  = 'dB';
   }
-  _drawAttViz(alpha, f, d, total_dB);
+  ManimViz.animate('att', { alpha, f, d, total_dB }, _drawAttViz, { canvas: document.getElementById('att-canvas') });
 }
 
-function _drawAttViz(alpha, f, d, total_dB) {
+function _drawAttViz(p, state) {
+  const { d, total_dB } = p;
   const canvas = document.getElementById('att-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
+  const prog = state.progress;
 
   const PAD_L = 32, PAD_R = 20, PAD_T = 16, PAD_B = 28;
   const W = CW - PAD_L - PAD_R;
@@ -529,52 +558,59 @@ function _drawAttViz(alpha, f, d, total_dB) {
   bg.addColorStop(0, 'rgba(203,213,225,.68)'); bg.addColorStop(1, 'rgba(148,163,184,.50)');
   ctx.fillStyle = bg; ctx.fillRect(PAD_L, PAD_T, W, H);
 
-  /* Decaying sine wave */
+  /* Faint coordinate-plane gridlines behind the curve */
+  ctx.strokeStyle = 'rgba(148,163,184,.18)'; ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) {
+    const gx = PAD_L + (W * i) / 4;
+    ctx.beginPath(); ctx.moveTo(gx, PAD_T); ctx.lineTo(gx, PAD_T + H); ctx.stroke();
+  }
+
+  /* Decaying sine wave — traces on left to right */
   const cy  = PAD_T + H / 2;
   const A0  = H * 0.4;    /* starting amplitude (px) */
   const lam_px = W / 8;   /* visual wavelength (~8 cycles across) */
   const att_lin = Math.pow(10, -total_dB / 20); /* linear amplitude ratio */
+  const curveProg = ManimViz.stagger(prog, 0, 0.75);
 
-  ctx.beginPath(); ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 2.5;
+  const wavePts = [];
   for (let px = 0; px <= W; px++) {
-    const t    = px / W;   /* 0 → 1 across the beam path */
-    const att  = Math.pow(att_lin, t);  /* attenuation at this point */
-    const y    = cy - A0 * att * Math.sin(2 * Math.PI * px / lam_px);
-    px === 0 ? ctx.moveTo(PAD_L + px, y) : ctx.lineTo(PAD_L + px, y);
+    const t   = px / W;
+    const att = Math.pow(att_lin, t);
+    wavePts.push([PAD_L + px, cy - A0 * att * Math.sin(2 * Math.PI * px / lam_px)]);
   }
-  ctx.stroke();
+  ManimViz.tracePath(ctx, wavePts, curveProg, { color: '#1d4ed8', width: 2.5, dotColor: '#f2c14e' });
 
-  /* Envelope curve (dashed) */
-  ctx.beginPath(); ctx.strokeStyle = 'rgba(29,78,216,.62)'; ctx.lineWidth = 1.4; ctx.setLineDash([3, 3]);
+  /* Envelope curve (dashed) — traces alongside the wave */
+  const envTop = [], envBot = [];
   for (let px = 0; px <= W; px++) {
     const att = Math.pow(att_lin, px / W);
-    const y   = cy - A0 * att;
-    px === 0 ? ctx.moveTo(PAD_L + px, y) : ctx.lineTo(PAD_L + px, y);
+    envTop.push([PAD_L + px, cy - A0 * att]);
+    envBot.push([PAD_L + px, cy + A0 * att]);
   }
-  ctx.stroke();
-  ctx.beginPath();
-  for (let px = 0; px <= W; px++) {
-    const att = Math.pow(att_lin, px / W);
-    const y   = cy + A0 * att;
-    px === 0 ? ctx.moveTo(PAD_L + px, y) : ctx.lineTo(PAD_L + px, y);
-  }
-  ctx.stroke(); ctx.setLineDash([]);
+  ManimViz.tracePath(ctx, envTop, curveProg, { color: 'rgba(29,78,216,.62)', width: 1.4, dash: [3, 3], dot: false });
+  ManimViz.tracePath(ctx, envBot, curveProg, { color: 'rgba(29,78,216,.62)', width: 1.4, dash: [3, 3], dot: false });
 
   /* Axis line */
   ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(PAD_L, cy); ctx.lineTo(CW - PAD_R, cy); ctx.stroke();
 
-  /* Labels */
-  ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
-  ctx.fillStyle = '#1d4ed8'; ctx.fillText('0 dB', PAD_L + 12, PAD_T + H / 2 - A0 - 5);
-  ctx.fillStyle = '#dc2626';
-  ctx.fillText(`−${fmt(total_dB, 3)} dB`, CW - PAD_R - 18, PAD_T + H / 2 - A0 * att_lin - 6);
+  /* Labels — pop in once the curve has drawn */
+  const labelProg = ManimViz.stagger(prog, 0.7, 1);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
+    ctx.fillStyle = '#1d4ed8'; ctx.fillText('0 dB', PAD_L + 12, PAD_T + H / 2 - A0 - 5);
+  });
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
+    ctx.fillStyle = '#dc2626';
+    ctx.fillText(`−${fmt(total_dB, 3)} dB`, CW - PAD_R - 18, PAD_T + H / 2 - A0 * att_lin - 6);
+  });
 
   /* distance axis */
-  ctx.fillStyle = '#64748b'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#64748b'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'left';
   ctx.fillText('0', PAD_L - 2, CH - 6);
   ctx.textAlign = 'right';
-  ctx.fillText(`${d} mm`, CW - PAD_R + 2, CH - 6);
+  ctx.fillText(`${fmt(d, 3)} mm`, CW - PAD_R + 2, CH - 6);
   ctx.textAlign = 'center';
   ctx.fillText('propagation distance →', PAD_L + W / 2, CH - 3);
 }
@@ -594,17 +630,19 @@ function calcSnell() {
     const theta2 = Math.asin(sinT2) * 180 / Math.PI;
     if (res) { res.querySelector('.result-value').textContent = fmt(theta2); res.querySelector('.result-unit').textContent = '°'; }
   }
-  _drawSnellViz(theta1, v1, v2, sinT2);
+  ManimViz.animate('sn', { theta1, v1, v2 }, _drawSnellViz, { canvas: document.getElementById('sn-canvas') });
 }
 
-function _drawSnellViz(theta1, v1, v2, sinT2) {
+function _drawSnellViz(p, state) {
+  const { theta1, v1, v2 } = p;
+  const sinT2 = (v2 / v1) * Math.sin(theta1 * Math.PI / 180);
   const canvas = document.getElementById('sn-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
+  const prog = state.progress;
 
   const isTIR = Math.abs(sinT2) > 1;
-  const theta2 = isTIR ? null : Math.asin(sinT2) * 180 / Math.PI;
   const iy = CH / 2, cx = CW / 2;
   const RAY = 80;   /* ray length in pixels */
   const PI  = Math.PI;
@@ -623,39 +661,57 @@ function _drawSnellViz(theta1, v1, v2, sinT2) {
 
   /* Rays */
   const t1r = theta1 * PI / 180;
-  /* Incident: from upper-left toward center */
+  /* Incident: travels from upper-left toward the interface, arrowhead leading */
   const ix0 = cx - RAY * Math.sin(t1r), iy0 = iy - RAY * Math.cos(t1r);
+  const incidentProg = ManimViz.stagger(prog, 0, 0.4);
   ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 2;
-  _arrow(ctx, ix0, iy0, cx, iy);
+  _arrow(ctx, ix0, iy0, ManimViz.lerp(ix0, cx, incidentProg), ManimViz.lerp(iy0, iy, incidentProg));
+
+  const secondRayProg = ManimViz.stagger(prog, 0.35, 0.7);
+  const arcProg       = ManimViz.stagger(prog, 0.55, 0.85);
+  const labelProg     = ManimViz.stagger(prog, 0.75, 1);
 
   if (isTIR) {
-    /* Reflected ray: symmetric to incident */
+    /* Reflected ray: symmetric to incident, travels outward from the interface */
     const rx = cx + RAY * Math.sin(t1r), ry = iy - RAY * Math.cos(t1r);
-    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2; _arrow(ctx, cx, iy, rx, ry);
-    ctx.fillStyle = '#dc2626'; ctx.font = 'bold 11px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Total Internal Reflection', cx, iy + 24);
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
+    _arrow(ctx, cx, iy, ManimViz.lerp(cx, rx, secondRayProg), ManimViz.lerp(iy, ry, secondRayProg));
+    ManimViz.popIn(ctx, labelProg, () => {
+      ctx.fillStyle = '#dc2626'; ctx.font = 'bold 11px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('Total Internal Reflection', cx, iy + 24);
+    });
   } else {
+    const theta2 = Math.asin(sinT2) * 180 / Math.PI;
     const t2r = theta2 * PI / 180;
-    /* Refracted */
+    /* Refracted: travels outward from the interface */
     const rx2 = cx + RAY * Math.sin(t2r), ry2 = iy + RAY * Math.cos(t2r);
-    ctx.strokeStyle = '#374151'; ctx.lineWidth = 2; _arrow(ctx, cx, iy, rx2, ry2);
+    ctx.strokeStyle = '#374151'; ctx.lineWidth = 2;
+    _arrow(ctx, cx, iy, ManimViz.lerp(cx, rx2, secondRayProg), ManimViz.lerp(iy, ry2, secondRayProg));
 
-    /* Angle arcs */
+    /* Angle arcs — sweep out */
     ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(cx, iy, 28, -PI / 2, -PI / 2 + t1r); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, iy, 28, -PI / 2, -PI / 2 + t1r * arcProg); ctx.stroke();
     ctx.strokeStyle = '#374151';
-    ctx.beginPath(); ctx.arc(cx, iy, 28, PI / 2, PI / 2 + t2r); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, iy, 28, PI / 2, PI / 2 + t2r * arcProg); ctx.stroke();
 
     /* Angle labels */
-    ctx.font = '11px Inter,sans-serif'; ctx.textAlign = 'left';
-    ctx.fillStyle = '#1d4ed8'; ctx.fillText(`θ₁ = ${theta1}°`, cx + 8, iy - 22);
-    ctx.fillStyle = '#374151'; ctx.fillText(`θ₂ = ${fmt(theta2, 3)}°`, cx + 8, iy + 32);
+    ManimViz.popIn(ctx, labelProg, () => {
+      ctx.font = '11px Inter,sans-serif'; ctx.textAlign = 'left';
+      ctx.fillStyle = '#1d4ed8'; ctx.fillText(`θ₁ = ${fmt(theta1, 3)}°`, cx + 8, iy - 22);
+    });
+    ManimViz.popIn(ctx, labelProg, () => {
+      ctx.font = '11px Inter,sans-serif'; ctx.textAlign = 'left';
+      ctx.fillStyle = '#374151'; ctx.fillText(`θ₂ = ${fmt(theta2, 3)}°`, cx + 8, iy + 32);
+    });
   }
 
   /* Speed labels */
+  const speedProg = ManimViz.stagger(prog, 0, 0.25);
+  ctx.save(); ctx.globalAlpha = speedProg;
   ctx.font = '10px Inter,sans-serif';
-  ctx.fillStyle = '#1d4ed8'; ctx.textAlign = 'left'; ctx.fillText(`c₁ = ${v1} m/s`, 6, 16);
-  ctx.fillStyle = '#475569';  ctx.fillText(`c₂ = ${v2} m/s`, 6, iy + 16);
+  ctx.fillStyle = '#1d4ed8'; ctx.textAlign = 'left'; ctx.fillText(`c₁ = ${fmt(v1, 4)} m/s`, 6, 16);
+  ctx.fillStyle = '#475569';  ctx.fillText(`c₂ = ${fmt(v2, 4)} m/s`, 6, iy + 16);
+  ctx.restore();
 }
 
 /* ============================================================
@@ -674,14 +730,16 @@ function calcImpedance() {
   document.getElementById('z-z2').textContent = fmt(Z2 / 1e6) + ' MRayl';
   document.getElementById('z-r').textContent  = fmt(R) + ' %';
   document.getElementById('z-t').textContent  = fmt(T) + ' %';
-  _drawZViz(Z1, Z2, R, T);
+  ManimViz.animate('z', { Z1, Z2, R, T }, _drawZViz, { canvas: document.getElementById('z-canvas') });
 }
 
-function _drawZViz(Z1, Z2, R, T) {
+function _drawZViz(p, state) {
+  const { Z1, Z2, R, T } = p;
   const canvas = document.getElementById('z-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
+  const prog = state.progress;
 
   const ix = CW / 2, cy = CH / 2;   /* interface x, center y */
   const RAY = 68;
@@ -694,34 +752,47 @@ function _drawZViz(Z1, Z2, R, T) {
   ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(ix, 0); ctx.lineTo(ix, CH); ctx.stroke();
 
-  /* Incident arrow → */
+  /* Incident arrow → travels in from offscreen, arriving at the interface */
+  const incidentProg = ManimViz.stagger(prog, 0, 0.4);
   ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 2;
-  _arrow(ctx, ix - RAY, cy, ix - 4, cy);
-  ctx.fillStyle = '#1d4ed8'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('Incident', ix - RAY / 2 - 4, cy - 10);
-  ctx.fillText('(100%)', ix - RAY / 2 - 4, cy + 18);
+  _arrow(ctx, ix - RAY, cy, ManimViz.lerp(ix - RAY, ix - 4, incidentProg), cy);
 
-  /* Transmitted arrow → */
+  const splitProg = ManimViz.stagger(prog, 0.35, 0.7);
+  const labelProg = ManimViz.stagger(prog, 0.65, 1);
+
+  ManimViz.popIn(ctx, ManimViz.stagger(prog, 0, 0.35), () => {
+    ctx.fillStyle = '#1d4ed8'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Incident', ix - RAY / 2 - 4, cy - 10);
+    ctx.fillText('(100%)', ix - RAY / 2 - 4, cy + 18);
+  });
+
+  /* Transmitted arrow → grows outward from the interface once incident arrives */
   const tFrac = T / 100;
   ctx.strokeStyle = '#374151'; ctx.lineWidth = Math.max(1, 2.5 * tFrac);
-  _arrow(ctx, ix + 4, cy, ix + RAY, cy);
-  ctx.fillStyle = '#374151'; ctx.textAlign = 'center';
-  ctx.fillText('Transmitted', ix + RAY / 2 + 4, cy - 10);
-  ctx.fillText(`T = ${fmt(T, 3)}%`, ix + RAY / 2 + 4, cy + 18);
+  _arrow(ctx, ix + 4, cy, ManimViz.lerp(ix + 4, ix + RAY, splitProg), cy);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#374151'; ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
+    ctx.fillText('Transmitted', ix + RAY / 2 + 4, cy - 10);
+    ctx.fillText(`T = ${fmt(T, 3)}%`, ix + RAY / 2 + 4, cy + 18);
+  });
 
-  /* Reflected arrow ← (above center, going left) */
+  /* Reflected arrow ← (above center, going left) grows outward alongside it */
   const rFrac = R / 100;
   ctx.strokeStyle = '#dc2626'; ctx.lineWidth = Math.max(0.5, 2.5 * rFrac);
-  _arrow(ctx, ix - 4, cy - 26, ix - RAY, cy - 26);
-  ctx.fillStyle = '#dc2626'; ctx.textAlign = 'center';
-  ctx.fillText(`R = ${fmt(R, 3)}%`, ix - RAY / 2 - 4, cy - 36);
+  _arrow(ctx, ix - 4, cy - 26, ManimViz.lerp(ix - 4, ix - RAY, splitProg), cy - 26);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#dc2626'; ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
+    ctx.fillText(`R = ${fmt(R, 3)}%`, ix - RAY / 2 - 4, cy - 36);
+  });
 
   /* Z labels */
-  ctx.font = '10px Inter,sans-serif';
-  ctx.fillStyle = '#1e40af'; ctx.textAlign = 'center';
-  ctx.fillText(`Z₁ = ${fmt(Z1 / 1e6, 3)} MRayl`, ix / 2, CH - 8);
-  ctx.fillStyle = '#374151';
-  ctx.fillText(`Z₂ = ${fmt(Z2 / 1e6, 3)} MRayl`, ix + ix / 2, CH - 8);
+  ManimViz.popIn(ctx, ManimViz.stagger(prog, 0, 0.3), () => {
+    ctx.font = '10px Inter,sans-serif';
+    ctx.fillStyle = '#1e40af'; ctx.textAlign = 'center';
+    ctx.fillText(`Z₁ = ${fmt(Z1 / 1e6, 3)} MRayl`, ix / 2, CH - 8);
+    ctx.fillStyle = '#374151';
+    ctx.fillText(`Z₂ = ${fmt(Z2 / 1e6, 3)} MRayl`, ix + ix / 2, CH - 8);
+  });
 }
 
 /* ============================================================
@@ -749,14 +820,16 @@ function calcBeamDiv() {
     if (r2) { r2.querySelector('.result-value').textContent = fmt(fullDeg);  r2.querySelector('.result-unit').textContent = '°'; }
   }
 
-  _drawBeamDivViz(D, lam_mm, N_mm, sinHalf);
+  ManimViz.animate('bd', { D_mm: D, lam_mm, N_mm, sinHalf }, _drawBeamDivViz, { canvas: document.getElementById('bd-canvas') });
 }
 
-function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
+function _drawBeamDivViz(p, state) {
+  const { D_mm, lam_mm, N_mm, sinHalf } = p;
   const canvas = document.getElementById('bd-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
+  const prog = state.progress;
 
   const PAD = 18;
   const transX = PAD + 22;
@@ -768,12 +841,13 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
   const cy      = CH / 2;
   const beamHPx = Math.min(D_mm * sc / 2, CH * 0.34);
 
-  /* Near-field tinted region */
+  /* Near-field tinted region — grows in from the transducer on entrance */
+  const NpxGrow = Npx * prog;
   const nfGrad = ctx.createLinearGradient(transX, 0, transX + Npx, 0);
   nfGrad.addColorStop(0, 'rgba(8,145,178,.40)');
   nfGrad.addColorStop(1, 'rgba(8,145,178,.12)');
   ctx.fillStyle = nfGrad;
-  ctx.fillRect(transX, cy - beamHPx, Npx, beamHPx * 2);
+  ctx.fillRect(transX, cy - beamHPx, NpxGrow, beamHPx * 2);
 
   /* Transducer */
   ctx.fillStyle = '#0f2d5e';
@@ -784,24 +858,20 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
   /* Near-field parallel edges */
   ctx.strokeStyle = 'rgba(8,145,178,.82)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
   ctx.beginPath();
-  ctx.moveTo(transX, cy - beamHPx); ctx.lineTo(transX + Npx, cy - beamHPx);
-  ctx.moveTo(transX, cy + beamHPx); ctx.lineTo(transX + Npx, cy + beamHPx);
+  ctx.moveTo(transX, cy - beamHPx); ctx.lineTo(transX + NpxGrow, cy - beamHPx);
+  ctx.moveTo(transX, cy + beamHPx); ctx.lineTo(transX + NpxGrow, cy + beamHPx);
   ctx.stroke(); ctx.setLineDash([]);
 
-  /* Far-field diverging lines at −6 dB half-angle */
+  /* Far-field diverging lines at −6 dB half-angle — trace on after the near field fills in */
   const farEnd  = CW - PAD;
   const farLen  = farEnd - (transX + Npx);
   const halfAng = Math.asin(Math.min(sinHalf, 0.9999));
+  const rayProg = ManimViz.stagger(prog, 0.35, 0.8);
 
-  ctx.strokeStyle = 'rgba(8,145,178,.75)'; ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(transX + Npx, cy - beamHPx);
-  ctx.lineTo(farEnd, cy - beamHPx - farLen * Math.tan(halfAng));
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(transX + Npx, cy + beamHPx);
-  ctx.lineTo(farEnd, cy + beamHPx + farLen * Math.tan(halfAng));
-  ctx.stroke();
+  ManimViz.tracePath(ctx, [[transX + Npx, cy - beamHPx], [farEnd, cy - beamHPx - farLen * Math.tan(halfAng)]], rayProg,
+    { color: 'rgba(8,145,178,.75)', width: 2, dotColor: '#f2c14e' });
+  ManimViz.tracePath(ctx, [[transX + Npx, cy + beamHPx], [farEnd, cy + beamHPx + farLen * Math.tan(halfAng)]], rayProg,
+    { color: 'rgba(8,145,178,.75)', width: 2, dotColor: '#f2c14e' });
 
   /* Axis centreline */
   ctx.strokeStyle = 'rgba(8,145,178,.38)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
@@ -809,49 +879,55 @@ function _drawBeamDivViz(D_mm, lam_mm, N_mm, sinHalf) {
   ctx.setLineDash([]);
 
   /* N marker */
+  ctx.save(); ctx.globalAlpha = prog;
   ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
   ctx.beginPath();
   ctx.moveTo(transX + Npx, cy - beamHPx - 10);
   ctx.lineTo(transX + Npx, cy + beamHPx + 10);
-  ctx.stroke(); ctx.setLineDash([]);
+  ctx.stroke(); ctx.setLineDash([]); ctx.restore();
 
-  /* Angle arc at the N boundary */
+  /* Angle arc at the N boundary — sweeps out with the diverging rays */
   const arcR = Math.min(farLen * 0.28, 38);
   ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.arc(transX + Npx, cy + beamHPx, arcR, Math.PI / 2, Math.PI / 2 + halfAng);
+  ctx.arc(transX + Npx, cy + beamHPx, arcR, Math.PI / 2, Math.PI / 2 + halfAng * rayProg);
   ctx.stroke();
 
-  /* Labels */
+  /* Labels — pop in last */
+  const labelProg = ManimViz.stagger(prog, 0.7, 1);
   ctx.textAlign = 'center'; ctx.font = '10px Inter,sans-serif';
-  ctx.fillStyle = '#0891b2';
-  ctx.fillText('Near Field', transX + Npx / 2, 13);
-  ctx.fillStyle = 'rgba(8,145,178,.90)';
-  ctx.fillText('Far Field', transX + Npx + farLen / 2, 13);
+  ManimViz.popIn(ctx, labelProg, () => { ctx.fillStyle = '#0891b2'; ctx.fillText('Near Field', transX + Npx / 2, 13); });
+  ManimViz.popIn(ctx, labelProg, () => { ctx.fillStyle = 'rgba(8,145,178,.90)'; ctx.fillText('Far Field', transX + Npx + farLen / 2, 13); });
 
   /* N value */
-  ctx.fillStyle = '#0891b2'; ctx.font = 'bold 10px Inter,sans-serif';
-  ctx.fillText(`N = ${fmt(N_mm, 3)} mm`, transX + Npx, cy + beamHPx + 22);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#0891b2'; ctx.font = 'bold 10px Inter,sans-serif';
+    ctx.fillText(`N = ${fmt(N_mm, 3)} mm`, transX + Npx, cy + beamHPx + 22);
+  });
 
   /* θ½ label beside arc */
   const halfDeg = halfAng * 180 / Math.PI;
-  ctx.fillStyle = '#0891b2'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'left';
-  ctx.fillText(`θ½ = ${fmt(halfDeg, 3)}°`, transX + Npx + arcR + 4, cy + beamHPx + arcR / 2 + 4);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#0891b2'; ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(`θ½ = ${fmt(halfDeg, 3)}°`, transX + Npx + arcR + 4, cy + beamHPx + arcR / 2 + 4);
+  });
 
   /* D label */
-  ctx.fillStyle = '#475569'; ctx.textAlign = 'left';
-  ctx.fillText(`D = ${D_mm} mm`, PAD + 2, 13);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#475569'; ctx.textAlign = 'left'; ctx.font = '10px Inter,sans-serif';
+    ctx.fillText(`D = ${fmt(D_mm, 3)} mm`, PAD + 2, 13);
+  });
 
   /* λ label */
-  ctx.fillStyle = '#64748b'; ctx.textAlign = 'right';
-  ctx.fillText(`λ = ${fmt(lam_mm, 3)} mm`, CW - PAD, CH - 4);
+  ManimViz.popIn(ctx, labelProg, () => {
+    ctx.fillStyle = '#64748b'; ctx.textAlign = 'right'; ctx.font = '10px Inter,sans-serif';
+    ctx.fillText(`λ = ${fmt(lam_mm, 3)} mm`, CW - PAD, CH - 4);
+  });
 }
 
 /* ============================================================
    8. WATER PATH CALCULATOR + ANIMATION
    ============================================================ */
-let _wpP = { f: 75, mp: 15, cs: 5900, cw: 1495, WP: 15.81, matThick: 30, valid: true };
-
 function calcWaterPath() {
   const f        = parseFloat(document.getElementById('wp-focal').value)  || 75;
   const mp       = parseFloat(document.getElementById('wp-focus').value)  || 15;
@@ -861,8 +937,6 @@ function calcWaterPath() {
 
   const WP    = f - mp * (cs / cw);
   const valid = (WP > 0) && (mp > 0) && (mp <= matThick);
-
-  _wpP = { f, mp, cs, cw, WP, matThick, valid };
 
   const res = document.getElementById('wp-result');
   if (res) {
@@ -878,26 +952,28 @@ function calcWaterPath() {
     }
   }
 
-  _wpDraw();
+  ManimViz.animate('wp', { f, mp, cs, cw, WP, matThick, valid }, _wpDraw, { canvas: document.getElementById('wp-canvas') });
 }
 
-function _wpDraw() {
+function _wpDraw(p, state) {
+  const { mp, WP, matThick, valid } = p;
   const canvas = document.getElementById('wp-canvas');
   if (!canvas) return;
   const prepared = _setupHiDPICanvas(canvas);
   const ctx = prepared.ctx;
-  const { f, mp, cs, cw, WP, matThick, valid } = _wpP;
-
   const CW = prepared.CW, CH = prepared.CH;
+  const prog = state.progress;
   ctx.clearRect(0, 0, CW, CH);
   ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
 
   if (!valid) {
+    ctx.save(); ctx.globalAlpha = prog;
     ctx.fillStyle = '#ef4444'; ctx.font = '12px Inter,sans-serif'; ctx.textAlign = 'center';
     const msgs = WP <= 0
       ? ['Water path ≤ 0', 'Increase focal length or reduce focus depth.']
       : ['Focus depth > thickness', 'Reduce mp or increase material thickness.'];
     msgs.forEach((m, i) => ctx.fillText(m, CW / 2, CH / 2 - 10 + i * 22));
+    ctx.restore();
     return;
   }
 
@@ -934,19 +1010,22 @@ function _wpDraw() {
   mg.addColorStop(0, 'rgba(203,213,225,.90)'); mg.addColorStop(1, 'rgba(148,163,184,.70)');
   ctx.fillStyle = mg; ctx.fillRect(xIF, PAD_T, xEnd - xIF, BEAM_H);
 
-  /* ── Interface line ── */
-  ctx.save(); ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
+  /* ── Interface line + region labels — fade in first, setting the scene ── */
+  const sceneProg = ManimViz.stagger(prog, 0, 0.25);
+  ctx.save(); ctx.globalAlpha = sceneProg;
+  ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
   ctx.strokeStyle = 'rgba(30,64,175,.75)';
   ctx.beginPath(); ctx.moveTo(xIF, PAD_T); ctx.lineTo(xIF, PAD_T + BEAM_H); ctx.stroke();
-  ctx.setLineDash([]); ctx.restore();
-
-  /* ── Region labels ── */
+  ctx.setLineDash([]);
   ctx.font = '10px Inter,sans-serif'; ctx.textAlign = 'center';
   ctx.fillStyle = '#1e40af'; ctx.fillText('Water', x0 + (xIF - x0) / 2, PAD_T + 14);
   ctx.fillStyle = '#334155'; ctx.fillText('Material', xIF + (xEnd - xIF) / 2, PAD_T + 14);
+  ctx.restore();
 
-  /* ── Beam fill (clipped to beam shape) ── */
+  /* ── Beam fill (clipped to beam shape) — fades in with the boundary trace ── */
+  const beamProg = ManimViz.stagger(prog, 0.2, 0.75);
   ctx.save();
+  ctx.globalAlpha = beamProg;
   ctx.beginPath();
   ctx.moveTo(x0, cy - BH0 / 2);
   ctx.lineTo(xIF, cy - BH_IF / 2);
@@ -962,23 +1041,31 @@ function _wpDraw() {
   ctx.fillStyle = btg; ctx.fillRect(x0, PAD_T, xEnd - x0, BEAM_H);
   ctx.restore();
 
-  /* ── Beam boundary dashes — kink at interface shows refraction ── */
-  ctx.save(); ctx.lineWidth = 1.4; ctx.setLineDash([4, 3]);
-  ctx.strokeStyle = 'rgba(8,145,178,.75)';
-  ctx.beginPath(); ctx.moveTo(x0, cy - BH0 / 2); ctx.lineTo(xIF, cy - BH_IF / 2); ctx.lineTo(xFocus, cy - BHF / 2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x0, cy + BH0 / 2); ctx.lineTo(xIF, cy + BH_IF / 2); ctx.lineTo(xFocus, cy + BHF / 2); ctx.stroke();
-  ctx.strokeStyle = 'rgba(8,145,178,.40)'; ctx.setLineDash([2, 5]);
-  ctx.beginPath(); ctx.moveTo(xFocus, cy - BHF / 2); ctx.lineTo(xEnd, cy - BH_END / 2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(xFocus, cy + BHF / 2); ctx.lineTo(xEnd, cy + BH_END / 2); ctx.stroke();
-  ctx.setLineDash([]); ctx.restore();
+  /* ── Beam boundary — traces from the transducer to the focus, then on to the far edge ── */
+  const nearProg = ManimViz.stagger(prog, 0.25, 0.65);
+  const farProg  = ManimViz.stagger(prog, 0.6, 0.9);
+  ManimViz.tracePath(ctx, [[x0, cy - BH0 / 2], [xIF, cy - BH_IF / 2], [xFocus, cy - BHF / 2]], nearProg,
+    { color: 'rgba(8,145,178,.75)', width: 1.4, dash: [4, 3], dot: false });
+  ManimViz.tracePath(ctx, [[x0, cy + BH0 / 2], [xIF, cy + BH_IF / 2], [xFocus, cy + BHF / 2]], nearProg,
+    { color: 'rgba(8,145,178,.75)', width: 1.4, dash: [4, 3], dot: false });
+  ManimViz.tracePath(ctx, [[xFocus, cy - BHF / 2], [xEnd, cy - BH_END / 2]], farProg,
+    { color: 'rgba(8,145,178,.40)', width: 1.4, dash: [2, 5], dot: false });
+  ManimViz.tracePath(ctx, [[xFocus, cy + BHF / 2], [xEnd, cy + BH_END / 2]], farProg,
+    { color: 'rgba(8,145,178,.40)', width: 1.4, dash: [2, 5], dot: false });
 
-  /* ── Focus glow (static) ── */
-  const glow = ctx.createRadialGradient(xFocus, cy, 0, xFocus, cy, 13);
-  glow.addColorStop(0, 'rgba(250,204,21,.95)'); glow.addColorStop(0.4, 'rgba(250,204,21,.50)'); glow.addColorStop(1, 'rgba(250,204,21,0)');
-  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(xFocus, cy, 13, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(xFocus, cy, 2.5, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#78350f'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('focus', xFocus, cy + 15);
+  /* ── Focus glow — pops in once the beam converges ── */
+  const focusProg = ManimViz.stagger(prog, 0.55, 0.8);
+  if (focusProg > 0) {
+    ctx.save(); ctx.globalAlpha = focusProg;
+    const r = 13 * focusProg;
+    const glow = ctx.createRadialGradient(xFocus, cy, 0, xFocus, cy, r);
+    glow.addColorStop(0, 'rgba(250,204,21,.95)'); glow.addColorStop(0.4, 'rgba(250,204,21,.50)'); glow.addColorStop(1, 'rgba(250,204,21,0)');
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(xFocus, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(xFocus, cy, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#78350f'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('focus', xFocus, cy + 15);
+    ctx.restore();
+  }
 
   /* ── Transducer block (left side) ── */
   const tg = ctx.createLinearGradient(PAD_L, 0, PAD_L + TRANS_W, 0);
@@ -989,23 +1076,28 @@ function _wpDraw() {
   ctx.fillStyle = '#bae6fd'; ctx.font = 'bold 7px Inter,sans-serif'; ctx.textAlign = 'center';
   ctx.fillText('TX', 0, 3); ctx.restore();
 
-  /* ── Dimension annotations ── */
+  /* ── Dimension annotations — pop in last ── */
+  const labelProg = ManimViz.stagger(prog, 0.85, 1);
   ctx.lineWidth = 1;
   if (xIF - x0 > 24) {
-    ctx.strokeStyle = '#3b82f6';
-    ctx.beginPath(); ctx.moveTo(x0, dimY); ctx.lineTo(xIF, dimY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x0,  dimY - 4); ctx.lineTo(x0,  dimY + 4); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(xIF, dimY - 4); ctx.lineTo(xIF, dimY + 4); ctx.stroke();
-    ctx.fillStyle = '#1e40af'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(`WP = ${fmt(WP, 3)} mm`, x0 + (xIF - x0) / 2, textY);
+    ManimViz.popIn(ctx, labelProg, () => {
+      ctx.strokeStyle = '#3b82f6';
+      ctx.beginPath(); ctx.moveTo(x0, dimY); ctx.lineTo(xIF, dimY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x0,  dimY - 4); ctx.lineTo(x0,  dimY + 4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xIF, dimY - 4); ctx.lineTo(xIF, dimY + 4); ctx.stroke();
+      ctx.fillStyle = '#1e40af'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(`WP = ${fmt(WP, 3)} mm`, x0 + (xIF - x0) / 2, textY);
+    });
   }
   if (xFocus - xIF > 24) {
-    ctx.strokeStyle = '#64748b';
-    ctx.beginPath(); ctx.moveTo(xIF, dimY); ctx.lineTo(xFocus, dimY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(xIF,    dimY - 4); ctx.lineTo(xIF,    dimY + 4); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(xFocus, dimY - 4); ctx.lineTo(xFocus, dimY + 4); ctx.stroke();
-    ctx.fillStyle = '#475569'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(`mp = ${fmt(mp, 3)} mm`, xIF + (xFocus - xIF) / 2, textY);
+    ManimViz.popIn(ctx, labelProg, () => {
+      ctx.strokeStyle = '#64748b';
+      ctx.beginPath(); ctx.moveTo(xIF, dimY); ctx.lineTo(xFocus, dimY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xIF,    dimY - 4); ctx.lineTo(xIF,    dimY + 4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xFocus, dimY - 4); ctx.lineTo(xFocus, dimY + 4); ctx.stroke();
+      ctx.fillStyle = '#475569'; ctx.font = '9.5px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(`mp = ${fmt(mp, 3)} mm`, xIF + (xFocus - xIF) / 2, textY);
+    });
   }
 }
 
@@ -1038,40 +1130,57 @@ function calcWaveVel() {
   resS.innerHTML = `<span style="font-size:.78rem;color:var(--text-muted);">c<sub>S</sub></span><br><strong>${cS.toFixed(0)} m/s</strong>`;
   resR.innerHTML = `c<sub>S</sub>/c<sub>L</sub> = <strong>${ratio.toFixed(3)}</strong> &nbsp;|&nbsp; &lambda;<sub>L</sub> at 5 MHz = <strong>${(cL/5e6*1e3).toFixed(2)} mm</strong>`;
 
-  /* ── Canvas bar chart ── */
+  ManimViz.animate('wv', { cL, cS, ratio, nu }, _drawWaveVelViz, { canvas: document.getElementById('wv-canvas') });
+}
+
+function _drawWaveVelViz(p, state) {
+  const { cL, cS, ratio, nu } = p;
   const canvas = document.getElementById('wv-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH);
   ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
+  const prog = state.progress;
 
-  const maxVal = Math.max(cL, cS, 1000);
+  const maxVal = Math.max(cL, cS, 1000) * 1.08;
   const barData = [
-    { label: `c_L = ${cL.toFixed(0)} m/s`, val: cL, color: '#0891b2' },
-    { label: `c_S = ${cS.toFixed(0)} m/s`, val: cS, color: '#7c3aed' }
+    { label: 'c_L', val: cL, color: '#0891b2' },
+    { label: 'c_S', val: cS, color: '#7c3aed' }
   ];
   const BAR_H = 38, GAP = 18, LEFT = 130, TOP = 40;
+  const plotW = CW - LEFT - 20;
+  const axisY0 = TOP + 2 * BAR_H + GAP + 4;   /* just under both bars */
   ctx.font = '11px Inter,sans-serif';
+
+  /* Coordinate-plane x-axis (velocity, m/s) under the bars */
+  ManimViz.drawAxes(ctx, {
+    x0: LEFT, y0: axisY0, w: plotW, h: axisY0 - TOP + 6,
+    xMax: maxVal, xTicks: 4, yTicks: 0,
+    xFmt: v => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0)
+  });
 
   barData.forEach((d, i) => {
     const y = TOP + i * (BAR_H + GAP);
-    const w = Math.max(4, (d.val / maxVal) * (CW - LEFT - 20));
+    const w = Math.max(4, (d.val / maxVal) * plotW) * prog;
     ctx.fillStyle = d.color + '22';
-    ctx.fillRect(LEFT, y, CW - LEFT - 20, BAR_H);
+    ctx.fillRect(LEFT, y, plotW, BAR_H);
     ctx.fillStyle = d.color;
     ctx.fillRect(LEFT, y, w, BAR_H);
     ctx.fillStyle = '#1e293b'; ctx.textAlign = 'right';
-    ctx.fillText(d.label.split('=')[0].trim(), LEFT - 8, y + BAR_H / 2 + 4);
+    ctx.fillText(d.label, LEFT - 8, y + BAR_H / 2 + 4);
+    const valueText = `${d.val.toFixed(0)} m/s`;
     ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
-    if (w > 60) ctx.fillText(d.label.split('=')[1].trim(), LEFT + w - 70, y + BAR_H / 2 + 4);
-    else { ctx.fillStyle = d.color; ctx.textAlign = 'left'; ctx.fillText(d.label.split('=')[1].trim(), LEFT + w + 4, y + BAR_H / 2 + 4); }
+    if (w > 60) ctx.fillText(valueText, LEFT + w - 70, y + BAR_H / 2 + 4);
+    else { ctx.fillStyle = d.color; ctx.textAlign = 'left'; ctx.fillText(valueText, LEFT + w + 4, y + BAR_H / 2 + 4); }
   });
 
-  /* Ratio bar */
+  /* Ratio line — pops in once the bars have grown */
   const ry = TOP + 2 * (BAR_H + GAP) + 8;
-  ctx.fillStyle = '#475569'; ctx.textAlign = 'left';
-  ctx.font = '10px Inter,sans-serif';
-  ctx.fillText(`c_S/c_L = ${ratio.toFixed(3)}  (Poisson ratio ${nu.toFixed(2)})`, LEFT, ry);
+  ManimViz.popIn(ctx, ManimViz.stagger(prog, 0.7, 1), () => {
+    ctx.fillStyle = '#475569'; ctx.textAlign = 'left';
+    ctx.font = '10px Inter,sans-serif';
+    ctx.fillText(`c_S/c_L = ${ratio.toFixed(3)}  (Poisson ratio ${nu.toFixed(2)})`, LEFT, ry);
+  });
 }
 calcWaveVel();
 
@@ -1093,11 +1202,16 @@ function calcTOFD() {
 
   res.innerHTML = `Crack height <em>a</em> = <strong style="font-size:1.2rem;">${a_mm.toFixed(2)} mm</strong>`;
 
-  /* ── Canvas: TOFD geometry diagram ── */
+  ManimViz.animate('tofd', { theta_deg, dt_us, v, a_mm }, _drawTOFDViz, { canvas: document.getElementById('tofd-canvas') });
+}
+
+function _drawTOFDViz(p, state) {
+  const { theta_deg, dt_us, v, a_mm } = p;
   const canvas = document.getElementById('tofd-canvas');
   if (!canvas) return;
   const { ctx, CW, CH } = _setupHiDPICanvas(canvas);
   ctx.clearRect(0, 0, CW, CH); ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, CW, CH);
+  const prog = state.progress;
 
   const MAT_TOP = 60, MAT_H = 110, CX = CW / 2;
   /* Material */
@@ -1105,16 +1219,21 @@ function calcTOFD() {
   ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
   ctx.strokeRect(20, MAT_TOP, CW - 40, MAT_H);
 
-  /* Crack (vertical red line at center) */
+  /* Crack (vertical red line at center) — grows down from the top surface */
   const crackTop = MAT_TOP + 10;
   const crackBot = crackTop + Math.max(8, Math.min(MAT_H - 20, a_mm * 2.5));
+  const crackProg = ManimViz.stagger(prog, 0, 0.4);
+  const crackBotGrow = ManimViz.lerp(crackTop, crackBot, crackProg);
   ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(CX, crackTop); ctx.lineTo(CX, crackBot); ctx.stroke();
-  /* 'a' annotation */
-  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(CX + 8, crackTop); ctx.lineTo(CX + 8, crackBot); ctx.stroke();
-  ctx.fillStyle = '#dc2626'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'left';
-  ctx.fillText(`a=${a_mm.toFixed(1)}mm`, CX + 12, (crackTop + crackBot) / 2 + 4);
+  ctx.beginPath(); ctx.moveTo(CX, crackTop); ctx.lineTo(CX, crackBotGrow); ctx.stroke();
+
+  /* 'a' annotation — pops in once the crack has grown */
+  ManimViz.popIn(ctx, ManimViz.stagger(prog, 0.35, 0.55), () => {
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(CX + 8, crackTop); ctx.lineTo(CX + 8, crackBot); ctx.stroke();
+    ctx.fillStyle = '#dc2626'; ctx.font = 'bold 10px Inter,sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(`a=${a_mm.toFixed(1)}mm`, CX + 12, (crackTop + crackBot) / 2 + 4);
+  });
 
   /* TX and RX blocks */
   const TX_X = 40, RX_X = CW - 40;
@@ -1124,15 +1243,20 @@ function calcTOFD() {
     ctx.fillText(lbl, bx, MAT_TOP - 11);
   });
 
-  /* Tip path (solid cyan) */
-  ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 1.8; ctx.setLineDash([]);
-  ctx.beginPath(); ctx.moveTo(TX_X, MAT_TOP); ctx.lineTo(CX, crackTop); ctx.lineTo(RX_X, MAT_TOP); ctx.stroke();
-  /* Base path (dashed purple) */
-  ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
-  ctx.beginPath(); ctx.moveTo(TX_X, MAT_TOP); ctx.lineTo(CX, crackBot); ctx.lineTo(RX_X, MAT_TOP); ctx.stroke();
-  ctx.setLineDash([]);
+  /* Tip path (solid cyan) — traces TX → crack tip → RX */
+  const tipProg = ManimViz.stagger(prog, 0.45, 0.8);
+  ManimViz.tracePath(ctx, [[TX_X, MAT_TOP], [CX, crackTop], [RX_X, MAT_TOP]], tipProg,
+    { color: '#0891b2', width: 1.8, dotColor: '#f2c14e' });
 
-  ctx.fillStyle = '#64748b'; ctx.font = '8.5px Inter,sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText(`θ=${theta_deg}°  Δt=${dt_us}μs  v=${v}m/s`, CW / 2, CH - 8);
+  /* Base path (dashed purple) — traces TX → crack base → RX, just after */
+  const baseProg = ManimViz.stagger(prog, 0.6, 0.95);
+  ManimViz.tracePath(ctx, [[TX_X, MAT_TOP], [CX, crackBot], [RX_X, MAT_TOP]], baseProg,
+    { color: '#7c3aed', width: 1.5, dash: [4, 3], dot: false });
+
+  /* Caption — pops in last */
+  ManimViz.popIn(ctx, ManimViz.stagger(prog, 0.85, 1), () => {
+    ctx.fillStyle = '#64748b'; ctx.font = '8.5px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(`θ=${fmt(theta_deg, 3)}°  Δt=${fmt(dt_us, 3)}μs  v=${fmt(v, 4)}m/s`, CW / 2, CH - 8);
+  });
 }
 calcTOFD();

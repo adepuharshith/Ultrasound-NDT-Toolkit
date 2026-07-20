@@ -651,6 +651,7 @@
   <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab</p>
 </footer>
 
+<script src="assets/js/manim-viz.js"></script>
 <script src="assets/js/main.js"></script>
 <script>
   /* Script is at end of <body> — DOM is fully parsed, call directly. */
@@ -662,10 +663,6 @@
   calcSnell();
   calcImpedance();
   calcBeamDiv();
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) _wpPause(); else _wpResume();
-  });
 
   /* Rebuild static canvases after their responsive frames change size. */
   let calcResizeTimer;
