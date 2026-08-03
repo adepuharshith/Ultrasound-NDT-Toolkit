@@ -112,9 +112,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     item.append(toggle, menu);
 
+    /* Position the dropdown under the actual trigger (clamped to the
+       viewport) instead of viewport-centering it — otherwise, on any
+       screen where "Theory" isn't near dead-center, moving the mouse
+       straight down from the link misses the menu entirely and the
+       hover chain breaks. */
+    const positionDropdown = () => {
+      const itemRect = item.getBoundingClientRect();
+      const ddWidth = Math.min(940, window.innerWidth - 32);
+      const margin = 8;
+      let left = itemRect.left + itemRect.width / 2 - ddWidth / 2;
+      left = Math.max(margin, Math.min(left, window.innerWidth - ddWidth - margin));
+      menu.style.setProperty('--dd-left', left + 'px');
+    };
+
     const setOpen = open => {
       item.classList.toggle('open', open);
       toggle.setAttribute('aria-expanded', String(open));
+      if (open) positionDropdown();
     };
     toggle.addEventListener('click', event => {
       event.stopPropagation();
@@ -125,6 +140,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     item.addEventListener('keydown', event => {
       if (event.key === 'Escape') { setOpen(false); theoryLink.focus(); }
+    });
+
+    /* Hover open/close driven by JS (not CSS :hover) with a short close
+       delay: the trigger and the dropdown aren't visually adjacent (the
+       dropdown sits below the whole nav bar), so a bare :hover chain
+       drops the instant the pointer crosses that gap. mouseenter/
+       mouseleave fire for the same subtree :hover would use, but the
+       delay gives the pointer time to reach the dropdown before it
+       actually closes. */
+    let closeTimer = null;
+    item.addEventListener('mouseenter', () => {
+      clearTimeout(closeTimer);
+      setOpen(true);
+    });
+    item.addEventListener('mouseleave', () => {
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(() => setOpen(false), 250);
+    });
+    window.addEventListener('resize', () => {
+      if (item.classList.contains('open')) positionDropdown();
     });
   }
 
@@ -1182,7 +1217,6 @@ function _drawWaveVelViz(p, state) {
     ctx.fillText(`c_S/c_L = ${ratio.toFixed(3)}  (Poisson ratio ${nu.toFixed(2)})`, LEFT, ry);
   });
 }
-calcWaveVel();
 
 /* ─────────────────────────────────────────────────────────────
    TOFD CRACK SIZING  —  calculators.html
@@ -1259,4 +1293,3 @@ function _drawTOFDViz(p, state) {
     ctx.fillText(`θ=${fmt(theta_deg, 3)}°  Δt=${fmt(dt_us, 3)}μs  v=${fmt(v, 4)}m/s`, CW / 2, CH - 8);
   });
 }
-calcTOFD();
