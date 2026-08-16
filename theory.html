@@ -429,41 +429,27 @@
       .wave-band-shear .wave-band-scene { order: -1; }
     }
 
-    /* ---- Wave generation at a liquid-solid interface ---- */
-    .mode-conversion-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-      margin: 1.4rem 0 1rem;
-    }
-    .mode-conversion-card {
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--bg-card);
-    }
-    .mode-conversion-card h3 { margin: 0; padding: 1rem 1rem .25rem; font-size: 1rem; color: var(--text); }
-    .mode-conversion-card > p { min-height: 4.6rem; margin: 0; padding: .25rem 1rem 1rem; font-size: .8rem; line-height: 1.5; }
-    .mode-conversion-card svg { display: block; width: 100%; height: auto; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .mode-result { padding: .8rem 1rem 1rem; font-size: .78rem; line-height: 1.5; color: var(--text-muted); }
-    .mode-result strong { color: var(--text); }
+    /* ---- Wave generation at a liquid-solid interface ----
+       Same blended band treatment as the elastic-wave-types scenes above:
+       no boxed cards, three alternating tinted bands instead. */
+    .wave-band-normal   { background: var(--pastel-blue-bg); }
+    .wave-band-oblique  { background: var(--pastel-purple-bg); grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+    .wave-band-critical { background: var(--pastel-green-bg); }
+    .wave-band-tag-normal   { color: var(--pastel-blue-text); }
+    .wave-band-tag-oblique  { color: var(--pastel-purple-text); }
+    .wave-band-tag-critical { color: var(--pastel-green-text); }
+    .mode-result { margin-top: .6rem; }
     .wave-legend {
       display: flex;
       flex-wrap: wrap;
-      gap: .65rem 1.1rem;
+      gap: .65rem 1.4rem;
       align-items: center;
-      padding: .75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
       color: var(--text-muted);
       font-size: .78rem;
     }
     .wave-legend i { display:inline-block; width:18px; height:3px; margin-right:.3rem; vertical-align:middle; border-radius:2px; }
     @media (max-width: 900px) {
-      .mode-conversion-grid { grid-template-columns: 1fr; }
-      .mode-conversion-card { max-width: 620px; width: 100%; margin: 0 auto; }
-      .mode-conversion-card > p { min-height: 0; }
+      .wave-band-oblique .wave-band-scene { order: -1; }
     }
 
     /* ---- VS comparison grid ---- */
@@ -846,67 +832,58 @@
             wave modes receive energy inside — or along the surface of — the solid.
           </p>
 
-          <div class="mode-conversion-grid">
-            <article class="mode-conversion-card">
-              <h3>1. Normal incidence</h3>
-              <p>The beam strikes perpendicular to the interface: &theta;<sub>i</sub> = 0&deg;.</p>
-              <svg viewBox="0 0 340 270" role="img" aria-label="Normal incidence from water into a solid producing reflected and transmitted longitudinal waves">
-                <defs><marker id="mc-a1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="context-stroke"/></marker></defs>
-                <rect width="340" height="130" fill="#dbeafe"/><rect y="130" width="340" height="140" fill="#e2e8f0"/>
-                <line x1="0" y1="130" x2="340" y2="130" stroke="#334155" stroke-width="2"/>
-                <text x="16" y="22" fill="#0369a1" font-size="12" font-weight="700">WATER · longitudinal only</text>
-                <text x="16" y="255" fill="#475569" font-size="12" font-weight="700">SOLID</text>
-                <line x1="170" y1="35" x2="170" y2="121" stroke="#0891b2" stroke-width="4" marker-end="url(#mc-a1)"/>
-                <text x="179" y="66" fill="#0369a1" font-size="10">incident L</text>
-                <line x1="158" y1="119" x2="158" y2="52" stroke="#dc2626" stroke-width="3" marker-end="url(#mc-a1)"/>
-                <text x="91" y="97" fill="#dc2626" font-size="10">reflected L</text>
-                <line x1="170" y1="139" x2="170" y2="222" stroke="#16a34a" stroke-width="4" marker-end="url(#mc-a1)"/>
-                <text x="179" y="190" fill="#15803d" font-size="10">transmitted L</text>
-              </svg>
-              <div class="mode-result"><strong>Result:</strong> reflected L + transmitted L. Symmetry prevents shear-wave generation.</div>
-            </article>
+          <div class="wave-band-list">
+            <section class="wave-band wave-band-normal" aria-labelledby="mc-normal-h">
+              <div class="wave-band-info">
+                <span class="wave-band-tag wave-band-tag-normal">&theta;ᵢ = 0&deg;</span>
+                <h3 id="mc-normal-h">1. Normal incidence</h3>
+                <p>
+                  The beam strikes <strong>perpendicular</strong> to the interface. Symmetry is
+                  preserved, so no shear component is created — the interface only ever sees
+                  motion along the beam axis.
+                  <span class="mode-result"><strong>Result:</strong> reflected L in the water +
+                  transmitted L in the solid. No shear-wave generation.</span>
+                </p>
+              </div>
+              <div class="wave-band-scene">
+                <canvas id="wg-normal" class="elastic-wave-canvas" width="520" height="340" aria-label="Animated isometric scene of normal-incidence longitudinal wave reflecting and transmitting at a water-solid interface"></canvas>
+              </div>
+            </section>
 
-            <article class="mode-conversion-card">
-              <h3>2. Oblique incidence</h3>
-              <p>An angled beam breaks the symmetry and causes mode conversion.</p>
-              <svg viewBox="0 0 340 270" role="img" aria-label="Oblique incidence from water into a solid producing longitudinal and shear vertical waves">
-                <defs><marker id="mc-a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="context-stroke"/></marker></defs>
-                <rect width="340" height="130" fill="#dbeafe"/><rect y="130" width="340" height="140" fill="#e2e8f0"/>
-                <line x1="0" y1="130" x2="340" y2="130" stroke="#334155" stroke-width="2"/>
-                <line x1="170" y1="92" x2="170" y2="168" stroke="#94a3b8" stroke-dasharray="4 3"/>
-                <text x="16" y="22" fill="#0369a1" font-size="12" font-weight="700">WATER · L only</text><text x="16" y="255" fill="#475569" font-size="12" font-weight="700">SOLID · L + SV</text>
-                <line x1="72" y1="36" x2="164" y2="124" stroke="#0891b2" stroke-width="4" marker-end="url(#mc-a2)"/>
-                <text x="72" y="67" fill="#0369a1" font-size="10">incident L</text>
-                <line x1="164" y1="124" x2="255" y2="38" stroke="#dc2626" stroke-width="3" marker-end="url(#mc-a2)"/>
-                <text x="230" y="76" fill="#dc2626" font-size="10">reflected L</text>
-                <line x1="174" y1="136" x2="232" y2="225" stroke="#16a34a" stroke-width="4" marker-end="url(#mc-a2)"/>
-                <text x="224" y="198" fill="#15803d" font-size="10">L</text>
-                <line x1="174" y1="136" x2="203" y2="235" stroke="#7c3aed" stroke-width="4" marker-end="url(#mc-a2)"/>
-                <text x="178" y="211" fill="#6d28d9" font-size="10">SV</text>
-                <path d="M170 105 A25 25 0 0 0 151 112" fill="none" stroke="#475569"/><text x="144" y="101" fill="#475569" font-size="10">&theta;ᵢ</text>
-              </svg>
-              <div class="mode-result"><strong>Result:</strong> reflected L in water; refracted L and SV waves in the solid at different Snell-law angles.</div>
-            </article>
+            <section class="wave-band wave-band-oblique" aria-labelledby="mc-oblique-h">
+              <div class="wave-band-scene">
+                <canvas id="wg-oblique" class="elastic-wave-canvas" width="520" height="340" aria-label="Animated isometric scene of oblique-incidence wave mode-converting into longitudinal and shear-vertical waves in the solid"></canvas>
+              </div>
+              <div class="wave-band-info">
+                <span class="wave-band-tag wave-band-tag-oblique">&theta;ᵢ &gt; 0&deg;</span>
+                <h3 id="mc-oblique-h">2. Oblique incidence</h3>
+                <p>
+                  An angled beam breaks that symmetry. Each mode refracts at its own Snell-law
+                  angle, set by its own wave speed — <strong>mode conversion</strong> splits one
+                  incoming beam into two outgoing ones in the solid.
+                  <span class="mode-result"><strong>Result:</strong> reflected L in the water;
+                  refracted L <em>and</em> SV in the solid, bent by different amounts.</span>
+                </p>
+              </div>
+            </section>
 
-            <article class="mode-conversion-card">
-              <h3>3. Rayleigh critical angle</h3>
-              <p>The incident angle is tuned so energy travels along the free surface.</p>
-              <svg viewBox="0 0 340 270" role="img" aria-label="Critical-angle incidence producing a Rayleigh surface wave in a solid">
-                <defs><marker id="mc-a3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="context-stroke"/></marker></defs>
-                <rect width="340" height="130" fill="#dbeafe"/><rect y="130" width="340" height="140" fill="#e2e8f0"/>
-                <line x1="0" y1="130" x2="340" y2="130" stroke="#334155" stroke-width="2"/>
-                <text x="16" y="22" fill="#0369a1" font-size="12" font-weight="700">WATER</text><text x="16" y="255" fill="#475569" font-size="12" font-weight="700">SOLID</text>
-                <line x1="58" y1="48" x2="151" y2="124" stroke="#0891b2" stroke-width="4" marker-end="url(#mc-a3)"/>
-                <text x="55" y="76" fill="#0369a1" font-size="10">incident L</text>
-                <line x1="151" y1="124" x2="246" y2="47" stroke="#dc2626" stroke-width="3" marker-end="url(#mc-a3)"/>
-                <text x="222" y="80" fill="#dc2626" font-size="10">reflected L</text>
-                <path d="M158 135 C176 116 192 154 210 135 S244 154 262 135 S296 154 316 135" fill="none" stroke="#059669" stroke-width="5" marker-end="url(#mc-a3)"/>
-                <path d="M165 146 C183 132 199 160 217 146 S251 160 269 146" fill="none" stroke="#10b981" stroke-width="2.5" opacity=".5"/>
-                <text x="235" y="177" fill="#047857" font-size="11" font-weight="700">Rayleigh surface wave</text>
-                <text x="235" y="191" fill="#64748b" font-size="9">elliptical motion decays with depth</text>
-              </svg>
-              <div class="mode-result"><strong>Result:</strong> a Rayleigh wave is launched along the solid surface; its energy remains within roughly one wavelength of the surface.</div>
-            </article>
+            <section class="wave-band wave-band-critical" aria-labelledby="mc-critical-h">
+              <div class="wave-band-info">
+                <span class="wave-band-tag wave-band-tag-critical">Critical &theta;ᵢ</span>
+                <h3 id="mc-critical-h">3. Rayleigh critical angle</h3>
+                <p>
+                  Tune the incident angle so the refracted L wave would travel exactly along the
+                  interface — that critical condition launches a <strong>Rayleigh wave</strong>
+                  instead of a bulk beam.
+                  <span class="mode-result"><strong>Result:</strong> a surface wave riding the
+                  solid's free surface, its elliptical motion decaying within about one
+                  wavelength of depth.</span>
+                </p>
+              </div>
+              <div class="wave-band-scene">
+                <canvas id="wg-critical" class="elastic-wave-canvas" width="520" height="340" aria-label="Animated isometric scene of critical-angle incidence launching a Rayleigh surface wave along a water-solid interface"></canvas>
+              </div>
+            </section>
           </div>
 
           <div class="wave-legend">
@@ -4987,6 +4964,239 @@
       frame++; requestAnimationFrame(draw);
     })();
   })();
+})();
+
+/* ============================================================
+   HOW ARE DIFFERENT ELASTIC WAVES CREATED? — isometric ray scenes
+   Same isometric water/solid sample block for all three panels; the
+   incidence angle changes which rays exist and, more importantly,
+   the mode each ray carries is animated directly into its particle
+   motion — L-rays oscillate along their own direction, the SV-ray
+   oscillates across it, and the critical-angle panel swaps the
+   transmitted ray for a decaying Rayleigh patch riding the interface.
+   ============================================================ */
+(function () {
+  var COS30 = Math.cos(Math.PI / 6), SIN30 = 0.5, YV = 0.85;
+
+  var palette = {};
+  function refreshPalette() {
+    var cs = getComputedStyle(document.documentElement);
+    function v(name, fb) { var val = cs.getPropertyValue(name); return val ? val.trim() : fb; }
+    palette.border = v('--border', '#cbd5e1');
+    palette.muted  = v('--text-muted', '#64748b');
+    palette.water  = v('--pastel-blue-text', '#1e3a8a');
+    palette.solid  = v('--text-muted', '#64748b');
+  }
+  refreshPalette();
+  if (window.MutationObserver) {
+    new MutationObserver(refreshPalette)
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+
+  var COLORS = { incident: '#0891b2', reflected: '#dc2626', transL: '#16a34a', transSV: '#7c3aed', rayleigh: '#059669' };
+
+  function project(ox, oy, tile, x, y, z) {
+    return { x: ox + (x - z) * tile * COS30, y: oy + (x + z) * tile * SIN30 + y * tile * YV };
+  }
+
+  function bbox(tile, xr, yr, zr) {
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    xr.forEach(function (x) { yr.forEach(function (y) { zr.forEach(function (z) {
+      var p = project(0, 0, tile, x, y, z);
+      if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+    }); }); });
+    return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
+  }
+
+  function initCanvas(id) {
+    var canvas = document.getElementById(id);
+    if (!canvas) return null;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = canvas.width, h = canvas.height;
+    if (dpr > 1) { canvas.width = w * dpr; canvas.height = h * dpr; }
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    return { ctx: ctx, W: w, H: h };
+  }
+
+  function poly(ctx, pts, fill, alpha) {
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.closePath();
+    ctx.globalAlpha = alpha; ctx.fillStyle = fill; ctx.fill();
+    ctx.globalAlpha = .45; ctx.strokeStyle = palette.border; ctx.lineWidth = 1; ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  /* A half-space slab drawn as an isometric box (top / right / front faces). */
+  function drawSlab(ctx, P, nx, nz, yTop, yBottom, tint) {
+    poly(ctx, [P(0, yTop, 0), P(nx, yTop, 0), P(nx, yTop, nz), P(0, yTop, nz)], tint, 0.09);
+    poly(ctx, [P(0, yTop, nz), P(nx, yTop, nz), P(nx, yBottom, nz), P(0, yBottom, nz)], tint, 0.15);
+    poly(ctx, [P(nx, yTop, 0), P(nx, yTop, nz), P(nx, yBottom, nz), P(nx, yBottom, 0)], tint, 0.21);
+  }
+
+  function arrowhead(ctx, x1, y1, x2, y2, color) {
+    var a = Math.atan2(y2 - y1, x2 - x1), s = 6.5;
+    ctx.globalAlpha = .95; ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - s * Math.cos(a - .5), y2 - s * Math.sin(a - .5));
+    ctx.lineTo(x2 - s * Math.cos(a + .5), y2 - s * Math.sin(a + .5));
+    ctx.closePath(); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  /* Traveling wave-train along a ray from (x0,y0) to (x1,y1). mode 'L'
+     oscillates the particles along the ray's own direction (compression);
+     mode 'SV' oscillates them across it (shear). `reverse` flips which
+     end the pulse appears to travel from, so arrows into vs. out of the
+     interface both read as moving the right way. */
+  function drawRay(ctx, P, x0, y0, x1, y1, mode, color, t, np, reverse, label, labelSide, labelT) {
+    var dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+    var ux = dx / len, uy = dy / len, perpx = -uy, perpy = ux;
+    var amp = 0.24;
+
+    var guideA = P(x0, y0, 0.85), guideB = P(x1, y1, 0.85);
+    ctx.globalAlpha = .3; ctx.strokeStyle = color; ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(guideA.x, guideA.y); ctx.lineTo(guideB.x, guideB.y); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+    for (var l = 0; l < 2; l++) {
+      var z = l * 1.1 + 0.3;
+      for (var i = 0; i < np; i++) {
+        var f = i / (np - 1);
+        var bx = x0 + dx * f, by = y0 + dy * f;
+        var phase = (reverse ? (1 - f) : f) * np * 0.75 - t;
+        var dAlong = mode === 'L' ? amp * Math.sin(phase) : 0;
+        var dAcross = mode === 'SV' ? amp * Math.sin(phase) : 0;
+        var px = bx + ux * dAlong + perpx * dAcross;
+        var py = by + uy * dAlong + perpy * dAcross;
+        var pp = P(px, py, z);
+        ctx.globalAlpha = 0.5 + 0.4 * (l / 1);
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(pp.x, pp.y, 2.5, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    var endX = reverse ? x0 : x1, endY = reverse ? y0 : y1;
+    var prevT = reverse ? 0.08 : 0.92;
+    var prevPt = P(x0 + dx * prevT, y0 + dy * prevT, 0.85);
+    var endPt = P(endX, endY, 0.85);
+    arrowhead(ctx, prevPt.x, prevPt.y, endPt.x, endPt.y, color);
+
+    if (label) {
+      var lt = labelT === undefined ? 0.7 : labelT;
+      var side = labelSide === 'right' ? 1 : -1;
+      var off = 0.85;
+      var lp = P(x0 + dx * lt + perpx * off * side, y0 + dy * lt + perpy * off * side, 0.85);
+      ctx.font = '700 10px Inter, sans-serif';
+      ctx.textAlign = labelSide === 'right' ? 'left' : 'right';
+      ctx.fillStyle = color;
+      ctx.fillText(label, lp.x, lp.y);
+    }
+  }
+
+  /* Rayleigh patch: a small decaying lattice riding the interface, reusing
+     the same retrograde-ellipse motion as the wave-types Rayleigh scene. */
+  function rayleighPatch(ctx, P, x0, cols, rows, t, color) {
+    var amp = 0.4;
+    for (var l = 0; l < 2; l++) {
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          var phase = c * 0.8 - t;
+          var decay = Math.exp(-r * 0.85);
+          var dx = -amp * decay * Math.cos(phase), dy = amp * decay * Math.sin(phase);
+          var pp = P(x0 + c + dx, r + dy, l * 1.1 + 0.3);
+          ctx.globalAlpha = 0.3 + 0.65 * decay;
+          ctx.fillStyle = color;
+          ctx.beginPath(); ctx.arc(pp.x, pp.y, 2.1 + 1.3 * decay, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function angleArc(ctx, P, cx, cy, fromAngle, toAngle, color, label) {
+    var r = 0.9;
+    ctx.globalAlpha = .8; ctx.strokeStyle = color; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    var steps = 16;
+    for (var i = 0; i <= steps; i++) {
+      var a = fromAngle + (toAngle - fromAngle) * (i / steps);
+      var p = P(cx + Math.sin(a) * r, cy - Math.cos(a) * r, 0.85);
+      if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke(); ctx.globalAlpha = 1;
+    var mid = fromAngle + (toAngle - fromAngle) * 0.5;
+    var lp = P(cx + Math.sin(mid) * (r + 0.55), cy - Math.cos(mid) * (r + 0.55), 0.85);
+    ctx.font = '700 10px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = color;
+    ctx.fillText(label, lp.x, lp.y);
+  }
+
+  var SCENES = [
+    { id: 'wg-normal',   mode: 'normal' },
+    { id: 'wg-oblique',  mode: 'oblique' },
+    { id: 'wg-critical', mode: 'critical' }
+  ];
+
+  function start(spec) {
+    var c = initCanvas(spec.id); if (!c) return;
+    var frame = 0;
+    var tile = 30;
+    var xr = [0, 10], yr = [-3.4, 3.6], zr = [0, 2];
+
+    (function draw() {
+      var W = c.W, H = c.H, ctx = c.ctx;
+      ctx.clearRect(0, 0, W, H);
+
+      var box = bbox(tile, xr, yr, zr);
+      var avail = H - 96, needed = box.maxY - box.minY;
+      var t2 = tile * Math.min(1, avail / needed);
+      box = bbox(t2, xr, yr, zr);
+      var ox = W / 2 - (box.minX + box.maxX) / 2;
+      var oy = 58 - box.minY;
+      function P(x, y, z) { return project(ox, oy, t2, x, y, z); }
+
+      drawSlab(ctx, P, 10, 2, -3.4, 0, palette.water);
+      drawSlab(ctx, P, 10, 2, 0, 3.6, palette.solid);
+
+      ctx.font = '700 10px Inter, sans-serif'; ctx.textAlign = 'left';
+      ctx.globalAlpha = .8; ctx.fillStyle = palette.muted;
+      var wl = P(0.2, -3.15, 0.1), sl = P(0.2, 3.4, 0.1);
+      ctx.fillText('WATER', wl.x, wl.y);
+      ctx.fillText('SOLID', sl.x, sl.y);
+      ctx.globalAlpha = 1;
+
+      var t = frame * 0.05;
+
+      if (spec.mode === 'normal') {
+        drawRay(ctx, P, 4.6, -3.2, 4.6, 0, 'L', COLORS.incident, t, 7, false, 'incident L', 'right', 0.14);
+        drawRay(ctx, P, 5.4, 0, 5.4, -3.2, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
+        drawRay(ctx, P, 5, 0, 5, 3.6, 'L', COLORS.transL, t, 7, false, 'transmitted L', 'right', 0.85);
+      } else if (spec.mode === 'oblique') {
+        drawRay(ctx, P, 1.6, -3.2, 5, 0, 'L', COLORS.incident, t, 7, false, 'incident L', 'left', 0.14);
+        drawRay(ctx, P, 5, 0, 8.4, -3.2, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
+        drawRay(ctx, P, 5, 0, 7.2, 3.6, 'L', COLORS.transL, t, 6, false, 'L', 'right', 0.92);
+        drawRay(ctx, P, 5, 0, 6.15, 3.6, 'SV', COLORS.transSV, t, 6, false, 'SV', 'left', 0.95);
+        angleArc(ctx, P, 5, 0, 0, -0.62, palette.muted, 'θᵢ');
+      } else if (spec.mode === 'critical') {
+        drawRay(ctx, P, 1.6, -3.2, 5, 0, 'L', COLORS.incident, t, 7, false, 'incident L', 'left', 0.14);
+        drawRay(ctx, P, 5, 0, 8.4, -3.2, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
+        rayleighPatch(ctx, P, 5, 6, 4, t, COLORS.rayleigh);
+        angleArc(ctx, P, 5, 0, 0, -0.98, palette.muted, 'critical θᵢ');
+        var rl = P(7.4, -0.55, 1.6);
+        ctx.font = '700 10px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = COLORS.rayleigh;
+        ctx.fillText('Rayleigh — decays with depth', rl.x, rl.y);
+      }
+
+      frame++; requestAnimationFrame(draw);
+    })();
+  }
+
+  SCENES.forEach(start);
 })();
 </script>
 </body>
