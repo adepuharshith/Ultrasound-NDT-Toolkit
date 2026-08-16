@@ -352,65 +352,64 @@
     .app-card li { margin-bottom: .4rem; font-size: .9rem; color: var(--text-muted); }
     .app-card li strong { color: var(--text); }
 
-    /* ---- Elastic wave type lattice cards ---- */
-    .elastic-wave-grid {
+    /* ---- Elastic wave type bands ----
+       No boxed "cards" — each wave type is a full-bleed band that blends
+       straight into its own tinted background wash. The wash color (not a
+       border/shadow) is what tells the three types apart. */
+    .wave-band-list {
+      display: flex;
+      flex-direction: column;
+      margin: 1.5rem -2.5rem 1.75rem;
+    }
+    .wave-band {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-      margin: 1.4rem 0 1.25rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      gap: 2rem;
+      align-items: center;
+      padding: 2.4rem 2.5rem;
+      transition: var(--transition-theme);
     }
-    .elastic-wave-card {
-      min-width: 0;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--bg-card);
-    }
-    .elastic-wave-head { padding: 1rem 1rem .75rem; }
-    .elastic-wave-head h3 { margin: 0 0 .25rem; font-size: 1rem; color: var(--text); }
-    .elastic-wave-head p { margin: 0; font-size: .79rem; line-height: 1.45; }
-    .elastic-wave-tag {
+    .wave-band-shear { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+    .wave-band-long     { background: var(--pastel-blue-bg); }
+    .wave-band-shear    { background: var(--pastel-purple-bg); }
+    .wave-band-rayleigh { background: var(--pastel-green-bg); }
+    .wave-band-info h3 { margin: .55rem 0 .6rem; font-size: 1.15rem; color: var(--text); }
+    .wave-band-info p { margin: 0; font-size: .88rem; line-height: 1.65; color: var(--text-muted); }
+    .wave-band-info p strong { color: var(--text); }
+    .wave-band-tag {
       display: inline-block;
-      margin-bottom: .5rem;
-      padding: .18rem .5rem;
+      padding: .2rem .55rem;
       border-radius: 999px;
-      background: var(--pastel-blue-bg);
-      color: var(--pastel-blue-text);
+      background: rgba(255,255,255,.5);
       font-size: .68rem;
       font-weight: 800;
       letter-spacing: .06em;
       text-transform: uppercase;
     }
-    .elastic-wave-card:nth-child(2) .elastic-wave-tag { background: var(--pastel-purple-bg); color: var(--pastel-purple-text); }
-    .elastic-wave-card:nth-child(3) .elastic-wave-tag { background: var(--pastel-green-bg); color: var(--pastel-green-text); }
-    .elastic-wave-canvas { display: block; width: 100%; height: auto; background: var(--surface-canvas); }
-    .elastic-wave-note {
-      min-height: 5.8rem;
-      padding: .75rem 1rem 1rem;
-      border-top: 1px solid var(--border);
-      font-size: .78rem;
-      line-height: 1.5;
-      color: var(--text-muted);
-    }
-    .elastic-wave-note strong { color: var(--text); }
+    .wave-band-tag-long     { color: var(--pastel-blue-text); }
+    .wave-band-tag-shear    { color: var(--pastel-purple-text); }
+    .wave-band-tag-rayleigh { color: var(--pastel-green-text); }
+    :root[data-theme="dark"] .wave-band-tag { background: rgba(0,0,0,.22); }
+    .wave-band-scene { min-width: 0; }
+    .elastic-wave-canvas { display: block; width: 100%; height: auto; }
+
     .elastic-key {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: .75rem;
-      padding: .9rem 1rem;
-      border-radius: 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.1rem 2rem;
       font-size: .8rem;
       color: var(--text-muted);
     }
-    .elastic-key strong { display: block; margin-bottom: .1rem; color: var(--text); }
+    .elastic-key > div { display: flex; align-items: flex-start; gap: .55rem; max-width: 320px; }
+    .elastic-key strong { display: block; color: var(--text); }
+    .elastic-key-dot { width: .6rem; height: .6rem; margin-top: .4rem; border-radius: 50%; flex-shrink: 0; }
+    .elastic-key-dot-long     { background: var(--pastel-blue-text); }
+    .elastic-key-dot-shear    { background: var(--pastel-purple-text); }
+    .elastic-key-dot-rayleigh { background: var(--pastel-green-text); }
     @media (max-width: 900px) {
-      .elastic-wave-grid { grid-template-columns: 1fr; }
-      .elastic-wave-card { max-width: 620px; width: 100%; margin: 0 auto; }
-      .elastic-wave-note { min-height: 0; }
+      .wave-band, .wave-band-shear { grid-template-columns: 1fr; padding: 1.9rem 1.75rem; gap: 1.25rem; }
+      .wave-band-shear .wave-band-scene { order: -1; }
     }
-    @media (max-width: 560px) { .elastic-key { grid-template-columns: 1fr; } }
 
     /* ---- Wave generation at a liquid-solid interface ---- */
     .mode-conversion-grid {
@@ -750,55 +749,67 @@
           <p>
             In a solid, atoms are linked by elastic bonds. A disturbance can move through that
             lattice in several ways, classified by how the particles move relative to the
-            <strong>wave direction</strong>. The dots below show particle motion; the wave itself
-            always travels from left to right.
+            <strong>wave direction</strong>. Each isometric sample below is a small block of
+            material with particles tracking their true 3-D motion as the wave passes through
+            it, left to right.
           </p>
 
-          <div class="elastic-wave-grid">
-            <article class="elastic-wave-card">
-              <div class="elastic-wave-head">
-                <span class="elastic-wave-tag">Bulk wave</span>
-                <h3>1. Longitudinal (L)</h3>
-                <p>Particles move parallel to propagation.</p>
+          <div class="wave-band-list">
+            <section class="wave-band wave-band-long" aria-labelledby="wave-long-h">
+              <div class="wave-band-info">
+                <span class="wave-band-tag wave-band-tag-long">Bulk wave</span>
+                <h3 id="wave-long-h">1. Longitudinal (L)</h3>
+                <p>
+                  Particles move <strong>parallel</strong> to the direction of travel, alternately
+                  bunching together and spreading apart. Alternating
+                  <strong>compression and rarefaction</strong> pass through the volume — the same
+                  push-pull motion as a sound wave in air. L-waves travel in solids, liquids, and
+                  gases, and are the fastest elastic wave in a solid.
+                </p>
               </div>
-              <canvas id="elastic-long" class="elastic-wave-canvas" width="360" height="230" aria-label="Animated longitudinal elastic wave in a three-dimensional particle lattice"></canvas>
-              <div class="elastic-wave-note">
-                Alternating <strong>compression and rarefaction</strong> pass through the volume.
-                L-waves travel in solids, liquids, and gases and are the fastest elastic wave in a solid.
+              <div class="wave-band-scene">
+                <canvas id="elastic-long" class="elastic-wave-canvas" width="460" height="320" aria-label="Animated longitudinal elastic wave in a three-dimensional isometric particle lattice"></canvas>
               </div>
-            </article>
+            </section>
 
-            <article class="elastic-wave-card">
-              <div class="elastic-wave-head">
-                <span class="elastic-wave-tag">Bulk wave</span>
-                <h3>2. Shear (S): SH &amp; SV</h3>
-                <p>Particles move perpendicular to propagation.</p>
+            <section class="wave-band wave-band-shear" aria-labelledby="wave-shear-h">
+              <div class="wave-band-scene">
+                <canvas id="elastic-shear" class="elastic-wave-canvas" width="600" height="330" aria-label="Animated shear horizontal and shear vertical elastic waves shown as two three-dimensional isometric particle lattices"></canvas>
               </div>
-              <canvas id="elastic-shear" class="elastic-wave-canvas" width="360" height="230" aria-label="Animated shear horizontal and shear vertical elastic waves in a three-dimensional particle lattice"></canvas>
-              <div class="elastic-wave-note">
-                <strong>SH</strong> motion is horizontal and side-to-side; <strong>SV</strong> motion is vertical.
-                Both require shear stiffness, so they propagate in solids but not in fluids.
+              <div class="wave-band-info">
+                <span class="wave-band-tag wave-band-tag-shear">Bulk wave</span>
+                <h3 id="wave-shear-h">2. Shear (S): SH &amp; SV</h3>
+                <p>
+                  Particles move <strong>perpendicular</strong> to propagation. <strong>SH</strong>
+                  motion is horizontal, side to side, out of the vertical plane of travel — motion
+                  that is only visible once the sample is viewed in three dimensions.
+                  <strong>SV</strong> motion is vertical, in that same plane. Both require shear
+                  stiffness, so they propagate in solids but not in fluids.
+                </p>
               </div>
-            </article>
+            </section>
 
-            <article class="elastic-wave-card">
-              <div class="elastic-wave-head">
-                <span class="elastic-wave-tag">Surface wave</span>
-                <h3>3. Rayleigh (R)</h3>
-                <p>Particles trace ellipses near a free surface.</p>
+            <section class="wave-band wave-band-rayleigh" aria-labelledby="wave-rayleigh-h">
+              <div class="wave-band-info">
+                <span class="wave-band-tag wave-band-tag-rayleigh">Surface wave</span>
+                <h3 id="wave-rayleigh-h">3. Rayleigh (R)</h3>
+                <p>
+                  Particles trace <strong>ellipses</strong> near a free surface. Coupled
+                  longitudinal and vertical motion produces a <strong>rolling, retrograde
+                  elliptical path</strong> that is strongest at the surface and decays rapidly
+                  with depth — visible here as the deeper rows of particles barely moving at all.
+                </p>
               </div>
-              <canvas id="elastic-rayleigh" class="elastic-wave-canvas" width="360" height="230" aria-label="Animated Rayleigh surface wave in a three-dimensional particle lattice"></canvas>
-              <div class="elastic-wave-note">
-                Coupled longitudinal and vertical motion produces a <strong>rolling elliptical path</strong>.
-                Motion is strongest at the surface and decays rapidly with depth.
+              <div class="wave-band-scene">
+                <canvas id="elastic-rayleigh" class="elastic-wave-canvas" width="460" height="340" aria-label="Animated Rayleigh surface wave in a three-dimensional isometric particle lattice, decaying with depth"></canvas>
               </div>
-            </article>
+            </section>
           </div>
 
           <div class="elastic-key">
-            <div><strong>Parallel motion</strong>L-wave: particle motion ∥ travel</div>
-            <div><strong>Perpendicular motion</strong>S-wave: particle motion ⟂ travel</div>
-            <div><strong>Elliptical motion</strong>Rayleigh: surface-localized rolling</div>
+            <div><span class="elastic-key-dot elastic-key-dot-long"></span><div><strong>Parallel motion</strong>L-wave: particle motion ∥ travel</div></div>
+            <div><span class="elastic-key-dot elastic-key-dot-shear"></span><div><strong>Perpendicular motion</strong>S-wave: particle motion ⟂ travel</div></div>
+            <div><span class="elastic-key-dot elastic-key-dot-rayleigh"></span><div><strong>Elliptical motion</strong>Rayleigh: surface-localized rolling</div></div>
           </div>
         </div>
 
@@ -4741,102 +4752,223 @@
 })();
 
 /* ============================================================
-   ELASTIC WAVE TYPES — pseudo-3D particle lattices
-   L: parallel motion; S: split SH/SV views; R: surface ellipse.
+   ELASTIC WAVE TYPES — isometric 3-D particle-lattice samples
+   A small material block is drawn in true isometric projection
+   (top / right / front faces) with a 3-D grid of particles inside
+   it; each mode displaces particles along the real axis that
+   physically moves (x = propagation, y = vertical, z = out-of-
+   plane width), so SH's out-of-plane wag — invisible in a flat
+   2-D view — actually reads as 3-D motion here.
    ============================================================ */
 (function () {
-  var specs = [
-    { id: 'elastic-long', type: 'long' },
-    { id: 'elastic-shear', type: 'shear' },
-    { id: 'elastic-rayleigh', type: 'rayleigh' }
-  ];
+  var COS30 = Math.cos(Math.PI / 6);
+  var SIN30 = 0.5;
+  var YV = 0.85; /* vertical px-per-unit relative to a tile, for pleasant proportions */
 
-  function start(spec) {
-    var canvas = document.getElementById(spec.id);
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height;
-    var frame = 0;
+  /* Theme-aware palette, re-read whenever the light/dark toggle flips. */
+  var palette = {};
+  function refreshPalette() {
+    var cs = getComputedStyle(document.documentElement);
+    function v(name, fallback) { var val = cs.getPropertyValue(name); return val ? val.trim() : fallback; }
+    palette.border   = v('--border', '#cbd5e1');
+    palette.text     = v('--text', '#0f172a');
+    palette.muted    = v('--text-muted', '#64748b');
+    palette.long     = v('--pastel-blue-text', '#1e3a8a');
+    palette.shear    = v('--pastel-purple-text', '#5b21b6');
+    palette.rayleigh = v('--pastel-green-text', '#166534');
+  }
+  refreshPalette();
+  if (window.MutationObserver) {
+    new MutationObserver(refreshPalette)
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
 
-    function arrow(x1, y1, x2, y2, color) {
-      var a = Math.atan2(y2-y1, x2-x1), s = 6;
-      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.7;
-      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x2,y2);
-      ctx.lineTo(x2-s*Math.cos(a-.55),y2-s*Math.sin(a-.55));
-      ctx.lineTo(x2-s*Math.cos(a+.55),y2-s*Math.sin(a+.55));
-      ctx.closePath(); ctx.fill();
+  function project(ox, oy, tile, x, y, z) {
+    return {
+      x: ox + (x - z) * tile * COS30,
+      y: oy + (x + z) * tile * SIN30 + y * tile * YV
+    };
+  }
+
+  function bbox(tile, nx, ny, nz) {
+    var xMin = -0.65, xMax = nx - 1 + 0.65;
+    var yMin = -0.55, yMax = ny - 1 + 0.55;
+    var zMin = -0.65, zMax = nz - 1 + 0.65;
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    [xMin, xMax].forEach(function (x) {
+      [yMin, yMax].forEach(function (y) {
+        [zMin, zMax].forEach(function (z) {
+          var p = project(0, 0, tile, x, y, z);
+          if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+        });
+      });
+    });
+    return { minX: minX, maxX: maxX, minY: minY, maxY: maxY,
+      xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, zMin: zMin, zMax: zMax };
+  }
+
+  function drawArrow(ctx, x1, y1, x2, y2, color) {
+    var a = Math.atan2(y2 - y1, x2 - x1), s = 6;
+    ctx.globalAlpha = 0.85;
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - s * Math.cos(a - .5), y2 - s * Math.sin(a - .5));
+    ctx.lineTo(x2 - s * Math.cos(a + .5), y2 - s * Math.sin(a + .5));
+    ctx.closePath(); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  /* Draws one isometric sample block + its animated particle lattice,
+     centered horizontally on cx and fit between topY/bottomY. */
+  function drawScene(ctx, cx, topY, bottomY, tile, nx, ny, nz, mode, accent, t, label) {
+    var box = bbox(tile, nx, ny, nz);
+    var avail = bottomY - topY, needed = box.maxY - box.minY;
+    if (needed > avail) tile *= avail / needed;
+    box = bbox(tile, nx, ny, nz);
+    var ox = cx - (box.minX + box.maxX) / 2;
+    var oy = topY - box.minY;
+    function P(x, y, z) { return project(ox, oy, tile, x, y, z); }
+
+    function poly(pts, alpha) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.closePath();
+      ctx.globalAlpha = alpha; ctx.fillStyle = accent; ctx.fill();
+      ctx.globalAlpha = 0.5; ctx.strokeStyle = palette.border; ctx.lineWidth = 1; ctx.stroke();
+      ctx.globalAlpha = 1;
     }
 
-    function point(x, row, depth, phase, mode, half) {
-      var py = 58 + row * 23 + depth * 8;
-      var px = 30 + x * 37 - depth * 8;
-      var amp = 7, decay = 1, dx = 0, dy = 0;
-      if (mode === 'long') dx = amp * Math.sin(phase);
-      if (mode === 'sh') {
-        /* out-of-plane horizontal motion, projected diagonally in the top view */
-        dx = -amp * .75 * Math.sin(phase);
-        py += amp * .42 * Math.sin(phase);
-      }
-      if (mode === 'sv') { py += amp * Math.sin(phase); px += depth * 1.2; }
-      if (mode === 'rayleigh') {
-        decay = Math.exp(-row * .55);
-        dx = -amp * .75 * decay * Math.cos(phase);
-        dy = amp * decay * Math.sin(phase);
-      }
-      return { x:px+dx+(half||0), y:py+dy, fade:decay };
+    var xMin = box.xMin, xMax = box.xMax, yMin = box.yMin, yMax = box.yMax, zMin = box.zMin, zMax = box.zMax;
+
+    /* Sample block: top (free surface), right and front faces — the
+       three faces a raised isometric view actually shows. */
+    poly([P(xMin,yMin,zMin), P(xMax,yMin,zMin), P(xMax,yMin,zMax), P(xMin,yMin,zMax)], 0.08);
+    poly([P(xMin,yMin,zMax), P(xMax,yMin,zMax), P(xMax,yMax,zMax), P(xMin,yMax,zMax)], 0.14);
+    poly([P(xMax,yMin,zMin), P(xMax,yMin,zMax), P(xMax,yMax,zMax), P(xMax,yMax,zMin)], 0.20);
+
+    if (mode === 'rayleigh') {
+      var s1 = P(xMin, yMin, zMin), s2 = P(xMax, yMin, zMin);
+      ctx.globalAlpha = 0.7; ctx.strokeStyle = accent; ctx.lineWidth = 1.3;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(s1.x, s1.y); ctx.lineTo(s2.x, s2.y); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
     }
 
-    function lattice(mode, x0, cols, rows, label) {
-      var t = frame * .045, pts = [], depths = mode === 'sh' ? 3 : 2;
-      for (var d=depths-1; d>=0; d--) {
-        for (var r=0; r<rows; r++) {
-          for (var c=0; c<cols; c++) {
-            var ph = c * .82 - t;
-            pts.push(point(c,r,d,ph,mode,x0));
+    /* Particle positions: displacement is added on the real axis that
+       physically moves for this mode, then the whole point is projected —
+       so out-of-plane (SH) and vertical (SV) motion render correctly. */
+    var amp = 0.42, pts = [];
+    for (var l = 0; l < nz; l++) {
+      for (var r = 0; r < ny; r++) {
+        for (var c = 0; c < nx; c++) {
+          var phase = c * 0.8 - t, dx = 0, dy = 0, dz = 0, decay = 1;
+          if (mode === 'long') dx = amp * Math.sin(phase);
+          if (mode === 'sh')   dz = amp * Math.sin(phase);
+          if (mode === 'sv')   dy = amp * Math.sin(phase);
+          if (mode === 'rayleigh') {
+            decay = Math.exp(-r * 0.85);
+            dx = -amp * decay * Math.cos(phase);
+            dy =  amp * decay * Math.sin(phase);
           }
+          var p = P(c + dx, r + dy, l + dz);
+          pts.push({ x: p.x, y: p.y, l: l, decay: decay });
         }
       }
-      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = .7;
-      for (var i=0; i<pts.length; i++) {
-        var p=pts[i];
-        ctx.beginPath(); ctx.arc(p.x,p.y,2.35,0,Math.PI*2);
-        ctx.fillStyle = mode === 'rayleigh'
-          ? 'rgba(5,150,105,' + (.25 + .7*p.fade) + ')'
-          : (mode === 'long' ? '#0891b2' : '#7c3aed');
-        ctx.fill();
-      }
-      if (label) {
-        ctx.fillStyle='#475569'; ctx.font='700 10px Inter,sans-serif'; ctx.textAlign='center';
-        ctx.fillText(label, x0 + (cols-1)*18.5 + 18, 27);
-      }
     }
 
-    function draw() {
-      ctx.fillStyle='#f8fafc'; ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='#e2e8f0'; ctx.fillRect(18,43,W-36,132);
-      ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(18,43); ctx.lineTo(W-18,43); ctx.stroke();
-
-      if (spec.type === 'long') lattice('long', 0, 9, 5, 'compression ↔ rarefaction');
-      if (spec.type === 'shear') {
-        ctx.strokeStyle='#cbd5e1'; ctx.beginPath(); ctx.moveTo(W/2,38); ctx.lineTo(W/2,178); ctx.stroke();
-        lattice('sh', 0, 4, 5, 'SH · top view');
-        lattice('sv', W/2+10, 4, 5, 'SV · front view');
+    /* Faint spring lines along the propagation direction, back layer first. */
+    for (var li = 0; li < nz; li++) {
+      for (var ri = 0; ri < ny; ri++) {
+        ctx.globalAlpha = 0.14 + 0.14 * (li / Math.max(1, nz - 1));
+        ctx.strokeStyle = accent; ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (var ci = 0; ci < nx; ci++) {
+          var pp = pts[li * ny * nx + ri * nx + ci];
+          if (ci === 0) ctx.moveTo(pp.x, pp.y); else ctx.lineTo(pp.x, pp.y);
+        }
+        ctx.stroke();
       }
-      if (spec.type === 'rayleigh') {
-        lattice('rayleigh', 0, 9, 5, 'free surface');
-        ctx.strokeStyle='#059669'; ctx.setLineDash([4,3]);
-        ctx.beginPath(); ctx.moveTo(18,52); ctx.lineTo(W-18,52); ctx.stroke(); ctx.setLineDash([]);
-      }
-
-      arrow(32,201,W-34,201,'#0f2d5e');
-      ctx.fillStyle='#0f2d5e'; ctx.font='700 10px Inter,sans-serif'; ctx.textAlign='center';
-      ctx.fillText('wave propagation',W/2,220);
-      frame++; requestAnimationFrame(draw);
     }
-    requestAnimationFrame(draw);
+    ctx.globalAlpha = 1;
+
+    /* Particles, back layer to front so the front face reads as solid. */
+    for (var i = 0; i < pts.length; i++) {
+      var pt = pts[i], depthMix = pt.l / Math.max(1, nz - 1);
+      var a = (0.55 + 0.45 * depthMix) * (mode === 'rayleigh' ? (0.3 + 0.7 * pt.decay) : 1);
+      var rad = mode === 'rayleigh' ? (2.2 + 1.6 * pt.decay) : (2.6 + depthMix);
+      ctx.globalAlpha = a; ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, rad, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    var half = (box.maxX - box.minX) / 2 * 0.9;
+    var a1 = P(xMin, yMax, zMax), a2 = P(xMax, yMax, zMax);
+    var ay = Math.max(a1.y, a2.y) + 14;
+    drawArrow(ctx, cx - half, ay, cx + half, ay, palette.text);
+
+    if (label) {
+      ctx.fillStyle = palette.muted; ctx.font = '700 11px Inter, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(label, cx, topY - 14);
+    }
   }
-  specs.forEach(start);
+
+  function initCanvas(id) {
+    var canvas = document.getElementById(id);
+    if (!canvas) return null;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = canvas.width, h = canvas.height;
+    if (dpr > 1) { canvas.width = w * dpr; canvas.height = h * dpr; }
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    return { ctx: ctx, W: w, H: h };
+  }
+
+  function caption(ctx, W, H) {
+    ctx.fillStyle = palette.muted; ctx.font = '600 10px Inter, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('wave propagation →', W / 2, H - 12);
+  }
+
+  (function startLong() {
+    var c = initCanvas('elastic-long'); if (!c) return;
+    var frame = 0;
+    (function draw() {
+      c.ctx.clearRect(0, 0, c.W, c.H);
+      drawScene(c.ctx, c.W / 2, 44, c.H - 46, 27, 8, 3, 3, 'long', palette.long, frame * 0.05, 'compression ↔ rarefaction');
+      caption(c.ctx, c.W, c.H);
+      frame++; requestAnimationFrame(draw);
+    })();
+  })();
+
+  (function startShear() {
+    var c = initCanvas('elastic-shear'); if (!c) return;
+    var frame = 0;
+    (function draw() {
+      c.ctx.clearRect(0, 0, c.W, c.H);
+      var midX = c.W / 2;
+      c.ctx.globalAlpha = 0.6; c.ctx.strokeStyle = palette.border; c.ctx.lineWidth = 1;
+      c.ctx.beginPath(); c.ctx.moveTo(midX, 30); c.ctx.lineTo(midX, c.H - 26); c.ctx.stroke();
+      c.ctx.globalAlpha = 1;
+      var t = frame * 0.05;
+      drawScene(c.ctx, c.W * 0.28, 46, c.H - 50, 21, 6, 3, 3, 'sh', palette.shear, t, 'SH — horizontal, out of plane');
+      drawScene(c.ctx, c.W * 0.74, 46, c.H - 50, 21, 6, 3, 3, 'sv', palette.shear, t, 'SV — vertical, in plane');
+      caption(c.ctx, c.W, c.H);
+      frame++; requestAnimationFrame(draw);
+    })();
+  })();
+
+  (function startRayleigh() {
+    var c = initCanvas('elastic-rayleigh'); if (!c) return;
+    var frame = 0;
+    (function draw() {
+      c.ctx.clearRect(0, 0, c.W, c.H);
+      drawScene(c.ctx, c.W / 2, 48, c.H - 50, 24, 8, 5, 3, 'rayleigh', palette.rayleigh, frame * 0.05, 'free surface — motion decays with depth');
+      caption(c.ctx, c.W, c.H);
+      frame++; requestAnimationFrame(draw);
+    })();
+  })();
 })();
 </script>
 </body>
