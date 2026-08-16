@@ -4967,25 +4967,21 @@
 })();
 
 /* ============================================================
-   HOW ARE DIFFERENT ELASTIC WAVES CREATED? — isometric ray scenes
-   Same isometric water/solid sample block for all three panels; the
-   incidence angle changes which rays exist and, more importantly,
-   the mode each ray carries is animated directly into its particle
-   motion — L-rays oscillate along their own direction, the SV-ray
-   oscillates across it, and the critical-angle panel swaps the
-   transmitted ray for a decaying Rayleigh patch riding the interface.
+   HOW ARE DIFFERENT ELASTIC WAVES CREATED? — flat 2-D ray scenes
+   A plain side-on view (water above, solid below — same framing as
+   the original static diagram), but every ray is now a traveling
+   wave-train instead of a static arrow: L-rays pulse along their own
+   direction (compression), the SV-ray pulses across its own direction
+   (shear), and the critical-angle panel swaps its transmitted ray for
+   a decaying Rayleigh patch riding the interface.
    ============================================================ */
 (function () {
-  var COS30 = Math.cos(Math.PI / 6), SIN30 = 0.5, YV = 0.85;
-
   var palette = {};
   function refreshPalette() {
     var cs = getComputedStyle(document.documentElement);
     function v(name, fb) { var val = cs.getPropertyValue(name); return val ? val.trim() : fb; }
-    palette.border = v('--border', '#cbd5e1');
-    palette.muted  = v('--text-muted', '#64748b');
-    palette.water  = v('--pastel-blue-text', '#1e3a8a');
-    palette.solid  = v('--text-muted', '#64748b');
+    palette.muted = v('--text-muted', '#64748b');
+    palette.water = v('--pastel-blue-text', '#1e3a8a');
   }
   refreshPalette();
   if (window.MutationObserver) {
@@ -4994,20 +4990,6 @@
   }
 
   var COLORS = { incident: '#0891b2', reflected: '#dc2626', transL: '#16a34a', transSV: '#7c3aed', rayleigh: '#059669' };
-
-  function project(ox, oy, tile, x, y, z) {
-    return { x: ox + (x - z) * tile * COS30, y: oy + (x + z) * tile * SIN30 + y * tile * YV };
-  }
-
-  function bbox(tile, xr, yr, zr) {
-    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    xr.forEach(function (x) { yr.forEach(function (y) { zr.forEach(function (z) {
-      var p = project(0, 0, tile, x, y, z);
-      if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
-      if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
-    }); }); });
-    return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
-  }
 
   function initCanvas(id) {
     var canvas = document.getElementById(id);
@@ -5020,23 +5002,6 @@
     return { ctx: ctx, W: w, H: h };
   }
 
-  function poly(ctx, pts, fill, alpha) {
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-    ctx.closePath();
-    ctx.globalAlpha = alpha; ctx.fillStyle = fill; ctx.fill();
-    ctx.globalAlpha = .45; ctx.strokeStyle = palette.border; ctx.lineWidth = 1; ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-
-  /* A half-space slab drawn as an isometric box (top / right / front faces). */
-  function drawSlab(ctx, P, nx, nz, yTop, yBottom, tint) {
-    poly(ctx, [P(0, yTop, 0), P(nx, yTop, 0), P(nx, yTop, nz), P(0, yTop, nz)], tint, 0.09);
-    poly(ctx, [P(0, yTop, nz), P(nx, yTop, nz), P(nx, yBottom, nz), P(0, yBottom, nz)], tint, 0.15);
-    poly(ctx, [P(nx, yTop, 0), P(nx, yTop, nz), P(nx, yBottom, nz), P(nx, yBottom, 0)], tint, 0.21);
-  }
-
   function arrowhead(ctx, x1, y1, x2, y2, color) {
     var a = Math.atan2(y2 - y1, x2 - x1), s = 6.5;
     ctx.globalAlpha = .95; ctx.fillStyle = color;
@@ -5047,93 +5012,86 @@
     ctx.globalAlpha = 1;
   }
 
-  /* Traveling wave-train along a ray from (x0,y0) to (x1,y1). mode 'L'
-     oscillates the particles along the ray's own direction (compression);
-     mode 'SV' oscillates them across it (shear). `reverse` flips which
-     end the pulse appears to travel from, so arrows into vs. out of the
-     interface both read as moving the right way. */
-  function drawRay(ctx, P, x0, y0, x1, y1, mode, color, t, np, reverse, label, labelSide, labelT) {
+  /* Traveling wave-train along a straight ray from (x0,y0) to (x1,y1),
+     drawn directly in pixel space — no projection, no depth trick.
+     mode 'L' oscillates particles along the ray (compression); mode
+     'SV' oscillates them across it (shear). `reverse` flips which end
+     the pulse appears to travel from, so incoming vs. outgoing rays
+     both read as moving the right way. */
+  function drawRay(ctx, x0, y0, x1, y1, mode, color, t, np, reverse, label, labelSide, labelT) {
     var dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
-    var ux = dx / len, uy = dy / len, perpx = -uy, perpy = ux;
-    var amp = 0.24;
+    var ux = dx / len, uy = dy / len, px = -uy, py = ux;
+    var amp = 9;
 
-    var guideA = P(x0, y0, 0.85), guideB = P(x1, y1, 0.85);
     ctx.globalAlpha = .3; ctx.strokeStyle = color; ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
-    ctx.beginPath(); ctx.moveTo(guideA.x, guideA.y); ctx.lineTo(guideB.x, guideB.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
     ctx.setLineDash([]); ctx.globalAlpha = 1;
 
-    for (var l = 0; l < 2; l++) {
-      var z = l * 1.1 + 0.3;
-      for (var i = 0; i < np; i++) {
-        var f = i / (np - 1);
-        var bx = x0 + dx * f, by = y0 + dy * f;
-        var phase = (reverse ? (1 - f) : f) * np * 0.75 - t;
-        var dAlong = mode === 'L' ? amp * Math.sin(phase) : 0;
-        var dAcross = mode === 'SV' ? amp * Math.sin(phase) : 0;
-        var px = bx + ux * dAlong + perpx * dAcross;
-        var py = by + uy * dAlong + perpy * dAcross;
-        var pp = P(px, py, z);
-        ctx.globalAlpha = 0.5 + 0.4 * (l / 1);
-        ctx.fillStyle = color;
-        ctx.beginPath(); ctx.arc(pp.x, pp.y, 2.5, 0, Math.PI * 2); ctx.fill();
-      }
+    for (var i = 0; i < np; i++) {
+      var f = i / (np - 1);
+      var bx = x0 + dx * f, by = y0 + dy * f;
+      var phase = (reverse ? (1 - f) : f) * np * 0.75 - t;
+      var dAlong = mode === 'L' ? amp * Math.sin(phase) : 0;
+      var dAcross = mode === 'SV' ? amp * Math.sin(phase) : 0;
+      ctx.globalAlpha = .92;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(bx + ux * dAlong + px * dAcross, by + uy * dAlong + py * dAcross, 3.2, 0, Math.PI * 2);
+      ctx.fill();
     }
     ctx.globalAlpha = 1;
 
     var endX = reverse ? x0 : x1, endY = reverse ? y0 : y1;
-    var prevT = reverse ? 0.08 : 0.92;
-    var prevPt = P(x0 + dx * prevT, y0 + dy * prevT, 0.85);
-    var endPt = P(endX, endY, 0.85);
-    arrowhead(ctx, prevPt.x, prevPt.y, endPt.x, endPt.y, color);
+    var prevT = reverse ? 0.1 : 0.9;
+    arrowhead(ctx, x0 + dx * prevT, y0 + dy * prevT, endX, endY, color);
 
     if (label) {
       var lt = labelT === undefined ? 0.7 : labelT;
       var side = labelSide === 'right' ? 1 : -1;
-      var off = 0.85;
-      var lp = P(x0 + dx * lt + perpx * off * side, y0 + dy * lt + perpy * off * side, 0.85);
-      ctx.font = '700 10px Inter, sans-serif';
+      var off = 15;
+      ctx.font = '700 11px Inter, sans-serif';
       ctx.textAlign = labelSide === 'right' ? 'left' : 'right';
       ctx.fillStyle = color;
-      ctx.fillText(label, lp.x, lp.y);
+      ctx.fillText(label, x0 + dx * lt + px * off * side, y0 + dy * lt + py * off * side);
     }
   }
 
-  /* Rayleigh patch: a small decaying lattice riding the interface, reusing
-     the same retrograde-ellipse motion as the wave-types Rayleigh scene. */
-  function rayleighPatch(ctx, P, x0, cols, rows, t, color) {
-    var amp = 0.4;
-    for (var l = 0; l < 2; l++) {
-      for (var r = 0; r < rows; r++) {
-        for (var c = 0; c < cols; c++) {
-          var phase = c * 0.8 - t;
-          var decay = Math.exp(-r * 0.85);
-          var dx = -amp * decay * Math.cos(phase), dy = amp * decay * Math.sin(phase);
-          var pp = P(x0 + c + dx, r + dy, l * 1.1 + 0.3);
-          ctx.globalAlpha = 0.3 + 0.65 * decay;
-          ctx.fillStyle = color;
-          ctx.beginPath(); ctx.arc(pp.x, pp.y, 2.1 + 1.3 * decay, 0, Math.PI * 2); ctx.fill();
-        }
+  /* Rayleigh patch: a small decaying grid riding the interface — the
+     same retrograde-ellipse motion as the wave-types Rayleigh scene,
+     just flattened to one 2-D sheet instead of a 3-D lattice. */
+  function rayleighPatch(ctx, x0, y0, cols, rows, spacing, t, color) {
+    var amp = 7;
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var phase = c * 0.8 - t;
+        var decay = Math.exp(-r * 0.8);
+        var dx = -amp * decay * Math.cos(phase), dy = amp * decay * Math.sin(phase);
+        ctx.globalAlpha = 0.25 + 0.65 * decay;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x0 + c * spacing + dx, y0 + r * spacing * 0.85 + dy, 2.3 + 1.6 * decay, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
     ctx.globalAlpha = 1;
   }
 
-  function angleArc(ctx, P, cx, cy, fromAngle, toAngle, color, label) {
-    var r = 0.9;
-    ctx.globalAlpha = .8; ctx.strokeStyle = color; ctx.lineWidth = 1.2;
+  function angleArc(ctx, cx, cy, sourceX, sourceY, r, color, label) {
+    var a1 = -Math.PI / 2;
+    var a2 = Math.atan2(sourceY - cy, sourceX - cx);
+    ctx.globalAlpha = .85; ctx.strokeStyle = color; ctx.lineWidth = 1.2;
     ctx.beginPath();
     var steps = 16;
     for (var i = 0; i <= steps; i++) {
-      var a = fromAngle + (toAngle - fromAngle) * (i / steps);
-      var p = P(cx + Math.sin(a) * r, cy - Math.cos(a) * r, 0.85);
-      if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      var a = a1 + (a2 - a1) * (i / steps);
+      var x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke(); ctx.globalAlpha = 1;
-    var mid = fromAngle + (toAngle - fromAngle) * 0.5;
-    var lp = P(cx + Math.sin(mid) * (r + 0.55), cy - Math.cos(mid) * (r + 0.55), 0.85);
+    var mid = a1 + (a2 - a1) * 0.5;
     ctx.font = '700 10px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = color;
-    ctx.fillText(label, lp.x, lp.y);
+    ctx.fillText(label, cx + Math.cos(mid) * (r + 14), cy + Math.sin(mid) * (r + 14));
   }
 
   var SCENES = [
@@ -5145,51 +5103,48 @@
   function start(spec) {
     var c = initCanvas(spec.id); if (!c) return;
     var frame = 0;
-    var tile = 30;
-    var xr = [0, 10], yr = [-3.4, 3.6], zr = [0, 2];
 
     (function draw() {
       var W = c.W, H = c.H, ctx = c.ctx;
       ctx.clearRect(0, 0, W, H);
 
-      var box = bbox(tile, xr, yr, zr);
-      var avail = H - 96, needed = box.maxY - box.minY;
-      var t2 = tile * Math.min(1, avail / needed);
-      box = bbox(t2, xr, yr, zr);
-      var ox = W / 2 - (box.minX + box.maxX) / 2;
-      var oy = 58 - box.minY;
-      function P(x, y, z) { return project(ox, oy, t2, x, y, z); }
-
-      drawSlab(ctx, P, 10, 2, -3.4, 0, palette.water);
-      drawSlab(ctx, P, 10, 2, 0, 3.6, palette.solid);
+      var interfaceY = H * 0.4, cx = W * 0.52;
+      ctx.globalAlpha = .07; ctx.fillStyle = palette.water;
+      ctx.fillRect(0, 0, W, interfaceY);
+      ctx.globalAlpha = .1; ctx.fillStyle = palette.muted;
+      ctx.fillRect(0, interfaceY, W, H - interfaceY);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = palette.muted; ctx.globalAlpha = .5; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, interfaceY); ctx.lineTo(W, interfaceY); ctx.stroke();
+      ctx.globalAlpha = 1;
 
       ctx.font = '700 10px Inter, sans-serif'; ctx.textAlign = 'left';
       ctx.globalAlpha = .8; ctx.fillStyle = palette.muted;
-      var wl = P(0.2, -3.15, 0.1), sl = P(0.2, 3.4, 0.1);
-      ctx.fillText('WATER', wl.x, wl.y);
-      ctx.fillText('SOLID', sl.x, sl.y);
+      ctx.fillText('WATER', 14, 20);
+      ctx.fillText('SOLID', 14, H - 14);
       ctx.globalAlpha = 1;
 
       var t = frame * 0.05;
 
       if (spec.mode === 'normal') {
-        drawRay(ctx, P, 4.6, -3.2, 4.6, 0, 'L', COLORS.incident, t, 7, false, 'incident L', 'right', 0.14);
-        drawRay(ctx, P, 5.4, 0, 5.4, -3.2, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
-        drawRay(ctx, P, 5, 0, 5, 3.6, 'L', COLORS.transL, t, 7, false, 'transmitted L', 'right', 0.85);
+        drawRay(ctx, cx - 20, 20, cx - 20, interfaceY, 'L', COLORS.incident, t, 7, false, 'incident L', 'right', 0.16);
+        drawRay(ctx, cx + 20, interfaceY, cx + 20, 20, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
+        drawRay(ctx, cx, interfaceY, cx, H - 22, 'L', COLORS.transL, t, 7, false, 'transmitted L', 'right', 0.82);
       } else if (spec.mode === 'oblique') {
-        drawRay(ctx, P, 1.6, -3.2, 5, 0, 'L', COLORS.incident, t, 7, false, 'incident L', 'left', 0.14);
-        drawRay(ctx, P, 5, 0, 8.4, -3.2, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
-        drawRay(ctx, P, 5, 0, 7.2, 3.6, 'L', COLORS.transL, t, 6, false, 'L', 'right', 0.92);
-        drawRay(ctx, P, 5, 0, 6.15, 3.6, 'SV', COLORS.transSV, t, 6, false, 'SV', 'left', 0.95);
-        angleArc(ctx, P, 5, 0, 0, -0.62, palette.muted, 'θᵢ');
+        drawRay(ctx, cx - 150, 22, cx, interfaceY, 'L', COLORS.incident, t, 7, false, 'incident L', 'left', 0.18);
+        drawRay(ctx, cx, interfaceY, cx + 150, 22, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
+        drawRay(ctx, cx, interfaceY, cx + 110, H - 20, 'L', COLORS.transL, t, 6, false, 'L', 'right', 0.9);
+        drawRay(ctx, cx, interfaceY, cx + 62, H - 20, 'SV', COLORS.transSV, t, 6, false, 'SV', 'left', 0.95);
+        angleArc(ctx, cx, interfaceY, cx - 150, 22, 34, palette.muted, 'θᵢ');
       } else if (spec.mode === 'critical') {
-        drawRay(ctx, P, 1.6, -3.2, 5, 0, 'L', COLORS.incident, t, 7, false, 'incident L', 'left', 0.14);
-        drawRay(ctx, P, 5, 0, 8.4, -3.2, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
-        rayleighPatch(ctx, P, 5, 6, 4, t, COLORS.rayleigh);
-        angleArc(ctx, P, 5, 0, 0, -0.98, palette.muted, 'critical θᵢ');
-        var rl = P(7.4, -0.55, 1.6);
+        drawRay(ctx, cx - 150, 22, cx, interfaceY, 'L', COLORS.incident, t, 7, false, 'incident L', 'left', 0.18);
+        drawRay(ctx, cx, interfaceY, cx + 150, 22, 'L', COLORS.reflected, t, 7, true, 'reflected L', 'right', 0.82);
+        rayleighPatch(ctx, cx, interfaceY, 7, 4, 15, t, COLORS.rayleigh);
+        angleArc(ctx, cx, interfaceY, cx - 150, 22, 46, palette.muted, 'critical θᵢ');
         ctx.font = '700 10px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = COLORS.rayleigh;
-        ctx.fillText('Rayleigh — decays with depth', rl.x, rl.y);
+        ctx.globalAlpha = .9;
+        ctx.fillText('Rayleigh — decays with depth', cx + 8, interfaceY + 62);
+        ctx.globalAlpha = 1;
       }
 
       frame++; requestAnimationFrame(draw);
