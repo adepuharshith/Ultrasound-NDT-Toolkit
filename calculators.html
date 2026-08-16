@@ -10,14 +10,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <style>
-    /* Override the 540px cap from style.css (set for old 2-col layout) */
-    .calc-box { max-width: none; padding: 1.5rem 1.75rem; }
+    /* ---- Page-level overrides: blended full-bleed calculator bands ----
+       No boxed cards — each calculator is a full-bleed band that blends
+       into the page, distinguished from its neighbors only by alternating
+       between the two neutral surface tones (no border/shadow/gap). The
+       box-shadow + clip-path pair paints the background to the viewport
+       edges without a 100vw breakout, and clip-path keeps it from
+       bleeding into the next calculator vertically. */
+    .section { padding: 3.5rem 0 5rem; }
+    .container { padding: 0; }
+    .calc-box {
+      max-width: none;
+      position: relative;
+      padding: 3rem 2rem;
+      background: var(--bg);
+      box-shadow: 0 0 0 100vmax var(--bg);
+      clip-path: inset(0 -100vmax);
+      border-radius: 0;
+      border: none;
+      transition: var(--transition-theme);
+    }
+    .calc-box.calc-box-b { background: var(--bg-card); box-shadow: 0 0 0 100vmax var(--bg-card); }
 
-    /* ---- One calculator per row ---- */
+    /* ---- One calculator per row, no gap — bands sit flush ---- */
     .calc-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      gap: 0;
     }
 
     /* ---- Inner 2-panel: inputs left, viz right ---- */
@@ -244,7 +263,7 @@
       </div>
 
       <!-- ══ 2. WATER PATH ══════════════════════════════ -->
-      <div class="calc-box" id="waterpath">
+      <div class="calc-box calc-box-b" id="waterpath">
         <div class="calc-section-title">Immersion Testing</div>
         <h3>&#128167; Water Path Calculator</h3>
         <div class="calc-inner">
@@ -339,7 +358,7 @@
       </div>
 
       <!-- ══ 4. TIME-OF-FLIGHT → DEPTH ═════════════════ -->
-      <div class="calc-box" id="tof">
+      <div class="calc-box calc-box-b" id="tof">
         <div class="calc-section-title">Depth Sizing</div>
         <h3>&#9203; Time-of-Flight &rarr; Depth</h3>
         <div class="calc-inner">
@@ -417,7 +436,7 @@
       </div>
 
       <!-- ══ 6. SNELL'S LAW ══════════════════════════════ -->
-      <div class="calc-box" id="snell">
+      <div class="calc-box calc-box-b" id="snell">
         <div class="calc-section-title">Refraction &amp; Mode Conversion</div>
         <h3>&#128200; Snell&apos;s Law &amp; Critical Angle</h3>
         <div class="calc-inner">
@@ -502,7 +521,7 @@
       </div>
 
       <!-- ══ 8. BEAM DIVERGENCE ════════════════════════ -->
-      <div class="calc-box" id="beamdiv">
+      <div class="calc-box calc-box-b" id="beamdiv">
         <div class="calc-section-title">Beam Physics</div>
         <h3>&#128269; Beam Divergence &amp; Spread</h3>
         <div class="calc-inner">
@@ -578,7 +597,7 @@
       </div>
 
       <!-- TOFD Crack Sizing -->
-      <div class="calc-box" id="tofd-calc">
+      <div class="calc-box calc-box-b" id="tofd-calc">
         <h3>&#128400; TOFD Crack Height Sizing</h3>
         <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1rem;">
           Computes crack height from the time difference between tip and base diffraction signals.
@@ -603,7 +622,7 @@
     </div><!-- /calc-grid -->
 
     <!-- ── MATERIAL REFERENCE TABLE ───────────────────── -->
-    <div style="margin-top:3rem;">
+    <div style="margin-top:3rem; padding:0 2rem;">
       <h2 style="margin-bottom:.5rem;">&#128206; Material Reference</h2>
       <p style="margin-bottom:1rem; font-size:.9rem;">Longitudinal wave speed, density, and acoustic impedance at room temperature.</p>
       <div style="overflow-x:auto;">

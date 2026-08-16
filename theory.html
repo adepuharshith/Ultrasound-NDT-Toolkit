@@ -308,22 +308,40 @@
     .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); text-decoration: none; }
     .sec-nav-divider { opacity: .25; padding: 0 .25rem; line-height: 1; font-size: .9rem; align-self: center; }
 
-    /* ---- Theory content wrapper ---- */
+    /* ---- Theory content wrapper ----
+       No boxed section cards — each topic is a full-bleed band that
+       blends straight into the page. The `box-shadow` + `clip-path` pair
+       paints the section's background out to the viewport edges without
+       the 100vw/scrollbar breakout hacks (and without bleeding into the
+       next section vertically, since clip-path holds the top/bottom
+       edges at the section's own box). Two neutral tones (page bg / card
+       bg) alternate so adjacent topics stay visually distinct without a
+       border or shadow around the content. */
     .theory-content {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 1.5rem 2rem 5rem;
+      padding: 0;
     }
     .theory-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      padding: 2.5rem;
-      margin-bottom: 2rem;
+      position: relative;
+      padding: 3rem 2rem;
+      background: var(--bg);
+      box-shadow: 0 0 0 100vmax var(--bg);
+      clip-path: inset(0 -100vmax);
       scroll-margin-top: calc(var(--nav-h) + 58px);
+      transition: var(--transition-theme);
     }
-    .adv-divider { scroll-margin-top: calc(var(--nav-h) + 58px); }
+    .theory-section.theory-section-b {
+      background: var(--bg-card);
+      box-shadow: 0 0 0 100vmax var(--bg-card);
+    }
+    .theory-section:first-of-type { padding-top: 3.5rem; }
+    .theory-section:last-of-type  { padding-bottom: 5rem; }
+    .adv-divider {
+      scroll-margin-top: calc(var(--nav-h) + 58px);
+      padding: .5rem 2rem;
+      box-sizing: border-box;
+    }
 
     /* ---- Application split cards ---- */
     .app-split {
@@ -359,7 +377,7 @@
     .wave-band-list {
       display: flex;
       flex-direction: column;
-      margin: 1.5rem -2.5rem 1.75rem;
+      margin: 1.5rem -2rem 1.75rem;
     }
     .wave-band {
       display: grid;
@@ -656,7 +674,7 @@
         <!-- ══════════════════════════════════════════════
              SECTION 2 — Key Differences: Speed, Medium & Energy Loss
              ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="speed-comparison">
+        <div class="theory-section theory-section-b" id="speed-comparison">
           <h2>Key Differences — Speed, Medium &amp; Energy Loss</h2>
 
           <p>
@@ -744,7 +762,7 @@
         <!-- ══════════════════════════════════════════════
              ELASTIC WAVE TYPES — particle-motion introduction
              ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="elastic-wave-types">
+        <div class="theory-section theory-section-b" id="elastic-wave-types">
           <h2>Types of Elastic Waves</h2>
           <p>
             In a solid, atoms are linked by elastic bonds. A disturbance can move through that
@@ -819,7 +837,7 @@
         <!-- ══════════════════════════════════════════════
              CREATING ELASTIC WAVES — liquid-solid interface
              ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="wave-generation">
+        <div class="theory-section theory-section-b" id="wave-generation">
           <h2>How Are Different Elastic Waves Created?</h2>
           <p>
             Consider a longitudinal wave traveling through <strong>water</strong> toward a
@@ -911,7 +929,7 @@
         <!-- ══════════════════════════════════════════════
              UT PRINCIPLE — Pulse-Echo Schematic
              ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="ut-principle">
+        <div class="theory-section theory-section-b" id="ut-principle">
           <h2>Fundamental Principle of Ultrasonic NDT</h2>
 
           <p>
@@ -1150,7 +1168,7 @@
         <!-- ══════════════════════════════════════════════
              SECTION 6 — Generating Ultrasound
              ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="generating-ultrasound">
+        <div class="theory-section theory-section-b" id="generating-ultrasound">
           <h2>How is Ultrasound Generated?</h2>
 
           <p>
@@ -1482,7 +1500,7 @@
         <!-- ══════════════════════════════════════════════
              SECTION 8 — B-scan
              ══════════════════════════════════════════════ -->
-        <div class="theory-section" id="b-scan">
+        <div class="theory-section theory-section-b" id="b-scan">
           <h2>Scanning Methods — B-scan</h2>
 
           <p>
@@ -2088,7 +2106,7 @@
         </div>
 
         <!-- Attenuation (Advanced) -->
-        <div class="theory-section" id="attenuation">
+        <div class="theory-section theory-section-b" id="attenuation">
           <h2>&#128308; Attenuation — Detailed</h2>
           <p>
             Total attenuation in a polycrystalline metal has two physically distinct contributions:
@@ -2380,7 +2398,7 @@
         </div>
 
         <!-- Snell's Law -->
-        <div class="theory-section" id="snell">
+        <div class="theory-section theory-section-b" id="snell">
           <h2>&#128200; Snell's Law &amp; Mode Conversion</h2>
           <p>
             When an ultrasonic wave strikes a planar interface at oblique incidence, it simultaneously
@@ -2918,7 +2936,7 @@
         </div>
 
         <!-- Calibration & DAC -->
-        <div class="theory-section" id="calibration">
+        <div class="theory-section theory-section-b" id="calibration">
           <h2>&#128207; Calibration &amp; Reference Levels</h2>
           <p>
             Calibration establishes a quantitative reference so that any indication can be evaluated
@@ -3148,7 +3166,7 @@
         </div>
 
         <!-- TOFD -->
-        <div class="theory-section" id="tofd">
+        <div class="theory-section theory-section-b" id="tofd">
           <h2>&#128400; TOFD — Time-of-Flight Diffraction</h2>
           <p>
             Conventional pulse-echo sizes flaws by <em>amplitude</em> — but amplitude depends on

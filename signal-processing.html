@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css" />
   <style>
     /* ── Page layout ── */
-    .sp-wrap { max-width: 1200px; margin: 0 auto; padding: 0 2rem 5rem; }
+    .sp-wrap { max-width: 1200px; margin: 0 auto; padding: 0; }
 
     /* ── Section nav ── */
     .sec-nav {
@@ -43,16 +43,25 @@
     }
     .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); text-decoration: none; }
 
-    /* ── Block cards ── */
+    /* ── Blended section bands ──
+       No boxed cards — each technique is a full-bleed band that blends
+       into the page. box-shadow + clip-path paint the background out to
+       the viewport edges without a 100vw breakout (and without bleeding
+       into the next section, since clip-path holds the top/bottom edges
+       at the section's own box). Two neutral tones alternate so adjacent
+       techniques stay distinct without a border/shadow around them. */
     .sp-block {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      padding: 2.5rem;
-      margin-bottom: 2.5rem;
+      position: relative;
+      padding: 3rem 2rem;
+      background: var(--bg);
+      box-shadow: 0 0 0 100vmax var(--bg);
+      clip-path: inset(0 -100vmax);
       scroll-margin-top: calc(var(--nav-h) + 56px);
+      transition: var(--transition-theme);
     }
+    .sp-block.sp-block-b { background: var(--bg-card); box-shadow: 0 0 0 100vmax var(--bg-card); }
+    .sp-block:first-of-type { padding-top: 3.5rem; }
+    .sp-block:last-of-type  { padding-bottom: 5rem; }
     .sp-block h2 {
       font-size: 1.35rem;
       font-weight: 800;
@@ -417,7 +426,7 @@
 <!-- ══════════════════════════════════════════════════════════
      BLOCK 2 — WAVELET TRANSFORM
 ══════════════════════════════════════════════════════════ -->
-<div class="sp-block" id="wavelet">
+<div class="sp-block sp-block-b" id="wavelet">
   <div class="sp-subtitle">Technique 02</div>
   <h2>Wavelet Transform &amp; Time–Frequency Analysis</h2>
 
