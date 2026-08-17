@@ -13,9 +13,14 @@
     /* ── Page layout ── */
     .sp-wrap { max-width: 1200px; margin: 0 auto; padding: 0; }
 
-    /* ── Section nav ── */
+    /* ── Section nav ──
+       Frosted glass, Apple-nav style: translucent + blurred instead of a
+       flat fill, so it reads as floating above the content scrolling
+       beneath it rather than a hard-edged bar. */
     .sec-nav {
-      background: var(--bg-card);
+      background: rgba(var(--bg-card-rgb), .72);
+      backdrop-filter: saturate(1.8) blur(20px);
+      -webkit-backdrop-filter: saturate(1.8) blur(20px);
       border-bottom: 1px solid var(--border);
       padding: .7rem 2rem;
       position: sticky;
@@ -38,7 +43,7 @@
       color: var(--text-muted);
       cursor: pointer;
       text-decoration: none;
-      transition: all .15s;
+      transition: all .15s var(--ease);
       white-space: nowrap;
     }
     .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); text-decoration: none; }
@@ -138,14 +143,14 @@
     }
     .ctrl-btn {
       padding: .4rem 1.1rem;
-      border-radius: 8px;
+      border-radius: 999px;
       border: 1.5px solid var(--border);
       background: var(--bg);
       font-size: .84rem;
       font-weight: 600;
       color: var(--text);
       cursor: pointer;
-      transition: all .15s;
+      transition: all .15s var(--ease);
     }
     .ctrl-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); }
     .ctrl-btn.primary { background: var(--brand-cyan); border-color: var(--brand-cyan); color: #fff; }

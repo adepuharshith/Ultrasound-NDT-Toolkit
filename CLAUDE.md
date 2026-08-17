@@ -92,6 +92,49 @@ live under `:root[data-theme="dark"]`.
 dark-on-light colors (JS `ctx.fillStyle`, inline SVG `fill=`/`stroke=`, KaTeX `currentColor`), so only the
 *container* needs to stay a safe paper tone; trying to invert the drawn pixels isn't worth it.
 
+## Apple-derived design refinements
+
+A few structural metrics were pulled from `apple.com`'s live computed styles (via headless Chrome, not
+copied CSS files — see below) and folded into the shared token system where they fit the existing navy/cyan
+brand rather than replacing it. Reference metrics pulled from Apple, for future comparison:
+
+| Aspect | Apple's value | Applied here as |
+|---|---|---|
+| Motion easing | `cubic-bezier(0.4, 0, 0.6, 1)` (252 uses, their dominant curve) | `--ease` token in `style.css`, used in every hover/theme `transition` touched below |
+| CTA button shape | `border-radius: 980px` (fully pill, ~34 uses) | `--radius` stays for cards; buttons/pills use `999px` (already the site's convention for chips/tags) |
+| CTA button padding | `padding: 11px 21px` | left as the site's existing `.btn`/`.ctrl-btn`/etc. padding — close enough, not worth churning |
+| Nav bar | `rgba(255,255,255,.8)` + `backdrop-filter: saturate(1.8) blur(20px)` | same `backdrop-filter: saturate(1.8) blur(20px)` value, tinted with the brand navy instead of white (see below) |
+| Heading tracking | `letter-spacing: -0.374px` on 34px text (≈ ‑0.011em) | `h1 { letter-spacing: -.02em }`, `h2 { -.015em }` — proportionally similar tightening on Inter |
+| Text color | `#1d1d1f` (neutral near-black) | **not adopted** — `--text: #0f172a` (slate-tinted) is the established brand color; swapping it would be a bigger rebrand than "apply Apple's polish" |
+| Font family | `"SF Pro Text"/"SF Pro Display"` | **not adopted** — SF Pro is only present on Apple OSes, so referencing it would make typography platform-inconsistent; Inter (already loaded, cross-platform) stays |
+
+Where it was applied:
+- **`.nav`** (main nav, `style.css`) and **`.sec-nav`** (theory.html's/signal-processing.html's sticky
+  quick-jump bar) use frosted glass instead of a flat fill: translucent background + `backdrop-filter:
+  saturate(1.8) blur(20px)` (with a `-webkit-backdrop-filter` fallback for Safari). `.nav` tints
+  `rgba(var(--brand-navy-rgb), .82)` to keep the brand color; `.sec-nav` tints `rgba(var(--bg-card-rgb),
+  .72)`. The `--bg-card-rgb`/`--brand-navy-rgb` tokens exist specifically so `rgba(var(--x-rgb), alpha)`
+  works — a hex custom property can't be split into components for that.
+- **Pill buttons**: `.btn`/`.btn-primary`/`.btn-outline` (hero CTAs, `style.css`), `.ctrl-btn`
+  (signal-processing.html's Animate/Reset controls), `.wave-demo-btn` (theory.html's canvas play/pause
+  overlays), and `.profile-link` (about.html's contact links) all moved from small rounded-rect radii
+  (5–8px) to `999px`. `.sec-nav-btn`/`.filter-btn`/`.theme-toggle`/`.pastel-*` chips were already pill —
+  this just made the CTA buttons match the site's own existing chip convention, not a new idea imported
+  wholesale from Apple.
+- **`--ease`** replaces the implicit default `ease` in `--transition-theme` and in every transition touched
+  above.
+
+**Gotcha hit and fixed while applying this**: putting `backdrop-filter` directly on `.nav` broke the Theory
+mega-menu (`.theory-dropdown`, `position: fixed`) — `backdrop-filter` (like `transform`/`filter`) makes its
+element the *containing block* for `position: fixed`/`absolute` descendants, so the dropdown's
+viewport-relative `top`/`left` math silently became wrong (invisible when closed, since `opacity:0`, but its
+layout box now stuck out past the viewport and inflated `document.documentElement.scrollWidth`). Fixed by
+moving the frosted background onto a `.nav::before` pseudo-element (`position:absolute; inset:0; z-index:-1`)
+instead of styling `.nav` itself — `.nav` stays filter-free, so its `position: fixed` descendants keep using
+the viewport as their containing block. **If you add `backdrop-filter`/`filter`/`transform` to any element
+that has (or could gain) a `position: fixed` descendant, use this pseudo-element pattern rather than putting
+it on the element directly.**
+
 ## Theme toggle & navigation
 
 - The toggle button (`.theme-toggle`, sun/moon SVG) and the Theory nav item's four-group mega-menu (Wave
