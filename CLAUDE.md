@@ -8,8 +8,9 @@ A static, no-build educational website (Purdue NDT Lab) teaching ultrasonic/NDT 
 theory: wave physics, signal processing, and interactive calculators. Pure HTML/CSS/vanilla JS — no
 framework, no bundler, no package manager.
 
-Remote: `https://github.com/adepuharshith/ultrasound-ndt-toolkit`, GitHub Pages at
-`https://adepuharshith.github.io/ultrasound-ndt-toolkit/` (not yet enabled in repo settings — Settings →
+Remote: `https://github.com/adepuharshith/Ultrasound-NDT-Toolkit` (the repo was renamed from lowercase at
+some point; GitHub redirects the old URL, but the local `origin` remote was repointed to the canonical one),
+GitHub Pages at `https://adepuharshith.github.io/ultrasound-ndt-toolkit/` (not yet enabled in repo settings — Settings →
 Pages → main branch). Pushing over HTTPS works via credentials already cached in the macOS Keychain
 (`osxkeychain` credential helper) — `git push origin main` from the CLI just works, no PAT/SSH setup
 needed. Offer to commit + push after finishing a change, but only do it once the user confirms — they
