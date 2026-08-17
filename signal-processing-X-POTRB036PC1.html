@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f2d5e" />
+  <script>(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+  <title>Signal Processing — Ultrasound &amp; NDT Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ── Page layout ── */
+    .sp-wrap { max-width: 1200px; margin: 0 auto; padding: 0; }
+
+    /* ── Section nav ── */
+    .sec-nav {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: .7rem 2rem;
+      position: sticky;
+      top: var(--nav-h);
+      z-index: 80;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .sec-nav-inner { display: inline-flex; gap: .5rem; }
+    .sec-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .28rem .85rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .sec-nav-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); text-decoration: none; }
+
+    /* ── Blended section bands ──
+       No boxed cards — each technique is a full-bleed band that blends
+       into the page. box-shadow + clip-path paint the background out to
+       the viewport edges without a 100vw breakout (and without bleeding
+       into the next section, since clip-path holds the top/bottom edges
+       at the section's own box). Two neutral tones alternate so adjacent
+       techniques stay distinct without a border/shadow around them. */
+    .sp-block {
+      position: relative;
+      padding: 3rem 2rem;
+      background: var(--bg);
+      box-shadow: 0 0 0 100vmax var(--bg);
+      clip-path: inset(0 -100vmax);
+      scroll-margin-top: calc(var(--nav-h) + 56px);
+      transition: var(--transition-theme);
+    }
+    .sp-block.sp-block-b { background: var(--bg-card); box-shadow: 0 0 0 100vmax var(--bg-card); }
+    .sp-block:first-of-type { padding-top: 3.5rem; }
+    .sp-block:last-of-type  { padding-bottom: 5rem; }
+    .sp-block h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: .35rem;
+    }
+    .sp-block .sp-subtitle {
+      font-size: .9rem;
+      color: var(--brand-cyan);
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+    .sp-block p {
+      font-size: .95rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: .85rem;
+    }
+    .sp-block p:last-child { margin-bottom: 0; }
+
+    /* ── Concept chips ── */
+    .concept-row { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
+    .concept-chip {
+      background: var(--accent-light);
+      color: var(--brand-blue);
+      font-size: .76rem;
+      font-weight: 700;
+      padding: .22rem .75rem;
+      border-radius: 999px;
+      letter-spacing: .01em;
+    }
+    .concept-chip.orange { background: var(--pastel-orange-bg); color: var(--pastel-orange-text); }
+    .concept-chip.purple { background: var(--pastel-purple-bg); color: var(--pastel-purple-text); }
+    .concept-chip.green  { background: var(--pastel-green-bg); color: var(--pastel-green-text); }
+
+    /* ── Split layout (text | canvas) ── */
+    .sp-split {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+      align-items: start;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 720px) { .sp-split { grid-template-columns: 1fr; } }
+
+    /* ── Canvas container ── */
+    .canvas-box {
+      background: var(--surface-canvas);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      transition: var(--transition-theme);
+    }
+    .canvas-box canvas { display: block; width: 100%; }
+    .canvas-label {
+      position: absolute;
+      top: .5rem;
+      left: .75rem;
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--surface-canvas-text);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Control row ── */
+    .ctrl-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      align-items: center;
+      margin: 1.1rem 0;
+    }
+    .ctrl-btn {
+      padding: .4rem 1.1rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      font-size: .84rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .ctrl-btn:hover { background: var(--accent-light); border-color: var(--brand-cyan); color: var(--pastel-blue-text); }
+    .ctrl-btn.primary { background: var(--brand-cyan); border-color: var(--brand-cyan); color: #fff; }
+    .ctrl-btn.primary:hover { background: var(--brand-blue); border-color: var(--brand-blue); }
+    .ctrl-label { font-size: .84rem; font-weight: 600; color: var(--text-muted); }
+    .ctrl-slider { accent-color: var(--brand-cyan); cursor: pointer; }
+
+    /* ── Formula box ── */
+    .formula-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--brand-cyan);
+      border-radius: 0 10px 10px 0;
+      padding: .85rem 1.2rem;
+      margin: 1rem 0;
+      font-family: 'Georgia', serif;
+      font-size: 1.05rem;
+      color: var(--text);
+      line-height: 1.8;
+    }
+    .formula-box .f-note { font-family: var(--font); font-size: .8rem; color: var(--text-muted); margin-top: .4rem; }
+
+    /* ── Step boxes ── */
+    .steps { display: flex; flex-direction: column; gap: .6rem; margin: 1rem 0; }
+    .step {
+      display: flex;
+      gap: .85rem;
+      align-items: flex-start;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+    }
+    .step-num {
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--brand-cyan);
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: .05rem;
+    }
+    .step-text { font-size: .87rem; color: var(--text-muted); line-height: 1.6; }
+    .step-text strong { color: var(--text); }
+
+    /* ── Insight callout ── */
+    .insight {
+      display: flex;
+      gap: .85rem;
+      align-items: flex-start;
+      background: var(--pastel-green-bg);
+      border: 1px solid var(--pastel-green-border);
+      border-radius: 10px;
+      padding: .9rem 1.1rem;
+      margin: 1rem 0;
+      transition: var(--transition-theme);
+    }
+    .insight-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .insight p { font-size: .88rem; color: var(--pastel-green-text); margin: 0; line-height: 1.65; }
+    .insight.blue { background: var(--pastel-blue-bg); border-color: var(--pastel-blue-border); }
+    .insight.blue p { color: var(--pastel-blue-text); }
+    .insight.purple { background: var(--pastel-purple-bg); border-color: var(--pastel-purple-border); }
+    .insight.purple p { color: var(--pastel-purple-text); }
+
+    /* ── Full-width canvas plots ── */
+    .plot-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.2rem 0;
+    }
+    @media (max-width: 680px) { .plot-row { grid-template-columns: 1fr; } }
+
+    /* ── Section divider ── */
+    .sp-divider {
+      border: none;
+      border-top: 1px dashed var(--border);
+      margin: 1.75rem 0;
+    }
+
+    /* ── SVG wrapper ── */
+    .scan-svg-wrap {
+      background: var(--surface-canvas);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1.25rem 0 1.75rem;
+      transition: var(--transition-theme);
+    }
+    .scan-svg-wrap svg { display: block; width: 100%; height: auto; }
+
+    /* ── Comparison table ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: .88rem;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .compare-table th {
+      background: var(--brand-navy);
+      color: #fff;
+      padding: .65rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: .85rem;
+    }
+    .compare-table td {
+      padding: .58rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:nth-child(even) td { background: var(--bg); }
+    .compare-table .hi { color: var(--brand-cyan); font-weight: 700; }
+    .compare-table strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="3" fill="#06b6d4"/>
+      <path d="M14 6 Q20 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q18 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 6 Q8 14 14 22" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 9 Q10 14 14 19" stroke="#38bdf8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </svg>
+    US &amp; NDT Toolkit
+    <span class="sub">Purdue NDT Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="theory.html">Theory</a></li>
+    <li><a href="calculators.html">Calculators</a></li>
+    <li><a href="signal-processing.html" class="active">Signal Processing</a></li>
+    <li><a href="resources.html">Resources</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- SECTION NAV -->
+<div class="sec-nav">
+  <div class="sec-nav-inner">
+    <a href="#xcorr"            class="sec-nav-btn">&#9001;&#9002; Cross-Correlation</a>
+    <a href="#wavelet"          class="sec-nav-btn">&#12316; Wavelet Transform</a>
+    <a href="#ascan-processing" class="sec-nav-btn">&#128250; A-scan Processing</a>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Signal Processing</h1>
+  <p>Core techniques for extracting meaning from ultrasonic waveforms</p>
+</div>
+
+<div class="sp-wrap">
+
+<!-- ══════════════════════════════════════════════════════════
+     BLOCK 1 — CROSS-CORRELATION
+══════════════════════════════════════════════════════════ -->
+<div class="sp-block" id="xcorr">
+  <div class="sp-subtitle">Technique 01</div>
+  <h2>Cross-Correlation</h2>
+
+  <div class="concept-row">
+    <span class="concept-chip">Time-of-Flight</span>
+    <span class="concept-chip">Pulse-Echo</span>
+    <span class="concept-chip orange">TOFD</span>
+    <span class="concept-chip purple">Matched Filter</span>
+  </div>
+
+  <div class="sp-split">
+    <div>
+      <p>
+        In pulse-echo UT you often receive two echoes — a <strong>reference (front wall) pulse</strong>
+        and a <strong>back wall (or defect) pulse</strong> — and need to measure the time delay Δt
+        between them precisely to size the reflector.
+      </p>
+      <p>
+        Simply reading the peak positions works for clean signals, but noise and waveform distortion
+        make that unreliable. <strong>Cross-correlation</strong> slides one pulse over the other,
+        computes their overlap (inner product) at every lag, and returns a correlation function whose
+        peak sits exactly at Δt — even for noisy, clipped, or overlapping echoes.
+      </p>
+
+      <div class="formula-box">
+        R<sub>xy</sub>(τ) = ∫ x(t) · y(t + τ) dt
+        <div class="f-note">τ = lag; peak of R<sub>xy</sub> gives Δt → depth = v·Δt / 2</div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Capture</strong> the A-scan with two separated echoes (FW = reference, BW = target).</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>Window</strong> the back-wall echo as the search template y(t).</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Slide</strong> y(t) across the full signal x(t), computing the overlap at each lag τ.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Find peak</strong> of R<sub>xy</sub>(τ) — its position is the best estimate of Δt.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-text"><strong>Compute depth</strong>: d = v · Δt / 2 (factor of 2 for round-trip).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signal canvas -->
+    <div>
+      <div class="canvas-box" style="margin-bottom:.75rem;">
+        <span class="canvas-label">A-scan signal</span>
+        <canvas id="xcorrSignalCanvas" height="180"></canvas>
+      </div>
+      <div class="canvas-box">
+        <span class="canvas-label">Correlation R(τ)</span>
+        <canvas id="xcorrCorrCanvas" height="130"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="ctrl-row">
+    <button class="ctrl-btn primary" id="xcorrPlayBtn">▶ Animate</button>
+    <button class="ctrl-btn" id="xcorrResetBtn">↺ Reset</button>
+    <span class="ctrl-label">Δt offset:</span>
+    <input type="range" id="xcorrOffset" class="ctrl-slider" min="40" max="180" value="110" style="width:120px;">
+    <span id="xcorrOffsetLabel" class="ctrl-label">110 samples</span>
+    <span class="ctrl-label" style="margin-left:auto;">Noise:</span>
+    <input type="range" id="xcorrNoise" class="ctrl-slider" min="0" max="60" value="15" style="width:90px;">
+    <span id="xcorrNoiseLabel" class="ctrl-label">15%</span>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">💡</div>
+    <p>
+      <strong>Why correlation beats peak-picking:</strong> Noise shifts an individual peak unpredictably.
+      The correlation sums contributions over the entire pulse shape — making the peak location
+      robust even at SNR &lt; 10 dB. In TOFD, where lateral-wave and tip-diffraction echoes overlap,
+      cross-correlation is essential for sub-sample Δt accuracy.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <p style="margin:0; font-size:.88rem; color:var(--text-muted);">
+    <strong>In practice:</strong> cross-correlation can be computed efficiently via FFT as
+    R<sub>xy</sub> = IFFT( FFT(x)* · FFT(y) ), turning an O(N²) sliding-dot-product into O(N log N).
+    Most UT instruments and MATLAB's <code>xcorr()</code> / Python's <code>scipy.signal.correlate()</code>
+    implement exactly this.
+  </p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     BLOCK 2 — WAVELET TRANSFORM
+══════════════════════════════════════════════════════════ -->
+<div class="sp-block sp-block-b" id="wavelet">
+  <div class="sp-subtitle">Technique 02</div>
+  <h2>Wavelet Transform &amp; Time–Frequency Analysis</h2>
+
+  <div class="concept-row">
+    <span class="concept-chip purple">CWT</span>
+    <span class="concept-chip orange">Morlet Wavelet</span>
+    <span class="concept-chip">Spectrogram</span>
+    <span class="concept-chip green">Dispersion</span>
+  </div>
+
+  <p>
+    A raw A-scan tells you <em>what</em> frequencies are present (via FFT) but not <em>when</em>
+    they arrive. For broadband pulses, dispersive media (plates, composites), or overlapping
+    modes, that distinction matters enormously.
+  </p>
+
+  <!-- Row 1: time signal + FFT -->
+  <div class="plot-row">
+    <div>
+      <div class="canvas-box">
+        <span class="canvas-label">Time-domain pulse</span>
+        <canvas id="wvTimeDomainCanvas" height="160"></canvas>
+      </div>
+    </div>
+    <div>
+      <div class="canvas-box">
+        <span class="canvas-label">FFT — amplitude spectrum</span>
+        <canvas id="wvFFTCanvas" height="160"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight blue" style="margin:.75rem 0 1.25rem;">
+    <div class="insight-icon">⚠️</div>
+    <p>
+      The FFT gives global frequency content — a flat average over the whole signal window.
+      It cannot tell you that <strong>low frequencies arrived early and high frequencies arrived late</strong>,
+      which is exactly what happens in dispersive Lamb wave propagation.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.5rem; color:var(--text);">Enter the Wavelet Transform</h3>
+  <p>
+    Instead of sines (which extend to ±∞), the <strong>Continuous Wavelet Transform (CWT)</strong>
+    uses a <em>mother wavelet</em> — a short, localized oscillating function — and slides it
+    across the signal at every time position and every scale (∝ 1/frequency).
+    The result is a 2-D map: time on one axis, frequency on the other.
+  </p>
+
+  <div class="formula-box">
+    W(a, b) = (1/√a) ∫ x(t) · ψ*((t − b)/a) dt
+    <div class="f-note">a = scale (∝ 1/f), b = time shift, ψ = mother wavelet (Morlet used here)</div>
+  </div>
+
+  <p>
+    The <strong>Morlet wavelet</strong> is a Gaussian-windowed complex sinusoid — ideal for UT
+    because its shape closely matches a bandlimited ultrasonic pulse, giving excellent
+    time–frequency resolution balance.
+  </p>
+
+  <!-- Chirp controls -->
+  <div class="ctrl-row">
+    <span class="ctrl-label">Signal type:</span>
+    <button class="ctrl-btn primary" id="wvSigPulse">Single pulse</button>
+    <button class="ctrl-btn" id="wvSigChirp">Linear chirp (dispersive)</button>
+    <button class="ctrl-btn" id="wvSigMulti">Two-mode (Lamb)</button>
+  </div>
+
+  <!-- Spectrogram canvas -->
+  <div class="canvas-box" style="margin:.5rem 0 .75rem;">
+    <span class="canvas-label">CWT Spectrogram (Morlet) — brighter = higher |W(a,b)|</span>
+    <canvas id="wvSpectroCanvas" height="220"></canvas>
+  </div>
+
+  <!-- Time domain underneath spectrogram -->
+  <div class="canvas-box" style="margin-bottom:1rem;">
+    <span class="canvas-label">Signal overlaid</span>
+    <canvas id="wvSigCanvas" height="90"></canvas>
+  </div>
+
+  <div class="ctrl-row">
+    <span class="ctrl-label">Morlet ω₀:</span>
+    <input type="range" id="wvOmega" class="ctrl-slider" min="3" max="10" value="6" step="0.5" style="width:110px;">
+    <span id="wvOmegaLabel" class="ctrl-label">6</span>
+    <span class="ctrl-label" style="margin-left:1rem;">Center freq:</span>
+    <input type="range" id="wvFreq" class="ctrl-slider" min="1" max="8" value="4" step="0.5" style="width:100px;">
+    <span id="wvFreqLabel" class="ctrl-label">4 MHz</span>
+  </div>
+
+  <div class="insight purple" style="margin-top:.5rem;">
+    <div class="insight-icon">🔍</div>
+    <p>
+      <strong>Dispersive Lamb waves:</strong> Switch to "Two-mode (Lamb)" to see two wave packets
+      with different group velocities. The FFT shows overlapping frequency bands — indistinguishable.
+      The CWT spectrogram cleanly separates them in time, enabling individual mode analysis
+      and group velocity measurement.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.75rem; color:var(--text);">FFT vs. Wavelet — When to use which</h3>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+    <div class="step" style="flex-direction:column; gap:.4rem; align-items:flex-start;">
+      <span style="font-weight:700; font-size:.92rem; color:var(--brand-blue);">FFT</span>
+      <div class="step-text">Best for <strong>stationary signals</strong> where frequency content doesn't change over time. Fast (O(N log N)), gives exact frequency values. Use for: bandwidth characterization, transducer spectrum, pulse spectrum.</div>
+    </div>
+    <div class="step" style="flex-direction:column; gap:.4rem; align-items:flex-start;">
+      <span style="font-weight:700; font-size:.92rem; color:#7c3aed;">Wavelet CWT</span>
+      <div class="step-text">Best for <strong>non-stationary signals</strong>: dispersive waves, multi-mode Lamb, AE transients. Reveals <em>when</em> each frequency arrives. Use for: Lamb wave mode separation, dispersion curve extraction, AE source characterization.</div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ══════════════════════════════════════════════════════════
+     BLOCK 3 — A-SCAN SIGNAL PROCESSING
+══════════════════════════════════════════════════════════ -->
+<div class="sp-block" id="ascan-processing">
+  <div class="sp-subtitle">Technique 03</div>
+  <h2>&#128250; A-scan Signal Processing</h2>
+
+  <div class="concept-row">
+    <span class="concept-chip">Envelope Detection</span>
+    <span class="concept-chip orange">TGC</span>
+    <span class="concept-chip purple">Pulse Compression</span>
+    <span class="concept-chip green">SNR &amp; Noise</span>
+  </div>
+
+  <p>
+    The raw A-scan is a time-domain RF voltage waveform — a bipolar oscillating signal whose amplitude
+    encodes reflector strength and whose timing encodes depth. Four processing steps convert that raw
+    signal into a displayable, measurable, and imageable result.
+  </p>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">Envelope Detection (Hilbert Transform)</h3>
+  <p>
+    Gated C-scans sample peak echo amplitude within a depth window. Sampling the raw RF signal
+    directly produces a position-dependent artefact: a reflector sitting at a wave crest reads full
+    amplitude; one at a zero-crossing reads zero — yet both are physically identical. The cure is
+    the <strong>analytic signal</strong>:
+  </p>
+  <div class="formula-box">
+    z(t) = s(t) + j&#8239;&#8459;{s(t)} &nbsp;&#10230;&nbsp; |z(t)| = envelope
+    <div class="f-note">&#8459; = Hilbert transform; magnitude |z(t)| is smooth, non-negative, phase-independent</div>
+  </div>
+  <p>
+    The Hilbert transform phase-shifts every frequency component by 90&deg;, producing
+    a quadrature imaginary part. The magnitude |z(t)| tracks peak echo amplitude regardless of RF phase.
+    In practice: FFT &rarr; zero negative-frequency bins &rarr; inverse FFT.
+  </p>
+
+  <div class="scan-svg-wrap">
+    <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg">
+      <rect width="580" height="160" fill="#ffffff"/>
+      <line x1="30" y1="80" x2="555" y2="80" stroke="#e2e8f0" stroke-width="1"/>
+      <polyline fill="none" stroke="#0891b2" stroke-width="1.4" opacity="0.85"
+        points="30,80 40,80 45,79 50,81 55,80
+          60,74 63,67 66,71 69,93 72,116 74,115 76,80 78,47 80,35 82,65 84,93 86,101 88,91 90,80 92,77 94,78 96,80
+          100,80 110,78 120,82 130,79 140,81 150,78 160,82 170,79 180,81 190,80 200,78 210,82 220,79 230,81 240,80 248,80
+          250,79 252,76 254,73 257,80 260,95 262,104 264,92 266,68 268,52 270,65 272,80 274,87 276,84 278,81 280,80
+          290,82 310,78 330,82 350,79 370,81 390,80 410,82 430,80
+          432,79 434,81 436,80 438,74 440,68 442,72 444,92 446,114 448,114 450,80 452,47 454,38 456,65 458,93 460,101 462,91 464,80 466,77 468,78 470,80
+          480,80 555,80"/>
+      <path fill="none" stroke="#ea580c" stroke-width="2.4" opacity="0.95"
+        d="M 30,80 L 55,80 Q 65,64 72,50 Q 78,38 80,35 Q 82,40 88,60 Q 94,76 100,78
+           L 248,78 Q 256,65 263,56 Q 268,52 272,60 Q 278,72 285,78
+           L 430,78 Q 440,58 447,45 Q 452,38 456,48 Q 464,68 472,78 L 555,78"/>
+      <text x="80" y="22" text-anchor="middle" fill="#0369a1" font-size="10" font-weight="700" font-family="Inter,sans-serif">IP</text>
+      <line x1="80" y1="25" x2="80" y2="37" stroke="#0891b2" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="268" y="30" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="700" font-family="Inter,sans-serif">Flaw Echo</text>
+      <line x1="268" y1="33" x2="268" y2="54" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="452" y="22" text-anchor="middle" fill="#15803d" font-size="10" font-weight="700" font-family="Inter,sans-serif">BW</text>
+      <line x1="452" y1="25" x2="452" y2="40" stroke="#16a34a" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="280" y1="147" x2="310" y2="147" stroke="#0891b2" stroke-width="1.8" opacity="0.85"/>
+      <text x="315" y="151" fill="#475569" font-size="9" font-family="Inter,sans-serif">RF signal (bipolar)</text>
+      <line x1="420" y1="147" x2="450" y2="147" stroke="#ea580c" stroke-width="2.4"/>
+      <text x="455" y="151" fill="#475569" font-size="9" font-family="Inter,sans-serif">Hilbert envelope</text>
+      <text x="292" y="10" text-anchor="middle" fill="#475569" font-size="9" font-family="Inter,sans-serif">A-scan RF signal and its Hilbert envelope</text>
+      <text x="292" y="100" text-anchor="middle" fill="#64748b" font-size="8.5" font-family="Inter,sans-serif">time &#8594;</text>
+    </svg>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">&#128161;</div>
+    <p>
+      <strong>NDE example:</strong> Automated immersion UT of aerospace titanium forgings gates on
+      the Hilbert envelope to flag embedded porosity. A &minus;6&nbsp;dB drop in gated amplitude marks a
+      suspect region. Using raw RF instead would produce false positives every time the back wall shifts by
+      a quarter wavelength — an artefact no threshold setting can suppress.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">Time Gain Compensation (TGC)</h3>
+  <p>
+    Attenuation decays echo amplitude exponentially with depth, so identical reflectors at different depths
+    return unequal signals. TGC applies a programmable depth-dependent gain matched to the material's
+    attenuation law:
+  </p>
+  <div class="formula-box">
+    G<sub>TGC</sub>(t) = exp(+&alpha; &middot; c &middot; t/2)
+    <div class="f-note">dB-linear ramp compensating round-trip path loss; &alpha; set from step-wedge or DAC calibration</div>
+  </div>
+  <p>
+    A properly compensated A-scan shows equal amplitude for equal-size reflectors at all depths, making
+    the C-scan colour scale a direct indicator of reflectivity rather than a convolution of reflectivity
+    and depth.
+  </p>
+  <div class="insight blue">
+    <div class="insight-icon">&#128161;</div>
+    <p>
+      <strong>NDE example:</strong> Corrosion mapping of a 6&ndash;20&nbsp;mm carbon-steel pressure vessel
+      at 5&nbsp;MHz (&alpha;&nbsp;&asymp;&nbsp;1&nbsp;dB/(mm&middot;MHz)). Without TGC the back-wall echo from a 20&nbsp;mm
+      wall arrives 28&nbsp;dB below a 6&nbsp;mm wall reading. TGC recovers that loss, making the C-scan
+      map actual wall-thinning geometry.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">Pulse Compression (Chirp / Coded Excitation)</h3>
+  <p>
+    Conventional pulsed UT trades off resolution against SNR: shorter pulse &rarr; finer range resolution,
+    but less energy &rarr; lower SNR. Pulse compression decouples these. A linear FM chirp of duration T and
+    bandwidth B is transmitted; a matched filter compresses the received signal to &asymp;&nbsp;1/B while
+    preserving the full transmitted energy:
+  </p>
+  <div class="formula-box">
+    SNR gain = T &times; B &ensp; (time&ndash;bandwidth product)
+    <div class="f-note">Resolution = 1/B; SNR equivalent to a CW burst of duration T</div>
+  </div>
+  <p>
+    Sidelobe levels must be managed with amplitude weighting (Hann, Taylor) at the cost of slight
+    resolution broadening.
+  </p>
+  <div class="insight purple">
+    <div class="insight-icon">&#128161;</div>
+    <p>
+      <strong>NDE example:</strong> Air-coupled UT of CFRP suffers 60&ndash;80&nbsp;dB insertion loss at
+      each air&ndash;composite interface. A 50&nbsp;&mu;s chirp with B&nbsp;=&nbsp;200&nbsp;kHz yields
+      T&times;B&nbsp;=&nbsp;10&nbsp;(+10&nbsp;dB) — often the difference between resolving a delamination
+      and noise-floor burial.
+    </p>
+  </div>
+
+  <hr class="sp-divider">
+
+  <h3 style="margin-bottom:.55rem; color:var(--text);">SNR &amp; Noise Sources</h3>
+  <p>Three distinct noise mechanisms compete with flaw echoes and require different mitigation strategies:</p>
+  <table class="compare-table">
+    <thead>
+      <tr><th>Noise type</th><th>Origin</th><th>Frequency scaling</th><th>Mitigation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Electronic noise</strong></td>
+        <td>Amplifier Johnson noise; preamplifier noise figure</td>
+        <td>White (flat spectrum)</td>
+        <td>Low-noise preamp; coherent averaging N shots &rarr; +10log&#x2081;&#x2080;(N)&nbsp;dB</td>
+      </tr>
+      <tr>
+        <td><strong>Coherent grain noise</strong></td>
+        <td>Backscatter from grain boundaries; coherent with transmitted pulse; cannot be averaged away</td>
+        <td>&prop; f&#178; (stochastic) or f&#8308; (Rayleigh, d&nbsp;&laquo;&nbsp;&lambda;)</td>
+        <td>Lower frequency; spatial compounding; FMC/TFM; frequency-dependent filtering</td>
+      </tr>
+      <tr>
+        <td><strong>Geometric / structural noise</strong></td>
+        <td>Surface roughness, geometry re-entrant echoes, mode-converted arrivals</td>
+        <td>Depends on geometry</td>
+        <td>Time-gating; wedge design; surface preparation; TOFD lateral-wave subtraction</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="insight">
+    <div class="insight-icon">&#9888;&#65039;</div>
+    <p>
+      <strong>Austenitic weld inspection:</strong> 316L stainless steel welds contain columnar grains
+      100&ndash;500&nbsp;&mu;m wide. At 5&nbsp;MHz, coherent grain noise sits only 10&ndash;15&nbsp;dB below
+      a 1&nbsp;mm side-drilled hole reference — well within typical flaw-detection thresholds. Because grain
+      noise is <em>coherent</em>, waveform averaging does not suppress it. Remedies: (1)&nbsp;drop to
+      1&ndash;2&nbsp;MHz, or (2)&nbsp;use phased-array spatial compounding / FMC-TFM to decorrelate grain
+      noise while keeping coherent flaw signals in phase.
+    </p>
+  </div>
+</div>
+
+</div><!-- /sp-wrap -->
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="theory.html">Theory</a>
+    <a href="calculators.html">Calculators</a>
+    <a href="signal-processing.html">Signal Processing</a>
+    <a href="resources.html">Resources</a>
+    <a href="about.html">About</a>
+  </div>
+  <p>Ultrasound &amp; NDT Toolkit &mdash; Purdue University NDT Lab &mdash; Built with curiosity and caffeine.</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+/* ================================================================
+   SIGNAL PROCESSING PAGE — Interactive Visualizations
+   Fixes: (1) gaussPulse sigma in sample units, (2) CWT support
+   cutoff for performance, (3) deferred init via window.load
+   ================================================================ */
+window.addEventListener('load', function() {
+  const PI  = Math.PI;
+  const DPR = window.devicePixelRatio || 1;
+  function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
+  function lerp(a,b,t){ return Math.round(a+(b-a)*t); }
+
+  function initCanvas(el, cssH) {
+    const w = Math.max(el.offsetWidth, 300);
+    el.width  = w * DPR;
+    el.height = cssH * DPR;
+    el.style.height = cssH + 'px';
+    return el.getContext('2d');
+  }
+  /* ================================================================
+     BLOCK 1 — CROSS-CORRELATION
+     Fix: sigma=12 samples (was 0.25), proper sample-space pulse
+     ================================================================ */
+  (function(){
+    const N      = 256;
+    const SIGMA  = 12;    // envelope width in samples — visible pulse
+    const FCARR  = 0.10;  // carrier: 0.1 cycles/sample → period = 10 samples
+
+    const sCanvas = document.getElementById('xcorrSignalCanvas');
+    const cCanvas = document.getElementById('xcorrCorrCanvas');
+    let sCtx = initCanvas(sCanvas, 190);
+    let cCtx = initCanvas(cCanvas, 130);
+
+    const offsetSlider = document.getElementById('xcorrOffset');
+    const noiseSlider  = document.getElementById('xcorrNoise');
+    const offsetLabel  = document.getElementById('xcorrOffsetLabel');
+    const noiseLabel   = document.getElementById('xcorrNoiseLabel');
+    const playBtn      = document.getElementById('xcorrPlayBtn');
+    const resetBtn     = document.getElementById('xcorrResetBtn');
+
+    let lagPos=0, isPlaying=false, animFrame=null;
+
+    function gpulse(i, t0){
+      const dt=i-t0;
+      return Math.exp(-(dt*dt)/(2*SIGMA*SIGMA)) * Math.cos(2*PI*FCARR*dt);
+    }
+
+    function buildSignal(offset, noisePct){
+      const t1=45, t2=t1+offset;
+      const clean=new Float32Array(N);
+      for(let i=0;i<N;i++) clean[i]=gpulse(i,t1)+gpulse(i,t2);
+      const noiseAmp=(noisePct/100)*0.5;
+      const noisy=new Float32Array(N);
+      for(let i=0;i<N;i++) noisy[i]=clean[i]+noiseAmp*(Math.random()*2-1);
+      return {clean,noisy,t1,t2};
+    }
+
+    function extractTemplate(sig, center, hw){
+      const tmpl=new Float32Array(hw*2+1);
+      for(let k=0;k<tmpl.length;k++) tmpl[k]=sig[clamp(center-hw+k,0,N-1)];
+      return tmpl;
+    }
+
+    function crossCorrelate(sig, tmpl, tStart){
+      const maxLag=N;
+      const corr=new Float32Array(maxLag*2+1);
+      for(let lag=-maxLag;lag<=maxLag;lag++){
+        let s=0;
+        for(let k=0;k<tmpl.length;k++){
+          const si=tStart+k+lag;
+          if(si>=0&&si<N) s+=sig[si]*tmpl[k];
+        }
+        corr[lag+maxLag]=s;
+      }
+      return corr;
+    }
+
+    function drawSignal(sig, noisy, t1, t2, slidePos){
+      const W=sCanvas.width, H=sCanvas.height;
+      sCtx.clearRect(0,0,W,H);
+      sCtx.fillStyle='#ffffff'; sCtx.fillRect(0,0,W,H);
+      [0.25,0.5,0.75].forEach(fy=>{
+        sCtx.strokeStyle='#e2e8f0'; sCtx.lineWidth=1;
+        sCtx.beginPath(); sCtx.moveTo(0,H*fy); sCtx.lineTo(W,H*fy); sCtx.stroke();
+      });
+      const xS=W/N, mid=H*0.5, amp=H*0.38;
+      const hw=22, tmplW=(hw*2+1)*xS;
+      sCtx.fillStyle='rgba(8,145,178,0.08)';
+      sCtx.fillRect(slidePos*xS-tmplW/2,0,tmplW,H);
+      // noisy
+      sCtx.beginPath(); sCtx.strokeStyle='#b0c4d8'; sCtx.lineWidth=1;
+      for(let i=0;i<N;i++){const x=i*xS,y=mid-noisy[i]*amp;if(i===0)sCtx.moveTo(x,y);else sCtx.lineTo(x,y);}
+      sCtx.stroke();
+      // clean
+      sCtx.beginPath(); sCtx.strokeStyle='#0891b2'; sCtx.lineWidth=2;
+      for(let i=0;i<N;i++){const x=i*xS,y=mid-sig[i]*amp;if(i===0)sCtx.moveTo(x,y);else sCtx.lineTo(x,y);}
+      sCtx.stroke();
+      // sliding window
+      sCtx.strokeStyle='rgba(8,145,178,0.9)'; sCtx.lineWidth=2; sCtx.setLineDash([5,3]);
+      sCtx.strokeRect(slidePos*xS-tmplW/2,H*0.08,tmplW,H*0.84);
+      sCtx.setLineDash([]);
+      // labels
+      const fz=Math.round(10*DPR);
+      sCtx.font=`bold ${fz}px Inter,sans-serif`;
+      sCtx.fillStyle='#d97706'; sCtx.textAlign='center';
+      sCtx.fillText('FW pulse',t1*xS,H*0.1);
+      sCtx.strokeStyle='#d97706'; sCtx.lineWidth=1;
+      sCtx.beginPath(); sCtx.moveTo(t1*xS,H*0.13); sCtx.lineTo(t1*xS,mid-amp*0.6); sCtx.stroke();
+      sCtx.fillStyle='#7c3aed';
+      sCtx.fillText('BW pulse',t2*xS,H*0.1);
+      sCtx.strokeStyle='#7c3aed';
+      sCtx.beginPath(); sCtx.moveTo(t2*xS,H*0.13); sCtx.lineTo(t2*xS,mid-amp*0.6); sCtx.stroke();
+      sCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
+      sCtx.fillStyle='#334155'; sCtx.textAlign='left'; sCtx.fillText('Amp',4,13);
+      sCtx.textAlign='right'; sCtx.fillText('time →',W-4,H-4);
+    }
+
+    function drawCorr(corrArr, peakLag, progress){
+      const W=cCanvas.width, H=cCanvas.height;
+      cCtx.clearRect(0,0,W,H);
+      cCtx.fillStyle='#ffffff'; cCtx.fillRect(0,0,W,H);
+      cCtx.strokeStyle='#e2e8f0'; cCtx.lineWidth=1;
+      cCtx.beginPath(); cCtx.moveTo(0,H*0.5); cCtx.lineTo(W,H*0.5); cCtx.stroke();
+      let maxC=1e-9;
+      for(let i=0;i<corrArr.length;i++) if(Math.abs(corrArr[i])>maxC) maxC=Math.abs(corrArr[i]);
+      const mid=H*0.5, amp=H*0.42, total=corrArr.length;
+      const upTo=Math.floor(progress*total);
+      cCtx.beginPath(); cCtx.strokeStyle='#059669'; cCtx.lineWidth=2;
+      for(let i=0;i<upTo;i++){
+        const x=i*W/total, y=mid-(corrArr[i]/maxC)*amp;
+        if(i===0)cCtx.moveTo(x,y);else cCtx.lineTo(x,y);
+      }
+      cCtx.stroke();
+      const peakIdx=peakLag+Math.floor(total/2);
+      if(peakIdx>=0&&peakIdx<upTo){
+        const px=peakIdx*W/total, py=mid-(corrArr[peakIdx]/maxC)*amp;
+        cCtx.fillStyle='#d97706';
+        cCtx.beginPath(); cCtx.arc(px,py,5*DPR,0,2*PI); cCtx.fill();
+        cCtx.font=`bold ${Math.round(9*DPR)}px Inter,sans-serif`;
+        cCtx.fillStyle='#d97706'; cCtx.textAlign='center';
+        cCtx.fillText('Δt = '+peakLag+' samp',px,py-8*DPR);
+      }
+      cCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
+      cCtx.fillStyle='#334155'; cCtx.textAlign='left'; cCtx.fillText('R(τ)',4,12);
+      cCtx.textAlign='center'; cCtx.fillText('lag τ →',W*0.5,H-3);
+    }
+
+    function render(){
+      const offset=parseInt(offsetSlider.value);
+      const noise=parseInt(noiseSlider.value);
+      offsetLabel.textContent=offset+' samp';
+      noiseLabel.textContent=noise+'%';
+      const {clean,noisy,t1,t2}=buildSignal(offset,noise);
+      const hw=22, tmpl=extractTemplate(clean,t2,hw);
+      const corrArr=crossCorrelate(noisy,tmpl,t2-hw);
+      const cCenter=Math.floor(corrArr.length/2);
+      let maxV=-1e9, peakLag=0;
+      for(let i=0;i<corrArr.length;i++) if(corrArr[i]>maxV){maxV=corrArr[i];peakLag=i-cCenter;}
+      const progress=isPlaying?lagPos/N:1;
+      drawSignal(clean,noisy,t1,t2,lagPos);
+      drawCorr(corrArr,peakLag,progress);
+    }
+
+    function animate(){
+      if(!isPlaying) return;
+      lagPos+=2; if(lagPos>=N){lagPos=0;}
+      render(); animFrame=requestAnimationFrame(animate);
+    }
+
+    playBtn.addEventListener('click',()=>{
+      if(isPlaying){isPlaying=false;cancelAnimationFrame(animFrame);playBtn.textContent='▶ Animate';}
+      else{lagPos=0;isPlaying=true;playBtn.textContent='⏸ Pause';animate();}
+    });
+    resetBtn.addEventListener('click',()=>{
+      isPlaying=false;cancelAnimationFrame(animFrame);
+      lagPos=0;playBtn.textContent='▶ Animate';render();
+    });
+    offsetSlider.addEventListener('input',()=>{if(!isPlaying)render();});
+    noiseSlider.addEventListener('input',()=>{if(!isPlaying)render();});
+    window.addEventListener('resize',()=>{
+      sCtx=initCanvas(sCanvas,190); cCtx=initCanvas(cCanvas,130); render();
+    });
+    render();
+  })();
+
+
+  /* ================================================================
+     BLOCK 2 — WAVELET TRANSFORM
+     Fix: N=256, CWT support cutoff (O(N×scale) not O(N²)), deferred
+     ================================================================ */
+  (function(){
+    const N=256, Fs=20;
+
+    const tdCanvas = document.getElementById('wvTimeDomainCanvas');
+    const ffCanvas = document.getElementById('wvFFTCanvas');
+    const spCanvas = document.getElementById('wvSpectroCanvas');
+    const sgCanvas = document.getElementById('wvSigCanvas');
+    let tdCtx=initCanvas(tdCanvas,160), ffCtx=initCanvas(ffCanvas,160);
+    let spCtx=initCanvas(spCanvas,220), sgCtx=initCanvas(sgCanvas,90);
+
+    const btnPulse=document.getElementById('wvSigPulse');
+    const btnChirp=document.getElementById('wvSigChirp');
+    const btnMulti=document.getElementById('wvSigMulti');
+    const omegaSlider=document.getElementById('wvOmega');
+    const freqSlider=document.getElementById('wvFreq');
+    const omegaLabel=document.getElementById('wvOmegaLabel');
+    const freqLabel=document.getElementById('wvFreqLabel');
+    let sigType='pulse';
+
+    function makePulse(fc){
+      const sig=new Float32Array(N);
+      const t0=N*0.45, sigma=N*0.07;
+      for(let i=0;i<N;i++){const dt=i-t0;sig[i]=Math.exp(-(dt*dt)/(2*sigma*sigma))*Math.cos(2*PI*(fc/Fs)*dt);}
+      return sig;
+    }
+    function makeChirp(){
+      const sig=new Float32Array(N);
+      const f1=1,f2=8,sigma=N*0.28,center=N*0.5;
+      for(let i=0;i<N;i++){
+        const fi=f1+(f2-f1)*i/N;
+        const env=Math.exp(-((i-center)*(i-center))/(2*sigma*sigma));
+        sig[i]=env*Math.cos(2*PI*(fi/Fs)*i);
+      }
+      return sig;
+    }
+    function makeMultiMode(){
+      const sig=new Float32Array(N);
+      const tA=N*0.28,sA=N*0.07,fA=2,tB=N*0.65,sB=N*0.06,fB=6;
+      for(let i=0;i<N;i++){
+        const dtA=i-tA,dtB=i-tB;
+        sig[i]=Math.exp(-(dtA*dtA)/(2*sA*sA))*Math.cos(2*PI*(fA/Fs)*dtA)
+              +Math.exp(-(dtB*dtB)/(2*sB*sB))*0.75*Math.cos(2*PI*(fB/Fs)*dtB);
+      }
+      return sig;
+    }
+    function getSignal(){
+      const fc=parseFloat(freqSlider.value);
+      if(sigType==='chirp') return makeChirp();
+      if(sigType==='multi') return makeMultiMode();
+      return makePulse(fc);
+    }
+
+    /* DFT — 64 bins, fast enough for display */
+    function computeDFT(sig){
+      const M=64, mag=new Float32Array(M);
+      for(let k=0;k<M;k++){
+        let r=0,im=0;
+        for(let n=0;n<N;n++){const a=2*PI*k*n/N;r+=sig[n]*Math.cos(a);im-=sig[n]*Math.sin(a);}
+        mag[k]=Math.sqrt(r*r+im*im);
+      }
+      return mag;
+    }
+
+    /* CWT — Morlet with Gaussian support cutoff: O(N × scale) not O(N²) */
+    function computeCWT(sig, omega0){
+      const freqSteps=48, freqMin=0.3, freqMax=9.8;
+      const result=[];
+      for(let fi=0;fi<freqSteps;fi++){
+        const freq=freqMin+(freqMax-freqMin)*fi/freqSteps;
+        const scale=omega0/(2*PI*freq/Fs);
+        const halfSupp=Math.min(Math.ceil(4.5*scale), N-1);
+        const row=new Float32Array(N);
+        for(let b=0;b<N;b++){
+          let wr=0,wi=0;
+          const t0=Math.max(0,b-halfSupp), t1=Math.min(N-1,b+halfSupp);
+          for(let t=t0;t<=t1;t++){
+            const tau=(t-b)/scale;
+            const g=Math.exp(-0.5*tau*tau);
+            wr+=sig[t]*g*Math.cos(omega0*tau);
+            wi+=sig[t]*g*Math.sin(omega0*tau);
+          }
+          row[b]=Math.sqrt(wr*wr+wi*wi)/Math.sqrt(scale+0.001);
+        }
+        result.push(row);
+      }
+      return result;
+    }
+
+    function heatColor(v){
+      /* White-background thermal: white → light yellow → orange → red → dark maroon */
+      if(v<0.20){const t=v/0.20;return[255,lerp(255,240,t),lerp(255,220,t)];}
+      if(v<0.45){const t=(v-0.20)/0.25;return[255,lerp(240,180,t),lerp(220,0,t)];}
+      if(v<0.70){const t=(v-0.45)/0.25;return[lerp(255,210,t),lerp(180,0,t),0];}
+      const t=(v-0.70)/0.30;return[lerp(210,80,t),0,lerp(0,40,t)];
+    }
+
+    function drawTimeDomain(){
+      const sig=getSignal();
+      const W=tdCanvas.width, H=tdCanvas.height;
+      tdCtx.clearRect(0,0,W,H);
+      tdCtx.fillStyle='#ffffff'; tdCtx.fillRect(0,0,W,H);
+      [0.25,0.5,0.75].forEach(fy=>{
+        tdCtx.strokeStyle='#e2e8f0'; tdCtx.lineWidth=1;
+        tdCtx.beginPath(); tdCtx.moveTo(0,H*fy); tdCtx.lineTo(W,H*fy); tdCtx.stroke();
+      });
+      const mid=H*0.5, amp=H*0.42;
+      tdCtx.beginPath(); tdCtx.strokeStyle='#0891b2'; tdCtx.lineWidth=2;
+      for(let i=0;i<N;i++){const x=i*W/N,y=mid-sig[i]*amp;if(i===0)tdCtx.moveTo(x,y);else tdCtx.lineTo(x,y);}
+      tdCtx.stroke();
+      const fz=Math.round(9*DPR);
+      tdCtx.font=`${fz}px Inter,sans-serif`; tdCtx.fillStyle='#334155';
+      tdCtx.textAlign='left'; tdCtx.fillText('v(t)',4,13);
+      tdCtx.textAlign='right'; tdCtx.fillText('time →',W-4,H-4);
+    }
+
+    function drawFFT(){
+      const sig=getSignal();
+      const W=ffCanvas.width, H=ffCanvas.height;
+      ffCtx.clearRect(0,0,W,H); ffCtx.fillStyle='#ffffff'; ffCtx.fillRect(0,0,W,H);
+      [0.25,0.5,0.75].forEach(fy=>{
+        ffCtx.strokeStyle='#e2e8f0'; ffCtx.lineWidth=1;
+        ffCtx.beginPath(); ffCtx.moveTo(0,H*fy); ffCtx.lineTo(W,H*fy); ffCtx.stroke();
+      });
+      const mag=computeDFT(sig);
+      let maxM=1e-9; for(let k=0;k<mag.length;k++) if(mag[k]>maxM) maxM=mag[k];
+      const bw=W/mag.length;
+      for(let k=0;k<mag.length;k++){
+        const v=mag[k]/maxM;
+        ffCtx.fillStyle=`hsl(${210-v*40},${60+v*20}%,${55-v*25}%)`;
+        ffCtx.fillRect(k*bw,H-v*(H*0.86),bw-1,v*(H*0.86));
+      }
+      const fz=Math.round(9*DPR);
+      ffCtx.font=`${fz}px Inter,sans-serif`; ffCtx.fillStyle='#334155';
+      ffCtx.textAlign='left'; ffCtx.fillText('|X(f)|',4,13);
+      ffCtx.textAlign='right'; ffCtx.fillText('freq →',W-4,H-4);
+    }
+
+    function drawSpectrogram(cwt){
+      const W=spCanvas.width, H=spCanvas.height;
+      spCtx.clearRect(0,0,W,H); spCtx.fillStyle='#ffffff'; spCtx.fillRect(0,0,W,H);
+      let maxV=1e-9;
+      cwt.forEach(r=>{for(let i=0;i<r.length;i++) if(r[i]>maxV) maxV=r[i];});
+      const freqSteps=cwt.length;
+      const imgData=spCtx.createImageData(W,H);
+      const d=imgData.data;
+      for(let fi=0;fi<freqSteps;fi++){
+        const row=cwt[fi];
+        const py=Math.round(H-(fi+1)*H/freqSteps);
+        const ph=Math.max(1,Math.round(H/freqSteps));
+        for(let t=0;t<N;t++){
+          const v=clamp(row[t]/maxV,0,1);
+          const [cr,cg,cb]=heatColor(v);
+          const px=Math.round(t*W/N);
+          const pw=Math.max(1,Math.round(W/N));
+          for(let dy=0;dy<ph;dy++){const ry=py+dy;if(ry<0||ry>=H)continue;
+            for(let dx=0;dx<pw;dx++){const rx=px+dx;if(rx<0||rx>=W)continue;
+              const idx=(ry*W+rx)*4;d[idx]=cr;d[idx+1]=cg;d[idx+2]=cb;d[idx+3]=255;}}
+        }
+      }
+      spCtx.putImageData(imgData,0,0);
+      const fz=Math.round(9*DPR);
+      spCtx.font=`${fz}px Inter,sans-serif`; spCtx.fillStyle='rgba(51,65,85,0.9)';
+      spCtx.textAlign='left'; spCtx.fillText('freq (MHz) ↑',5,15);
+      spCtx.textAlign='right'; spCtx.fillText('time →',W-5,H-5);
+      [2,4,6,8].forEach(f=>{
+        const fy=H-(f-0.3)/(9.8-0.3)*H;
+        spCtx.fillStyle='rgba(51,65,85,0.8)';
+        spCtx.font=`${fz}px Inter,sans-serif`;
+        spCtx.textAlign='left'; spCtx.fillText(f+' MHz',4,fy);
+        spCtx.strokeStyle='rgba(100,116,139,0.5)'; spCtx.lineWidth=1;
+        spCtx.beginPath(); spCtx.moveTo(52*DPR,fy); spCtx.lineTo(W,fy); spCtx.stroke();
+      });
+    }
+
+    function drawSigOverlay(){
+      const sig=getSignal();
+      const W=sgCanvas.width, H=sgCanvas.height;
+      sgCtx.clearRect(0,0,W,H); sgCtx.fillStyle='#ffffff'; sgCtx.fillRect(0,0,W,H);
+      const mid=H*0.5, amp=H*0.4;
+      sgCtx.beginPath(); sgCtx.strokeStyle='#0891b2'; sgCtx.lineWidth=2;
+      for(let i=0;i<N;i++){const x=i*W/N,y=mid-sig[i]*amp;if(i===0)sgCtx.moveTo(x,y);else sgCtx.lineTo(x,y);}
+      sgCtx.stroke();
+    }
+
+    let pending=false;
+    function renderAll(){
+      if(pending) return; pending=true;
+      requestAnimationFrame(()=>{
+        pending=false;
+        omegaLabel.textContent=omegaSlider.value;
+        freqLabel.textContent=freqSlider.value+' MHz';
+        const sig=getSignal();
+        drawTimeDomain(); drawFFT();
+        const cwt=computeCWT(sig, parseFloat(omegaSlider.value));
+        drawSpectrogram(cwt); drawSigOverlay();
+      });
+    }
+
+    function setActive(btn){[btnPulse,btnChirp,btnMulti].forEach(b=>b.classList.remove('primary'));btn.classList.add('primary');}
+    btnPulse.addEventListener('click',()=>{sigType='pulse';setActive(btnPulse);renderAll();});
+    btnChirp.addEventListener('click',()=>{sigType='chirp';setActive(btnChirp);renderAll();});
+    btnMulti.addEventListener('click',()=>{sigType='multi';setActive(btnMulti);renderAll();});
+    omegaSlider.addEventListener('input',renderAll);
+    freqSlider.addEventListener('input',renderAll);
+    window.addEventListener('resize',()=>{
+      tdCtx=initCanvas(tdCanvas,160); ffCtx=initCanvas(ffCanvas,160);
+      spCtx=initCanvas(spCanvas,220); sgCtx=initCanvas(sgCanvas,90);
+      renderAll();
+    });
+    renderAll();
+  })();
+
+}); // end window.load
+</script>
+</body>
+</html>
