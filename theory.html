@@ -267,6 +267,12 @@
       transition: var(--transition-theme);
     }
     .scan-svg-wrap svg { display: block; width: 100%; height: auto; }
+    .svg-caption {
+      text-align: center;
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin: .3rem 0 1.1rem;
+    }
 
     /* ---- Section h2 heading ---- */
     .theory-section h2 {
@@ -959,69 +965,81 @@
             the refracted P bends nearly twice as far from the normal as the mode-converted S.
           </p>
 
-          <!-- SVG: Mode conversion at water–steel interface (θ_i = 20°, between critical angles) -->
+          <!-- SVG: Mode conversion at water–steel interface (θ_i = 20°, between critical angles).
+               Coordinates generated to keep every ray the same stroke weight, every arrowhead the
+               same absolute size (userSpaceOnUse markers, not stroke-scaled), and every label
+               clear of the ray paths and of every other label — see /tmp gen_snell.py if these
+               ever need regenerating for a different θ_i. -->
           <div class="scan-svg-wrap">
-            <svg viewBox="0 0 600 236" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
               <defs>
-                <marker id="snl-p"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#0891b2"/></marker>
-                <marker id="snl-rp" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#64748b"/></marker>
-                <marker id="snl-s"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#ea580c"/></marker>
+                <marker id="snl-arrow-cyan"   markerWidth="13" markerHeight="13" refX="9.5" refY="5" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0891b2"/></marker>
+                <marker id="snl-arrow-red"    markerWidth="13" markerHeight="13" refX="9.5" refY="5" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+                <marker id="snl-arrow-purple" markerWidth="13" markerHeight="13" refX="9.5" refY="5" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
               </defs>
 
               <!-- Media backgrounds -->
-              <rect x="0" y="0"   width="600" height="112" fill="#dbeafe"/>
-              <rect x="0" y="112" width="600" height="124" fill="#e2e8f0"/>
+              <rect x="0" y="0"   width="640" height="150" fill="#e0f2fe"/>
+              <rect x="0" y="150" width="640" height="170" fill="#e2e8f0"/>
 
               <!-- Medium labels -->
-              <text x="16" y="44"  fill="#1e40af" font-size="11" font-weight="700" font-family="Inter,sans-serif">Water / Couplant</text>
-              <text x="16" y="59"  fill="#475569" font-size="9"   font-family="Inter,sans-serif">c&#x2081; = 1480 m/s</text>
-              <text x="16" y="145" fill="#334155" font-size="11" font-weight="700" font-family="Inter,sans-serif">Steel</text>
-              <text x="16" y="160" fill="#475569" font-size="9"   font-family="Inter,sans-serif">c_L = 5900 m/s  |  c_S = 3200 m/s</text>
+              <text x="18" y="30" fill="#1e40af" font-size="13" font-weight="700">Water / Couplant</text>
+              <text x="18" y="48" fill="#475569" font-size="10.5">c&#x2081; = 1480 m/s</text>
+              <text x="18" y="180" fill="#334155" font-size="13" font-weight="700">Steel</text>
+              <text x="18" y="198" fill="#475569" font-size="10.5">c<tspan baseline-shift="sub" font-size="8">L</tspan> = 5900 m/s &nbsp; c<tspan baseline-shift="sub" font-size="8">S</tspan> = 3200 m/s</text>
 
-              <!-- Interface line -->
-              <line x1="0" y1="112" x2="600" y2="112" stroke="#475569" stroke-width="1.8"/>
-              <text x="488" y="108" fill="#475569" font-size="8.5" font-family="Inter,sans-serif">Interface</text>
+              <!-- TIR note pill (steel side, well clear of the S ray) -->
+              <rect x="18" y="222" width="230" height="40" rx="8" fill="#fecaca" opacity="0.55"/>
+              <text x="30" y="238" fill="#991b1b" font-size="10" font-weight="700">P-wave: total internal reflection</text>
+              <text x="30" y="253" fill="#991b1b" font-size="9.5">&theta;&#x1D62; = 20&deg; &gt; &theta;<tspan baseline-shift="sub" font-size="7">c1</tspan> = 14.5&deg; &mdash; no P enters the steel</text>
 
-              <!-- Normal (dashed vertical at x=270) -->
-              <line x1="270" y1="12" x2="270" y2="220" stroke="#2d3f55" stroke-width="1.1" stroke-dasharray="5,4"/>
+              <!-- Interface -->
+              <line x1="0" y1="150" x2="640" y2="150" stroke="#475569" stroke-width="2"/>
+              <text x="622" y="144" text-anchor="end" fill="#475569" font-size="10">Interface</text>
 
-              <!-- INCIDENT P-wave: θ_i = 20° from normal -->
-              <!-- Δx = 90·tan(20°) ≈ 33 → start (237, 22) → end (270, 112) -->
-              <line x1="237" y1="22" x2="268" y2="110" stroke="#0891b2" stroke-width="2.4" marker-end="url(#snl-p)"/>
-              <text x="148" y="24"  fill="#0891b2" font-size="11" font-weight="700" font-family="Inter,sans-serif">Incident P</text>
-              <text x="148" y="40"  fill="#475569" font-size="9"   font-family="Inter,sans-serif">&theta;&#x1D62; = 20°</text>
+              <!-- Normal (dashed) -->
+              <line x1="300" y1="10" x2="300" y2="310" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,4"/>
+              <text x="300" y="308" text-anchor="middle" fill="#94a3b8" font-size="9">normal</text>
 
-              <!-- θ_i arc: radius 22 from (270,112), sweep from upward-normal to incident direction -->
-              <!-- Normal-up at r=22: (270, 90). Incident dir unit: (−33,−90)/95.9=(−0.344,−0.939). Point: (262.4, 91.3) -->
-              <path d="M 270 90 A 22 22 0 0 0 262.4 91.3" fill="none" stroke="#22d3ee" stroke-width="1.3"/>
-              <text x="241" y="97" fill="#22d3ee" font-size="10.5" font-family="Inter,sans-serif">&theta;&#x1D62;</text>
+              <!-- INCIDENT P (cyan): θᵢ = 20°, from upper-left into the entry point -->
+              <line x1="256.2" y1="29.7" x2="300" y2="150" stroke="#0891b2" stroke-width="3.2" stroke-linecap="round" marker-end="url(#snl-arrow-cyan)"/>
+              <text x="248" y="70" text-anchor="end" fill="#0891b2" font-size="12.5" font-weight="700">Incident P</text>
+              <text x="248" y="86" text-anchor="end" fill="#475569" font-size="10">&theta;&#x1D62; = 20&deg;</text>
 
-              <!-- REFLECTED P-wave: symmetric, θ_r = 20° → (303, 22) -->
-              <line x1="272" y1="110" x2="303" y2="22" stroke="#64748b" stroke-width="1.6" stroke-dasharray="7,4" marker-end="url(#snl-rp)"/>
-              <text x="308" y="24" fill="#64748b" font-size="10" font-family="Inter,sans-serif">Reflected P</text>
+              <!-- θᵢ arc + label -->
+              <path d="M 300 116 A 34 34 0 0 0 288.4 118.1" fill="none" stroke="#0891b2" stroke-width="1.4"/>
+              <text x="291" y="102.8" text-anchor="middle" fill="#0891b2" font-size="12" font-weight="700">&theta;&#x1D62;</text>
 
-              <!-- θ_r arc (CW, symmetric) -->
-              <!-- Reflected dir unit: (33,−90)/95.9=(0.344,−0.939). Point: (277.6, 91.3) -->
-              <path d="M 270 90 A 22 22 0 0 1 277.6 91.3" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+              <!-- REFLECTED P (red, solid — carries all the P energy since it's totally reflected) -->
+              <line x1="300" y1="150" x2="343.8" y2="29.7" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" marker-end="url(#snl-arrow-red)"/>
+              <text x="352" y="70" text-anchor="start" fill="#dc2626" font-size="12.5" font-weight="700">Reflected P</text>
+              <text x="352" y="86" text-anchor="start" fill="#475569" font-size="10">&theta;&#x1D63; = &theta;&#x1D62; = 20&deg;</text>
 
-              <!-- P-wave TIR annotation (steel side, left of normal) -->
-              <text x="68" y="152" fill="#dc2626" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">P: total reflection</text>
-              <text x="68" y="166" fill="#dc2626" font-size="8.5" font-family="Inter,sans-serif">(&theta;&#x1D62; = 20° &gt; &theta;&#x2C1;&#x2081; = 14.5°)</text>
+              <!-- θᵣ arc (equal to θᵢ, unlabeled echo) -->
+              <path d="M 300 116 A 34 34 0 0 1 311.6 118.1" fill="none" stroke="#dc2626" stroke-width="1.1" stroke-dasharray="3,3" opacity="0.7"/>
 
-              <!-- MODE-CONVERTED S-wave: θ_S ≈ 47.7° -->
-              <!-- sin(47.7°)=0.740 → Δx=90·tan(47.7°)=90·(0.740/0.672)=99 → end (369, 202) -->
-              <line x1="272" y1="114" x2="367" y2="202" stroke="#fb923c" stroke-width="2.4" marker-end="url(#snl-s)"/>
-              <text x="348" y="220" fill="#fb923c" font-size="11" font-weight="700" font-family="Inter,sans-serif">Mode-converted S</text>
-              <text x="348" y="233" fill="#64748b" font-size="9"   font-family="Inter,sans-serif">&theta;&#x53; ≈ 47.7°</text>
+              <!-- MODE-CONVERTED S (purple): θ_S ≈ 47.7°, into the steel -->
+              <line x1="300" y1="150" x2="465.6" y2="300.9" stroke="#7c3aed" stroke-width="3.2" stroke-linecap="round" marker-end="url(#snl-arrow-purple)"/>
+              <text x="395" y="218" text-anchor="start" fill="#7c3aed" font-size="12.5" font-weight="700">Mode-converted S</text>
+              <text x="395" y="234" text-anchor="start" fill="#475569" font-size="10">&theta;&#x53; &#x2248; 47.7&deg;</text>
 
-              <!-- θ_S arc: radius 22 from (270,112), sweep from downward-normal to S-ray direction -->
-              <!-- Normal-down at r=22: (270, 134). S dir unit: (99,90)/133.8=(0.740,0.673). Point: (286.3, 126.8) -->
-              <path d="M 270 134 A 22 22 0 0 1 286.3 126.8" fill="none" stroke="#fb923c" stroke-width="1.3"/>
-              <text x="280" y="144" fill="#fb923c" font-size="10.5" font-family="Inter,sans-serif">&theta;&#x53;</text>
+              <!-- θ_S arc + label -->
+              <path d="M 300 184 A 34 34 0 0 1 325.1 172.9" fill="none" stroke="#7c3aed" stroke-width="1.4"/>
+              <text x="321" y="201.6" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="700">&theta;&#x53;</text>
 
-              <!-- Bottom caption -->
-              <text x="16" y="232" fill="#64748b" font-size="8.5" font-family="Inter,sans-serif" font-style="italic">Immersion UT, &theta;&#x1D62; = 20°: between the two critical angles — P undergoes total internal reflection; only mode-converted S (&#x2248;48°) propagates into steel.</text>
+              <!-- Entry-point vertex -->
+              <circle cx="300" cy="150" r="3.4" fill="#1e293b"/>
             </svg>
+          </div>
+          <p class="svg-caption">
+            Immersion UT at &theta;<sub>i</sub> = 20&deg; — between the two critical angles for water&ndash;steel.
+            The refracted P-wave undergoes total internal reflection, so only the mode-converted S
+            (&asymp;&nbsp;48&deg;) propagates into the steel.
+          </p>
+          <div class="wave-legend">
+            <span><i style="background:#0891b2"></i>Incident P</span>
+            <span><i style="background:#dc2626"></i>Reflected P (TIR)</span>
+            <span><i style="background:#7c3aed"></i>Mode-converted S</span>
           </div>
 
           <h3>Critical Angles</h3>
@@ -1113,47 +1131,59 @@
           </p>
           <div class="eq-box">$$Z = \rho\,c \qquad [\text{Pa·s/m} = \text{Rayl}]$$</div>
 
-          <!-- Interface diagram — normal incidence -->
-          <div class="scan-svg-wrap" style="background:var(--surface-canvas);border:1px solid var(--border);padding:0;">
-            <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif" font-size="11">
-              <!-- Medium 1 background -->
-              <rect x="0" y="0" width="280" height="200" fill="#e0f2fe" opacity="0.55"/>
-              <text x="140" y="22" text-anchor="middle" fill="#0369a1" font-weight="700" font-size="12">Medium 1 (Z₁)</text>
-
-              <!-- Medium 2 background -->
-              <rect x="280" y="0" width="280" height="200" fill="#fef3c7" opacity="0.55"/>
-              <text x="420" y="22" text-anchor="middle" fill="#92400e" font-weight="700" font-size="12">Medium 2 (Z₂)</text>
-
-              <!-- Interface line -->
-              <line x1="280" y1="0" x2="280" y2="200" stroke="#475569" stroke-width="2" stroke-dasharray="6,3"/>
-              <text x="280" y="198" text-anchor="middle" fill="#475569" font-size="9">interface</text>
-
-              <!-- Incident wave arrow -->
-              <line x1="80" y1="100" x2="265" y2="100" stroke="#0891b2" stroke-width="2.2" marker-end="url(#ai-arr-cyan)"/>
-              <text x="158" y="92" text-anchor="middle" fill="#0891b2" font-weight="600">Incident (I)</text>
-
-              <!-- Reflected wave arrow -->
-              <line x1="265" y1="100" x2="80" y2="130" stroke="#dc2626" stroke-width="2" marker-end="url(#ai-arr-red)"/>
-              <text x="140" y="152" fill="#dc2626" font-weight="600">Reflected (R)</text>
-
-              <!-- Transmitted wave arrow -->
-              <line x1="295" y1="100" x2="470" y2="100" stroke="#16a34a" stroke-width="2" marker-end="url(#ai-arr-green)"/>
-              <text x="382" y="92" text-anchor="middle" fill="#16a34a" font-weight="600">Transmitted (T)</text>
-
-              <!-- R and T labels -->
-              <text x="140" y="76" text-anchor="middle" fill="#0891b2" font-size="10">amplitude ∝ I</text>
-              <rect x="60" y="162" width="190" height="26" rx="4" fill="#fee2e2"/>
-              <text x="155" y="179" text-anchor="middle" fill="#991b1b" font-size="10">R = [(Z₂−Z₁)/(Z₂+Z₁)]² (intensity)</text>
-              <rect x="300" y="162" width="180" height="26" rx="4" fill="#dcfce7"/>
-              <text x="390" y="179" text-anchor="middle" fill="#166534" font-size="10">T = 1 − R (energy conservation)</text>
-
-              <!-- Arrow markers -->
+          <!-- Interface diagram — normal incidence. Same visual language as the Snell's-law
+               diagram above: cyan = incident, red = reflected, green = transmitted; proportionate
+               userSpaceOnUse arrowheads instead of stroke-scaled ones; every label kept clear of
+               every ray and of every other label. -->
+          <div class="scan-svg-wrap">
+            <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
               <defs>
-                <marker id="ai-arr-cyan"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0891b2"/></marker>
-                <marker id="ai-arr-red"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#dc2626"/></marker>
-                <marker id="ai-arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#16a34a"/></marker>
+                <marker id="ai-arrow-cyan"  markerWidth="13" markerHeight="13" refX="9.5" refY="5" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0891b2"/></marker>
+                <marker id="ai-arrow-red"   markerWidth="13" markerHeight="13" refX="9.5" refY="5" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+                <marker id="ai-arrow-green" markerWidth="13" markerHeight="13" refX="9.5" refY="5" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
               </defs>
+
+              <!-- Media backgrounds -->
+              <rect x="0"   y="0" width="320" height="300" fill="#e0f2fe"/>
+              <rect x="320" y="0" width="320" height="300" fill="#fef3c7"/>
+              <text x="160" y="36" text-anchor="middle" fill="#0369a1" font-weight="700" font-size="15">Medium 1 (Z&#8321;)</text>
+              <text x="480" y="36" text-anchor="middle" fill="#92400e" font-weight="700" font-size="15">Medium 2 (Z&#8322;)</text>
+
+              <!-- Interface -->
+              <line x1="320" y1="14" x2="320" y2="286" stroke="#475569" stroke-width="1.6" stroke-dasharray="6,4"/>
+              <text x="320" y="10" text-anchor="middle" fill="#475569" font-size="10">Interface</text>
+
+              <!-- INCIDENT (cyan) -->
+              <line x1="60" y1="150" x2="314" y2="150" stroke="#0891b2" stroke-width="3.2" stroke-linecap="round" marker-end="url(#ai-arrow-cyan)"/>
+              <text x="60" y="132" text-anchor="start" fill="#0891b2" font-size="13" font-weight="700">Incident (I)</text>
+
+              <!-- TRANSMITTED (green) — continues straight through -->
+              <line x1="326" y1="150" x2="600" y2="150" stroke="#16a34a" stroke-width="3.2" stroke-linecap="round" marker-end="url(#ai-arrow-green)"/>
+              <text x="326" y="132" text-anchor="start" fill="#16a34a" font-size="13" font-weight="700">Transmitted (T)</text>
+
+              <!-- REFLECTED (red) — offset upward purely for visual separation; physically returns along the incident path -->
+              <line x1="314" y1="150" x2="100" y2="46" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" marker-end="url(#ai-arrow-red)"/>
+              <text x="140" y="122" text-anchor="start" fill="#dc2626" font-size="13" font-weight="700">Reflected (R)</text>
+
+              <!-- Entry-point vertex -->
+              <circle cx="320" cy="150" r="3.4" fill="#1e293b"/>
+
+              <!-- R and T formula pills -->
+              <rect x="46"  y="238" width="252" height="38" rx="10" fill="#fee2e2"/>
+              <text x="172" y="262" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="600">R = [(Z&#8322;&minus;Z&#8321;)/(Z&#8322;+Z&#8321;)]&sup2;</text>
+              <rect x="358" y="238" width="236" height="38" rx="10" fill="#dcfce7"/>
+              <text x="476" y="262" text-anchor="middle" fill="#166534" font-size="12" font-weight="600">T = 1 &minus; R</text>
             </svg>
+          </div>
+          <p class="svg-caption">
+            Normal incidence: the reflected ray is offset here only for visual clarity — it
+            physically returns straight back along the incident path. The greater the impedance
+            mismatch |Z&#8322;&thinsp;&minus;&thinsp;Z&#8321;|, the larger <em>R</em> and the smaller <em>T</em>.
+          </p>
+          <div class="wave-legend">
+            <span><i style="background:#0891b2"></i>Incident</span>
+            <span><i style="background:#dc2626"></i>Reflected</span>
+            <span><i style="background:#16a34a"></i>Transmitted</span>
           </div>
 
           <h3>Reflection &amp; Transmission Coefficients (Normal Incidence)</h3>
