@@ -147,7 +147,7 @@
     .calc-result .result-value { font-size: 1.45rem; font-weight: 800; color: var(--heading-accent); }
     .calc-result .result-unit  { font-size: .88rem; font-weight: 500; color: var(--text-muted); margin-left: .25rem; }
     .calc-formula { margin-top: .5rem; padding: .5rem .85rem; background: var(--bg); border-radius: 6px; font-family: var(--font-mono); font-size: .86rem; color: var(--text-muted); }
-    .calc-desc { font-size: .79rem; color: var(--text-muted); margin-top: .4rem; line-height: 1.5; }
+    .calc-desc { font-size: .79rem; color: var(--text); margin-top: .4rem; line-height: 1.5; }
 
     /* ---- Dual-result row (wavelength) ---- */
     .result-row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .6rem; }
@@ -162,7 +162,7 @@
     /* ---- Material table ---- */
     .mat-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: .75rem; }
     .mat-table th { background: var(--brand-navy); color: #fff; padding: .5rem .75rem; text-align: left; font-weight: 600; }
-    .mat-table td { padding: .45rem .75rem; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+    .mat-table td { padding: .45rem .75rem; border-bottom: 1px solid var(--border); color: var(--text); }
     .mat-table tr:last-child td { border-bottom: none; }
     .mat-table tr:hover td { background: var(--accent-light); }
 
@@ -572,7 +572,7 @@
       <!-- Wave Velocity from Material Properties -->
       <div class="calc-box" id="wavevelocity">
         <h3>&#9881; Wave Velocity from Material Properties</h3>
-        <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1rem;">
+        <p style="font-size:.84rem;color:var(--text);margin-bottom:1rem;">
           Calculates longitudinal (c<sub>L</sub>) and shear (c<sub>S</sub>) wave speeds from elastic constants.
           Useful when measuring new alloys or composites where tabulated values are unavailable.
         </p>
@@ -599,7 +599,7 @@
       <!-- TOFD Crack Sizing -->
       <div class="calc-box calc-box-b" id="tofd-calc">
         <h3>&#128400; TOFD Crack Height Sizing</h3>
-        <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1rem;">
+        <p style="font-size:.84rem;color:var(--text);margin-bottom:1rem;">
           Computes crack height from the time difference between tip and base diffraction signals.
           Based on: <em>a = cos&theta; &times; (&Delta;t &times; v) / 2</em>
         </p>

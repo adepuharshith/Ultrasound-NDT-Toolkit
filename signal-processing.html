@@ -81,7 +81,7 @@
     }
     .sp-block p {
       font-size: .95rem;
-      color: var(--text-muted);
+      color: var(--text);
       line-height: 1.75;
       margin-bottom: .85rem;
     }
@@ -198,7 +198,7 @@
       flex-shrink: 0;
       margin-top: .05rem;
     }
-    .step-text { font-size: .87rem; color: var(--text-muted); line-height: 1.6; }
+    .step-text { font-size: .87rem; color: var(--text); line-height: 1.6; }
     .step-text strong { color: var(--text); }
 
     /* ── Insight callout ── */
@@ -268,7 +268,7 @@
     .compare-table td {
       padding: .58rem 1rem;
       border-bottom: 1px solid var(--border);
-      color: var(--text-muted);
+      color: var(--text);
       vertical-align: top;
     }
     .compare-table tr:last-child td { border-bottom: none; }
@@ -419,7 +419,7 @@
 
   <hr class="sp-divider">
 
-  <p style="margin:0; font-size:.88rem; color:var(--text-muted);">
+  <p style="margin:0; font-size:.88rem; color:var(--text);">
     <strong>In practice:</strong> cross-correlation can be computed efficiently via FFT as
     R<sub>xy</sub> = IFFT( FFT(x)* · FFT(y) ), turning an O(N²) sliding-dot-product into O(N log N).
     Most UT instruments and MATLAB's <code>xcorr()</code> / Python's <code>scipy.signal.correlate()</code>

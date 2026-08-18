@@ -106,8 +106,26 @@ brand rather than replacing it. Reference metrics pulled from Apple, for future 
 | CTA button padding | `padding: 11px 21px` | left as the site's existing `.btn`/`.ctrl-btn`/etc. padding — close enough, not worth churning |
 | Nav bar | `rgba(255,255,255,.8)` + `backdrop-filter: saturate(1.8) blur(20px)` | same `backdrop-filter: saturate(1.8) blur(20px)` value, tinted with the brand navy instead of white (see below) |
 | Heading tracking | `letter-spacing: -0.374px` on 34px text (≈ ‑0.011em) | `h1 { letter-spacing: -.02em }`, `h2 { -.015em }` — proportionally similar tightening on Inter |
-| Text color | `#1d1d1f` (neutral near-black) | **not adopted** — `--text: #0f172a` (slate-tinted) is the established brand color; swapping it would be a bigger rebrand than "apply Apple's polish" |
-| Font family | `"SF Pro Text"/"SF Pro Display"` | **not adopted** — SF Pro is only present on Apple OSes, so referencing it would make typography platform-inconsistent; Inter (already loaded, cross-platform) stays |
+| Text color | `#1d1d1f` (neutral near-black) | **not adopted for the hue** — `--text: #0f172a` (slate-tinted) stays the brand color, not Apple's neutral gray. But most body copy was actually rendering in `--text-muted` (`#64748b`), not `--text`, sitewide — see below. |
+| Font family | `"SF Pro Text"/"SF Pro Display"` | **adopted via system-font stack**: `--font` now leads with `-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text'` before falling back to `'Inter', system-ui, sans-serif`. Apple/Safari/Chrome-on-macOS/iOS visitors get real San Francisco (no webfont hosting/licensing needed — it resolves to the OS's installed system font); everyone else falls back to Inter, which is visually close enough that the fallback doesn't read as a downgrade. Reverses the earlier "not adopted" call in this table. |
+
+**Body-text contrast fix (post-Apple-pass correction):** a global `p { color: var(--text-muted); }` rule in
+`style.css`, plus per-component copies of the same pattern (`.theory-section p`, `.compare-table td`,
+`.wave-band-info p`, `.mp-info p`, `.app-card li`, `.about-section p`, `.research-item p`, `.ack-item p`,
+`.sp-block p`, `.step-text`, `.mat-table td`, `.calc-desc`, and a couple of inline-styled intro `<p>`s in
+calculators.html), had every primary reading paragraph/list/table-cell sitewide rendering in the muted gray
+token (`#64748b` light / `#94a3b8` dark) instead of the near-black/near-white `--text` token — making the
+whole site read as washed-out. All of those were repointed to `var(--text)`; `.callout` (theory.html's "NDE
+example" asides) got the same fix since its content is substantive worked examples, not decoration. Genuine
+secondary chrome was deliberately left on `--text-muted` — unit suffixes, formula-box notes, nav/filter pill
+labels, section-divider eyebrow text, sidebar headers, `.svg-caption` diagram captions, and small one-line
+hints under a single input — since flattening literally everything to `--text` would erase the hierarchy
+between primary content and UI micro-copy. The one place `--text-muted`/a light literal color is *required*
+for contrast (`.hero`, `.pathways`, `.page-header`, `.footer`, `.transducer-link-card` — all dark/navy
+backgrounds) was left alone; `.footer p` needed an explicit `color: #94a3b8` added because the new global `p`
+rule would otherwise have overridden its inherited light color and put near-black text on the navy footer.
+**Any new component with a bare `<p>` on a dark/colored background must set its own `p` color explicitly** —
+the global default is now dark-on-light, not inherited-light.
 
 Where it was applied:
 - **`.nav`** (main nav, `style.css`) and **`.sec-nav`** (theory.html's/signal-processing.html's sticky

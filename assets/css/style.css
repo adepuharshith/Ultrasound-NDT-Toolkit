@@ -21,7 +21,7 @@
   --shadow:       0 2px 12px rgba(0,0,0,.08);
   --shadow-hover: 0 8px 28px rgba(14,65,163,.15);
   --nav-h:        64px;
-  --font:         'Inter', system-ui, -apple-system, sans-serif;
+  --font:         -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif;
   --font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 
   /* Apple-style motion: a symmetric ease-in/ease-out, not the browser
@@ -130,7 +130,7 @@ ul { list-style: none; }
 h1 { font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; }
 h2 { font-size: clamp(1.3rem, 2.5vw, 1.75rem); font-weight: 700; letter-spacing: -.015em; }
 h3 { font-size: 1.1rem; font-weight: 600; }
-p  { color: var(--text-muted); }
+p  { color: var(--text); }
 
 /* ============================================================
    NAVBAR
@@ -590,7 +590,7 @@ p  { color: var(--text-muted); }
 .theory-section { margin-bottom: 3rem; }
 .theory-section h2 { border-bottom: 2px solid var(--border); padding-bottom: .5rem; margin-bottom: 1rem; }
 .theory-section h3 { margin: 1.25rem 0 .5rem; color: var(--heading-accent); }
-.theory-section p, .theory-section li { color: var(--text-muted); font-size: .95rem; }
+.theory-section p, .theory-section li { color: var(--text); font-size: .95rem; }
 .theory-section ul { margin-left: 1.25rem; list-style: disc; }
 .theory-section ul li { margin-bottom: .3rem; }
 .eq-box {
@@ -614,7 +614,7 @@ p  { color: var(--text-muted); }
   padding: .9rem 1.25rem;
   margin: 1rem 0;
   font-size: .9rem;
-  color: var(--text-muted);
+  color: var(--text);
   transition: var(--transition-theme);
 }
 .callout strong { color: var(--pastel-blue-text); }
@@ -654,6 +654,7 @@ p  { color: var(--text-muted); }
   text-align: center;
   font-size: .85rem;
 }
+.footer p { color: #94a3b8; }
 .footer a { color: #7dd3fc; }
 .footer .footer-links {
   display: flex;
