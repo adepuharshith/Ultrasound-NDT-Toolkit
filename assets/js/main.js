@@ -66,20 +66,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const item = theoryLink.parentElement;
     item.classList.add('theory-menu');
     const groups = [
-      ['Wave Foundations', [
+      ['Wave Fundamentals', [
         ['Sound vs EM', 'wave-types'], ['Key Differences', 'speed-comparison'],
-        ['Applications', 'applications'], ['Elastic Wave Types', 'elastic-wave-types']
+        ['Applications', 'applications']
       ]],
-      ['Interfaces & Frequency', [
-        ['Acoustic Impedance', 'acoustic-impedance'], ['Creating Elastic Waves', 'wave-generation'],
-        ['Acoustic Spectrum', 'ultrasound-spectrum'], ['Generating Ultrasound', 'generating-ultrasound']
+      ['Elastic Waves & Interfaces', [
+        ['Elastic Wave Types', 'elastic-wave-types'], ['Creating Elastic Waves', 'wave-generation'],
+        ['Snell’s Law', 'snell'], ['Acoustic Impedance', 'acoustic-impedance']
       ]],
-      ['Inspection & Imaging', [
-        ['UT Principle', 'ut-principle'], ['Material Properties', 'material-props'],
-        ['A-scan', 'a-scan'], ['B-scan', 'b-scan'], ['C-scan', 'c-scan']
+      ['Ultrasound NDT Fundamentals', [
+        ['What Is Ultrasound?', 'what-is-ultrasound'], ['Acoustic Spectrum', 'ultrasound-spectrum'],
+        ['UT Principle', 'ut-principle'], ['Generating Ultrasound', 'generating-ultrasound']
+      ]],
+      ['Scanning & Material Evaluation', [
+        ['A-scan', 'a-scan'], ['B-scan', 'b-scan'], ['C-scan', 'c-scan'],
+        ['Material Properties', 'material-props']
       ]],
       ['Advanced Topics', [
-        ['Attenuation', 'attenuation'], ['Beam Physics', 'beam-physics'], ['Snell’s Law', 'snell'],
+        ['Attenuation', 'attenuation'], ['Beam Physics', 'beam-physics'],
         ['Phased Arrays', 'phased-arrays'], ['Calibration & DAC', 'calibration'],
         ['Pulser–Receiver', 'pulser-receiver'], ['TOFD', 'tofd'], ['Weld Inspection', 'weld-inspection']
       ]]
@@ -119,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
        hover chain breaks. */
     const positionDropdown = () => {
       const itemRect = item.getBoundingClientRect();
-      const ddWidth = Math.min(940, window.innerWidth - 32);
+      const ddWidth = Math.min(1080, window.innerWidth - 32);
       const margin = 8;
       let left = itemRect.left + itemRect.width / 2 - ddWidth / 2;
       left = Math.max(margin, Math.min(left, window.innerWidth - ddWidth - margin));

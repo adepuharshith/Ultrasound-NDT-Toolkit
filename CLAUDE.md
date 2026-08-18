@@ -167,13 +167,13 @@ Adjacent sections alternate the `-b` modifier class so neighboring topics stay v
 tone shift alone — no border, no shadow, no gap between them. This is preferred over the classic
 `width:100vw; margin-left:-50vw` breakout because it doesn't fight scrollbar-width/`vw` mismatches.
 
-**The alternation must follow actual DOM/render order, not just source order.** `theory.html` has a script
-that relocates a couple of sections at runtime — `#acoustic-impedance` moves to sit right after
-`#elastic-wave-types`, and `#ultrasound-spectrum` moves to sit right after `#wave-generation` (both moved so
-the detailed section stays a single DOM node instead of being duplicated for two different topic flows) —
-which shifts which sections end up adjacent on the page. When adding/reordering `.theory-section` elements,
-verify the live alternation in a browser (`document.querySelectorAll('.theory-content > *')` and check each
-element's rendered `top`), not just by reading the HTML source top-to-bottom.
+**The alternation must follow actual DOM/render order, not just source order.** `theory.html` used to have
+a script that relocated a couple of sections at runtime to avoid duplicating content across two topic flows
+— that script was removed when the content was reorganized (see the section map below), so render order and
+source order are now identical. If you ever reintroduce any kind of runtime reordering, re-verify the live
+alternation in a browser (`document.querySelectorAll('.theory-content > *')` and check each element's
+rendered `top`) rather than trusting source order — that's the mistake this note originally existed to
+prevent.
 
 Within a section, a further layer of this same pattern nests smaller alternating-tint sub-bands (see
 `.wave-band-list` / `.wave-band` / `.wave-band-tag-*` in `theory.html`, reused for both `#elastic-wave-types`
@@ -259,15 +259,24 @@ material (mm), `cs` = wave speed in material (m/s), `cw` = wave speed in water (
 
 ## `theory.html` section map
 
-Anchored IDs, in rendered order (after the runtime relocation noted above). Use these to jump directly to
-a section with `grep -n 'id="…"' theory.html` rather than scrolling a 5000-line file:
+Anchored IDs, in rendered order — this now **is** source order (the runtime section-relocation script was
+removed when the content was reorganized into 4 logical groups; render order and HTML order match exactly).
+Use these to jump directly to a section with `grep -n 'id="…"' theory.html` rather than scrolling a
+5000-line file. The mega-menu groups in `main.js` and the `.sec-nav` quick-jump pills in `theory.html` both
+mirror this same 4-group-plus-advanced structure — keep all three in sync if you reorder again.
 
-Student flow: `#wave-types` → `#speed-comparison` → `#applications` → `#elastic-wave-types` →
-`#acoustic-impedance` → `#wave-generation` → `#ultrasound-spectrum` → `#ut-principle` → `#material-props` →
-`#generating-ultrasound` → `#a-scan` → `#b-scan` → `#c-scan`.
+1. **Wave Fundamentals**: `#wave-types` → `#speed-comparison` → `#applications`
+2. **Elastic Waves & Interfaces**: `#elastic-wave-types` → `#wave-generation` → `#snell` →
+   `#acoustic-impedance` (Snell's law lives here now, not in Advanced Topics — it was moved up to sit next
+   to the other interface/refraction content instead of being a redundant, more-detailed repeat far down
+   the page)
+3. **Ultrasound NDT Fundamentals**: `#what-is-ultrasound` → `#ultrasound-spectrum` → `#ut-principle` →
+   `#generating-ultrasound`
+4. **Scanning & Material Evaluation**: `#a-scan` → `#b-scan` → `#c-scan` → `#material-props`
 
-Advanced topics (after an `#advanced-topics` divider): `#attenuation` → `#beam-physics` → `#snell` →
-`#phased-arrays` → `#calibration` → `#pulser-receiver` → `#tofd` → `#weld-inspection`.
+Advanced topics (after an `#advanced-topics` divider, minus Snell's law which moved up into group 2):
+`#attenuation` → `#beam-physics` → `#phased-arrays` → `#calibration` → `#pulser-receiver` → `#tofd` →
+`#weld-inspection`.
 
 ## `resources.html` filter logic
 
