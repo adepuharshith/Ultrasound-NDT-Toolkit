@@ -79,6 +79,10 @@
       font-weight: 600;
       margin-bottom: 1.25rem;
     }
+    /* Sub-heading color matches theory.html's .theory-section h3 rule
+       exactly (var(--heading-accent)) instead of the page's plain body
+       text color, for visual consistency across the two tabs. */
+    .sp-block h3 { margin: 1.75rem 0 .55rem; color: var(--heading-accent); font-size: 1.05rem; }
     .sp-block p {
       font-size: .95rem;
       color: var(--text);
@@ -112,7 +116,12 @@
     }
     @media (max-width: 720px) { .sp-split { grid-template-columns: 1fr; } }
 
-    /* ── Canvas container ── */
+    /* ── Canvas container ──
+       Aspect ratio is set per-plot via CSS (matching calculators.html's
+       `.calc-viz { aspect-ratio: 2/1 }` convention) instead of a magic
+       pixel height baked into the canvas attribute — keeps every plot a
+       sane, consistent shape at any viewport width instead of the very
+       flat/squashed ratios a fixed height produces in a wide column. */
     .canvas-box {
       background: var(--surface-canvas);
       border: 1px solid var(--border);
@@ -120,8 +129,9 @@
       overflow: hidden;
       position: relative;
       transition: var(--transition-theme);
+      aspect-ratio: 2.35 / 1;
     }
-    .canvas-box canvas { display: block; width: 100%; }
+    .canvas-box canvas { display: block; width: 100%; height: 100%; }
     .canvas-label {
       position: absolute;
       top: .5rem;
@@ -131,7 +141,18 @@
       color: var(--surface-canvas-text);
       letter-spacing: .06em;
       text-transform: uppercase;
+      pointer-events: none;
     }
+    .canvas-label.on-dark { color: rgba(255,255,255,.92); }
+    /* Wavelet spectrogram gets a wider, shorter ratio (it's a 2-D map —
+       too tall wastes space, too flat crushes the frequency axis) and
+       stacks directly onto its aligned time-domain strip inside one
+       shared box instead of two separately-bordered boxes. */
+    .canvas-box.spectro-box { aspect-ratio: 2.6 / 1; }
+    .canvas-box.wide-box { aspect-ratio: 2 / 1; }
+    .spectro-combo { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: .5rem 0 .75rem; transition: var(--transition-theme); }
+    .spectro-combo .canvas-box { border: none; border-radius: 0; border-bottom: 1px solid var(--border); }
+    .spectro-combo .canvas-box:last-child { border-bottom: none; aspect-ratio: 5 / 1; }
 
     /* ── Control row ── */
     .ctrl-row {
@@ -172,6 +193,23 @@
       line-height: 1.8;
     }
     .formula-box .f-note { font-family: var(--font); font-size: .8rem; color: var(--text-muted); margin-top: .4rem; }
+
+    /* ── FFT vs Wavelet comparison cards ── */
+    .fvw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .fvw-grid { grid-template-columns: 1fr; } }
+    .fvw-card {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      align-items: flex-start;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+    }
+    .fvw-tag { font-weight: 700; font-size: .92rem; }
+    .fvw-tag.blue   { color: var(--brand-blue); }
+    .fvw-tag.purple { color: var(--pastel-purple-text); }
 
     /* ── Step boxes ── */
     .steps { display: flex; flex-direction: column; gap: .6rem; margin: 1rem 0; }
@@ -386,11 +424,11 @@
     <div>
       <div class="canvas-box" style="margin-bottom:.75rem;">
         <span class="canvas-label">A-scan signal</span>
-        <canvas id="xcorrSignalCanvas" height="180"></canvas>
+        <canvas id="xcorrSignalCanvas"></canvas>
       </div>
       <div class="canvas-box">
         <span class="canvas-label">Correlation R(τ)</span>
-        <canvas id="xcorrCorrCanvas" height="130"></canvas>
+        <canvas id="xcorrCorrCanvas"></canvas>
       </div>
     </div>
   </div>
@@ -412,18 +450,11 @@
       <strong>Why correlation beats peak-picking:</strong> Noise shifts an individual peak unpredictably.
       The correlation sums contributions over the entire pulse shape — making the peak location
       robust even at SNR &lt; 10 dB. In TOFD, where lateral-wave and tip-diffraction echoes overlap,
-      cross-correlation is essential for sub-sample Δt accuracy.
+      cross-correlation is essential for sub-sample Δt accuracy. In practice it's computed via FFT as
+      R<sub>xy</sub> = IFFT(FFT(x)*&thinsp;&middot;&thinsp;FFT(y)) — an O(N log N) shortcut for what the
+      formula above defines as an O(N&sup2;) sliding dot-product.
     </p>
   </div>
-
-  <hr class="sp-divider">
-
-  <p style="margin:0; font-size:.88rem; color:var(--text);">
-    <strong>In practice:</strong> cross-correlation can be computed efficiently via FFT as
-    R<sub>xy</sub> = IFFT( FFT(x)* · FFT(y) ), turning an O(N²) sliding-dot-product into O(N log N).
-    Most UT instruments and MATLAB's <code>xcorr()</code> / Python's <code>scipy.signal.correlate()</code>
-    implement exactly this.
-  </p>
 </div>
 
 
@@ -450,15 +481,15 @@
   <!-- Row 1: time signal + FFT -->
   <div class="plot-row">
     <div>
-      <div class="canvas-box">
+      <div class="canvas-box wide-box">
         <span class="canvas-label">Time-domain pulse</span>
-        <canvas id="wvTimeDomainCanvas" height="160"></canvas>
+        <canvas id="wvTimeDomainCanvas"></canvas>
       </div>
     </div>
     <div>
-      <div class="canvas-box">
+      <div class="canvas-box wide-box">
         <span class="canvas-label">FFT — amplitude spectrum</span>
-        <canvas id="wvFFTCanvas" height="160"></canvas>
+        <canvas id="wvFFTCanvas"></canvas>
       </div>
     </div>
   </div>
@@ -472,9 +503,7 @@
     </p>
   </div>
 
-  <hr class="sp-divider">
-
-  <h3 style="margin-bottom:.5rem; color:var(--text);">Enter the Wavelet Transform</h3>
+  <h3>Enter the Wavelet Transform</h3>
   <p>
     Instead of sines (which extend to ±∞), the <strong>Continuous Wavelet Transform (CWT)</strong>
     uses a <em>mother wavelet</em> — a short, localized oscillating function — and slides it
@@ -501,17 +530,20 @@
     <button class="ctrl-btn" id="wvSigMulti">Two-mode (Lamb)</button>
   </div>
 
-  <!-- Spectrogram canvas -->
-  <div class="canvas-box" style="margin:.5rem 0 .75rem;">
-    <span class="canvas-label">CWT Spectrogram (Morlet) — brighter = higher |W(a,b)|</span>
-    <canvas id="wvSpectroCanvas" height="220"></canvas>
+  <!-- Spectrogram + time-aligned signal strip, combined into one framed
+       box (was two separately-bordered boxes) so it reads as one paired
+       visualization rather than two unrelated plots stacked together. -->
+  <div class="spectro-combo">
+    <div class="canvas-box spectro-box">
+      <span class="canvas-label on-dark">CWT spectrogram (Morlet)</span>
+      <canvas id="wvSpectroCanvas"></canvas>
+    </div>
+    <div class="canvas-box">
+      <span class="canvas-label">Signal, time-aligned</span>
+      <canvas id="wvSigCanvas"></canvas>
+    </div>
   </div>
-
-  <!-- Time domain underneath spectrogram -->
-  <div class="canvas-box" style="margin-bottom:1rem;">
-    <span class="canvas-label">Signal overlaid</span>
-    <canvas id="wvSigCanvas" height="90"></canvas>
-  </div>
+  <p style="text-align:center; font-size:.8rem; color:var(--text-muted); margin:-.4rem 0 1rem;">Inferno colormap — brighter = higher |W(a,b)|</p>
 
   <div class="ctrl-row">
     <span class="ctrl-label">Morlet ω₀:</span>
@@ -532,16 +564,14 @@
     </p>
   </div>
 
-  <hr class="sp-divider">
-
-  <h3 style="margin-bottom:.75rem; color:var(--text);">FFT vs. Wavelet — When to use which</h3>
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-    <div class="step" style="flex-direction:column; gap:.4rem; align-items:flex-start;">
-      <span style="font-weight:700; font-size:.92rem; color:var(--brand-blue);">FFT</span>
+  <h3>FFT vs. Wavelet — When to use which</h3>
+  <div class="fvw-grid">
+    <div class="fvw-card">
+      <span class="fvw-tag blue">FFT</span>
       <div class="step-text">Best for <strong>stationary signals</strong> where frequency content doesn't change over time. Fast (O(N log N)), gives exact frequency values. Use for: bandwidth characterization, transducer spectrum, pulse spectrum.</div>
     </div>
-    <div class="step" style="flex-direction:column; gap:.4rem; align-items:flex-start;">
-      <span style="font-weight:700; font-size:.92rem; color:#7c3aed;">Wavelet CWT</span>
+    <div class="fvw-card">
+      <span class="fvw-tag purple">Wavelet CWT</span>
       <div class="step-text">Best for <strong>non-stationary signals</strong>: dispersive waves, multi-mode Lamb, AE transients. Reveals <em>when</em> each frequency arrives. Use for: Lamb wave mode separation, dispersion curve extraction, AE source characterization.</div>
     </div>
   </div>
@@ -569,9 +599,7 @@
     signal into a displayable, measurable, and imageable result.
   </p>
 
-  <hr class="sp-divider">
-
-  <h3 style="margin-bottom:.55rem; color:var(--text);">Envelope Detection (Hilbert Transform)</h3>
+  <h3>Envelope Detection (Hilbert Transform)</h3>
   <p>
     Gated C-scans sample peak echo amplitude within a depth window. Sampling the raw RF signal
     directly produces a position-dependent artefact: a reflector sitting at a wave crest reads full
@@ -629,9 +657,7 @@
     </p>
   </div>
 
-  <hr class="sp-divider">
-
-  <h3 style="margin-bottom:.55rem; color:var(--text);">Time Gain Compensation (TGC)</h3>
+  <h3>Time Gain Compensation (TGC)</h3>
   <p>
     Attenuation decays echo amplitude exponentially with depth, so identical reflectors at different depths
     return unequal signals. TGC applies a programmable depth-dependent gain matched to the material's
@@ -656,9 +682,7 @@
     </p>
   </div>
 
-  <hr class="sp-divider">
-
-  <h3 style="margin-bottom:.55rem; color:var(--text);">Pulse Compression (Chirp / Coded Excitation)</h3>
+  <h3>Pulse Compression (Chirp / Coded Excitation)</h3>
   <p>
     Conventional pulsed UT trades off resolution against SNR: shorter pulse &rarr; finer range resolution,
     but less energy &rarr; lower SNR. Pulse compression decouples these. A linear FM chirp of duration T and
@@ -683,9 +707,7 @@
     </p>
   </div>
 
-  <hr class="sp-divider">
-
-  <h3 style="margin-bottom:.55rem; color:var(--text);">SNR &amp; Noise Sources</h3>
+  <h3>SNR &amp; Noise Sources</h3>
   <p>Three distinct noise mechanisms compete with flaw echoes and require different mitigation strategies:</p>
   <table class="compare-table">
     <thead>
@@ -752,11 +774,15 @@ window.addEventListener('load', function() {
   function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
   function lerp(a,b,t){ return Math.round(a+(b-a)*t); }
 
-  function initCanvas(el, cssH) {
+  /* Canvas backing-store size now comes from the CSS aspect-ratio on
+     .canvas-box (the canvas itself is width:100%; height:100% of that
+     box) rather than a hardcoded pixel height passed in here — keeps
+     every plot's shape controlled in one place (the stylesheet). */
+  function initCanvas(el) {
     const w = Math.max(el.offsetWidth, 300);
+    const h = Math.max(el.offsetHeight, 60);
     el.width  = w * DPR;
-    el.height = cssH * DPR;
-    el.style.height = cssH + 'px';
+    el.height = h * DPR;
     return el.getContext('2d');
   }
   /* ================================================================
@@ -770,8 +796,8 @@ window.addEventListener('load', function() {
 
     const sCanvas = document.getElementById('xcorrSignalCanvas');
     const cCanvas = document.getElementById('xcorrCorrCanvas');
-    let sCtx = initCanvas(sCanvas, 190);
-    let cCtx = initCanvas(cCanvas, 130);
+    let sCtx = initCanvas(sCanvas);
+    let cCtx = initCanvas(cCanvas);
 
     const offsetSlider = document.getElementById('xcorrOffset');
     const noiseSlider  = document.getElementById('xcorrNoise');
@@ -841,20 +867,24 @@ window.addEventListener('load', function() {
       sCtx.strokeStyle='rgba(8,145,178,0.9)'; sCtx.lineWidth=2; sCtx.setLineDash([5,3]);
       sCtx.strokeRect(slidePos*xS-tmplW/2,H*0.08,tmplW,H*0.84);
       sCtx.setLineDash([]);
-      // labels
+      // labels — kept clear of the "A-SCAN SIGNAL" badge in the top-left
+      // corner. The badge's own height is fixed in CSS px (~22px)
+      // regardless of the canvas's height, so a pure fraction of H isn't
+      // enough clearance on short/mobile boxes — clamp to a DPR-scaled
+      // minimum pixel offset as well.
       const fz=Math.round(10*DPR);
+      const labelY=Math.max(H*0.26, 42*DPR), leaderY=labelY+3*DPR;
       sCtx.font=`bold ${fz}px Inter,sans-serif`;
       sCtx.fillStyle='#d97706'; sCtx.textAlign='center';
-      sCtx.fillText('FW pulse',t1*xS,H*0.1);
+      sCtx.fillText('FW pulse',t1*xS,labelY);
       sCtx.strokeStyle='#d97706'; sCtx.lineWidth=1;
-      sCtx.beginPath(); sCtx.moveTo(t1*xS,H*0.13); sCtx.lineTo(t1*xS,mid-amp*0.6); sCtx.stroke();
+      sCtx.beginPath(); sCtx.moveTo(t1*xS,leaderY); sCtx.lineTo(t1*xS,mid-amp*0.6); sCtx.stroke();
       sCtx.fillStyle='#7c3aed';
-      sCtx.fillText('BW pulse',t2*xS,H*0.1);
+      sCtx.fillText('BW pulse',t2*xS,labelY);
       sCtx.strokeStyle='#7c3aed';
-      sCtx.beginPath(); sCtx.moveTo(t2*xS,H*0.13); sCtx.lineTo(t2*xS,mid-amp*0.6); sCtx.stroke();
+      sCtx.beginPath(); sCtx.moveTo(t2*xS,leaderY); sCtx.lineTo(t2*xS,mid-amp*0.6); sCtx.stroke();
       sCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
-      sCtx.fillStyle='#334155'; sCtx.textAlign='left'; sCtx.fillText('Amp',4,13);
-      sCtx.textAlign='right'; sCtx.fillText('time →',W-4,H-4);
+      sCtx.fillStyle='#334155'; sCtx.textAlign='right'; sCtx.fillText('time →',W-6*DPR,H-6*DPR);
     }
 
     function drawCorr(corrArr, peakLag, progress){
@@ -879,12 +909,23 @@ window.addEventListener('load', function() {
         cCtx.fillStyle='#d97706';
         cCtx.beginPath(); cCtx.arc(px,py,5*DPR,0,2*PI); cCtx.fill();
         cCtx.font=`bold ${Math.round(9*DPR)}px Inter,sans-serif`;
-        cCtx.fillStyle='#d97706'; cCtx.textAlign='center';
-        cCtx.fillText('Δt = '+peakLag+' samp',px,py-8*DPR);
+        cCtx.fillStyle='#d97706';
+        /* The peak (by definition the tallest point) always sits near the
+           top of the plot; when it also falls near the left edge — e.g.
+           a large negative lag — its label would land in the "CORRELATION
+           R(τ)" badge's corner. Detect that and anchor the label to the
+           right of the dot, below the badge, instead of centered above it. */
+        const nearCorner = px<100*DPR && py<40*DPR;
+        if(nearCorner){
+          cCtx.textAlign='left';
+          cCtx.fillText('Δt = '+peakLag+' samp',px+10*DPR,Math.max(py,32*DPR));
+        } else {
+          cCtx.textAlign='center';
+          cCtx.fillText('Δt = '+peakLag+' samp',px,py-8*DPR);
+        }
       }
       cCtx.font=`${Math.round(9*DPR)}px Inter,sans-serif`;
-      cCtx.fillStyle='#334155'; cCtx.textAlign='left'; cCtx.fillText('R(τ)',4,12);
-      cCtx.textAlign='center'; cCtx.fillText('lag τ →',W*0.5,H-3);
+      cCtx.fillStyle='#334155'; cCtx.textAlign='center'; cCtx.fillText('lag τ →',W*0.5,H-6*DPR);
     }
 
     function render(){
@@ -920,7 +961,7 @@ window.addEventListener('load', function() {
     offsetSlider.addEventListener('input',()=>{if(!isPlaying)render();});
     noiseSlider.addEventListener('input',()=>{if(!isPlaying)render();});
     window.addEventListener('resize',()=>{
-      sCtx=initCanvas(sCanvas,190); cCtx=initCanvas(cCanvas,130); render();
+      sCtx=initCanvas(sCanvas); cCtx=initCanvas(cCanvas); render();
     });
     render();
   })();
@@ -937,8 +978,8 @@ window.addEventListener('load', function() {
     const ffCanvas = document.getElementById('wvFFTCanvas');
     const spCanvas = document.getElementById('wvSpectroCanvas');
     const sgCanvas = document.getElementById('wvSigCanvas');
-    let tdCtx=initCanvas(tdCanvas,160), ffCtx=initCanvas(ffCanvas,160);
-    let spCtx=initCanvas(spCanvas,220), sgCtx=initCanvas(sgCanvas,90);
+    let tdCtx=initCanvas(tdCanvas), ffCtx=initCanvas(ffCanvas);
+    let spCtx=initCanvas(spCanvas), sgCtx=initCanvas(sgCanvas);
 
     const btnPulse=document.getElementById('wvSigPulse');
     const btnChirp=document.getElementById('wvSigChirp');
@@ -1018,12 +1059,30 @@ window.addEventListener('load', function() {
       return result;
     }
 
+    /* Inferno colormap (matplotlib), approximated with 7 anchor stops and
+       linear interpolation between them — near-black at v=0 through deep
+       purple/magenta/red-orange to a bright pale-yellow at v=1. Designed
+       for a black canvas background (unlike the old white-background
+       thermal scale it replaces). */
+    const INFERNO_STOPS = [
+      [0.00,  0,   0,   4],
+      [0.17, 34,  12,  84],
+      [0.34, 88,  21, 111],
+      [0.50,142,  30,  93],
+      [0.67,196,  60,  53],
+      [0.84,240, 124,  25],
+      [1.00,252, 255, 164]
+    ];
     function heatColor(v){
-      /* White-background thermal: white → light yellow → orange → red → dark maroon */
-      if(v<0.20){const t=v/0.20;return[255,lerp(255,240,t),lerp(255,220,t)];}
-      if(v<0.45){const t=(v-0.20)/0.25;return[255,lerp(240,180,t),lerp(220,0,t)];}
-      if(v<0.70){const t=(v-0.45)/0.25;return[lerp(255,210,t),lerp(180,0,t),0];}
-      const t=(v-0.70)/0.30;return[lerp(210,80,t),0,lerp(0,40,t)];
+      v=clamp(v,0,1);
+      for(let i=0;i<INFERNO_STOPS.length-1;i++){
+        const a=INFERNO_STOPS[i], b=INFERNO_STOPS[i+1];
+        if(v>=a[0] && v<=b[0]){
+          const t=(v-a[0])/(b[0]-a[0]);
+          return[lerp(a[1],b[1],t),lerp(a[2],b[2],t),lerp(a[3],b[3],t)];
+        }
+      }
+      return[252,255,164];
     }
 
     function drawTimeDomain(){
@@ -1041,8 +1100,7 @@ window.addEventListener('load', function() {
       tdCtx.stroke();
       const fz=Math.round(9*DPR);
       tdCtx.font=`${fz}px Inter,sans-serif`; tdCtx.fillStyle='#334155';
-      tdCtx.textAlign='left'; tdCtx.fillText('v(t)',4,13);
-      tdCtx.textAlign='right'; tdCtx.fillText('time →',W-4,H-4);
+      tdCtx.textAlign='right'; tdCtx.fillText('time →',W-6*DPR,H-6*DPR);
     }
 
     function drawFFT(){
@@ -1063,44 +1121,53 @@ window.addEventListener('load', function() {
       }
       const fz=Math.round(9*DPR);
       ffCtx.font=`${fz}px Inter,sans-serif`; ffCtx.fillStyle='#334155';
-      ffCtx.textAlign='left'; ffCtx.fillText('|X(f)|',4,13);
-      ffCtx.textAlign='right'; ffCtx.fillText('freq →',W-4,H-4);
+      ffCtx.textAlign='right'; ffCtx.fillText('freq →',W-6*DPR,H-6*DPR);
     }
 
     function drawSpectrogram(cwt){
       const W=spCanvas.width, H=spCanvas.height;
-      spCtx.clearRect(0,0,W,H); spCtx.fillStyle='#ffffff'; spCtx.fillRect(0,0,W,H);
+      spCtx.clearRect(0,0,W,H);
+      /* Inferno reads correctly only on a dark ground (v=0 is near-black,
+         not white) — this canvas intentionally breaks from the site's
+         usual light "paper" plot background for that reason. */
+      spCtx.fillStyle='#000004'; spCtx.fillRect(0,0,W,H);
       let maxV=1e-9;
       cwt.forEach(r=>{for(let i=0;i<r.length;i++) if(r[i]>maxV) maxV=r[i];});
       const freqSteps=cwt.length;
       const imgData=spCtx.createImageData(W,H);
       const d=imgData.data;
+      /* Block boundaries computed as consecutive floor()s (not a fixed
+         round()ed width per block) so adjacent blocks share an exact
+         edge — no rounding-induced 1px gaps between columns/rows left
+         at alpha=0, which previously showed as a grid of thin stripes
+         (the light .canvas-box background showing through the gaps). */
       for(let fi=0;fi<freqSteps;fi++){
         const row=cwt[fi];
-        const py=Math.round(H-(fi+1)*H/freqSteps);
-        const ph=Math.max(1,Math.round(H/freqSteps));
+        const py0=Math.round(H-(fi+1)*H/freqSteps);
+        const py1=Math.round(H-fi*H/freqSteps);
         for(let t=0;t<N;t++){
           const v=clamp(row[t]/maxV,0,1);
           const [cr,cg,cb]=heatColor(v);
-          const px=Math.round(t*W/N);
-          const pw=Math.max(1,Math.round(W/N));
-          for(let dy=0;dy<ph;dy++){const ry=py+dy;if(ry<0||ry>=H)continue;
-            for(let dx=0;dx<pw;dx++){const rx=px+dx;if(rx<0||rx>=W)continue;
+          const px0=Math.floor(t*W/N);
+          const px1=Math.floor((t+1)*W/N);
+          for(let ry=py0;ry<py1;ry++){if(ry<0||ry>=H)continue;
+            for(let rx=px0;rx<px1;rx++){if(rx<0||rx>=W)continue;
               const idx=(ry*W+rx)*4;d[idx]=cr;d[idx+1]=cg;d[idx+2]=cb;d[idx+3]=255;}}
         }
       }
       spCtx.putImageData(imgData,0,0);
       const fz=Math.round(9*DPR);
-      spCtx.font=`${fz}px Inter,sans-serif`; spCtx.fillStyle='rgba(51,65,85,0.9)';
-      spCtx.textAlign='left'; spCtx.fillText('freq (MHz) ↑',5,15);
-      spCtx.textAlign='right'; spCtx.fillText('time →',W-5,H-5);
+      spCtx.textAlign='right'; spCtx.fillStyle='rgba(255,255,255,0.85)';
+      spCtx.font=`${fz}px Inter,sans-serif`; spCtx.fillText('time →',W-6*DPR,H-6*DPR);
+      const labelBand=24*DPR; // keep tick labels clear of the badge in the top-left corner
       [2,4,6,8].forEach(f=>{
         const fy=H-(f-0.3)/(9.8-0.3)*H;
-        spCtx.fillStyle='rgba(51,65,85,0.8)';
+        spCtx.strokeStyle='rgba(255,255,255,0.18)'; spCtx.lineWidth=1;
+        spCtx.beginPath(); spCtx.moveTo(50*DPR,fy); spCtx.lineTo(W,fy); spCtx.stroke();
+        if(fy<labelBand) return;
+        spCtx.fillStyle='rgba(255,255,255,0.75)';
         spCtx.font=`${fz}px Inter,sans-serif`;
-        spCtx.textAlign='left'; spCtx.fillText(f+' MHz',4,fy);
-        spCtx.strokeStyle='rgba(100,116,139,0.5)'; spCtx.lineWidth=1;
-        spCtx.beginPath(); spCtx.moveTo(52*DPR,fy); spCtx.lineTo(W,fy); spCtx.stroke();
+        spCtx.textAlign='left'; spCtx.fillText(f+' MHz',6*DPR,fy);
       });
     }
 
@@ -1108,7 +1175,7 @@ window.addEventListener('load', function() {
       const sig=getSignal();
       const W=sgCanvas.width, H=sgCanvas.height;
       sgCtx.clearRect(0,0,W,H); sgCtx.fillStyle='#ffffff'; sgCtx.fillRect(0,0,W,H);
-      const mid=H*0.5, amp=H*0.4;
+      const mid=H*0.56, amp=H*0.3;
       sgCtx.beginPath(); sgCtx.strokeStyle='#0891b2'; sgCtx.lineWidth=2;
       for(let i=0;i<N;i++){const x=i*W/N,y=mid-sig[i]*amp;if(i===0)sgCtx.moveTo(x,y);else sgCtx.lineTo(x,y);}
       sgCtx.stroke();
@@ -1135,8 +1202,8 @@ window.addEventListener('load', function() {
     omegaSlider.addEventListener('input',renderAll);
     freqSlider.addEventListener('input',renderAll);
     window.addEventListener('resize',()=>{
-      tdCtx=initCanvas(tdCanvas,160); ffCtx=initCanvas(ffCanvas,160);
-      spCtx=initCanvas(spCanvas,220); sgCtx=initCanvas(sgCanvas,90);
+      tdCtx=initCanvas(tdCanvas); ffCtx=initCanvas(ffCanvas);
+      spCtx=initCanvas(spCanvas); sgCtx=initCanvas(sgCanvas);
       renderAll();
     });
     renderAll();

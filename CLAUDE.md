@@ -226,6 +226,14 @@ Nested functional components (calculator result chips, data tables, callouts, ca
 intentionally keep their own bounded box styling — the "no boxed cards" rule applies to the top-level
 content-section wrapper, not to every UI element.
 
+**Sub-headings** (`<h3>` inside a section) use `color: var(--heading-accent)`, matching `theory.html`'s
+`.theory-section h3` rule exactly — `signal-processing.html`'s `.sp-block h3` was previously plain
+`var(--text)` set per-instance via inline `style=""` (six separate copies) and has been consolidated into
+one class rule. **Sub-sections are separated by whitespace alone** (the `h3`'s own top margin), not a
+visible `<hr>` divider — `signal-processing.html` used to sprinkle `<hr class="sp-divider">` between every
+named sub-topic; removed to match `theory.html`, which has never used inline dividers between its own `h3`
+subsections within a `.theory-section`.
+
 ## Canvas animation conventions
 
 Nearly every `<canvas>` on the site is hand-drawn via `requestAnimationFrame` loops (no charting library).
@@ -243,6 +251,18 @@ Recurring patterns worth reusing rather than reinventing:
   `signal-processing.html`'s and `calculators.html`'s canvases, most static SVGs) instead keep a constant
   light backing via `--surface-canvas`/`--surface-screen`. Don't try to theme these; only their container
   background should ever change.
+- **Canvas aspect ratio via CSS, not a hardcoded pixel height**: `signal-processing.html`'s `.canvas-box`
+  sets `aspect-ratio` (default `2.35/1`; `.wide-box` for `2/1`; `.spectro-box` for `2.6/1`) and its
+  `canvas { width:100%; height:100% }` — matching `calculators.html`'s `.calc-viz { aspect-ratio: 2/1 }`
+  convention — instead of a `height="…"` canvas attribute paired with a magic-number `cssH` argument to
+  the sizing helper. `initCanvas(el)` reads `el.offsetWidth`/`el.offsetHeight` (already resolved by the
+  CSS aspect-ratio at layout time) rather than taking a height parameter. Keeps every plot a consistent,
+  intentional shape instead of whatever a fixed pixel height happens to produce at the container's actual
+  rendered width. In-canvas corner text (axis labels like "Amp"/"v(t)") was removed where it duplicated
+  the HTML `.canvas-label` badge in the same top-left corner — dynamic/data-dependent labels (peak
+  markers, per-pulse tags) that can land in that same corner depending on the data must actively avoid it
+  (see the corner-detection clamp in `xcorr`'s `drawCorr`/`drawSignal`), since the label and the badge
+  have no backing box and become mutually illegible if they overlap.
 - **Isometric particle-lattice rendering** (`theory.html`'s `#elastic-wave-types` canvases): a small
   reusable projection `project(ox, oy, tile, x, y, z) = { x: ox + (x - z)*tile*cos30, y: oy + (x + z)*tile*sin30 + y*tile*0.85 }`
   plus a `bbox()` auto-fit/centering helper, used to draw a translucent 3-box "sample" (top/right/front
@@ -265,9 +285,17 @@ Recurring patterns worth reusing rather than reinventing:
     ctx.stroke();
   }
   ```
-- `signal-processing.html`'s spectrogram uses a custom `heatColor(v)` colormap (white background version:
-  `v=0` → white, `v=0.2` → light yellow, `v=0.45` → orange, `v=0.7` → red, `v=1` → dark maroon) rather than
-  a library colormap — extend its four `if (v < …)` bands rather than introducing a dependency.
+- `signal-processing.html`'s CWT spectrogram uses a custom `heatColor(v)` colormap — an **inferno**
+  approximation (7 hand-picked anchor stops interpolated linearly: near-black at v=0, through deep
+  purple/magenta/red-orange, to pale yellow at v=1), not a library colormap — extend the `INFERNO_STOPS`
+  array rather than introducing a dependency. Unlike every other canvas on the site, this one paints a
+  **black** background (`#000004`) instead of the usual light "paper" surface — inferno only reads
+  correctly on dark ground — so its `.canvas-box` gets the `spectro-box` modifier class and its
+  `.canvas-label` gets the `on-dark` modifier (light text) rather than the default dark-on-light label
+  color. When filling a 2-D `ImageData` grid like this, compute each cell's start/end pixel with
+  consecutive `Math.floor()`s (`px0=floor(t*W/N)`, `px1=floor((t+1)*W/N)`), not a fixed `round()`ed
+  width per cell — the latter leaves 1px alpha=0 gaps between cells on non-integer `W/N` ratios, which
+  render as a grid of thin stripes showing the container's background through the gaps.
 - All 13 `eq-box` equation elements in `theory.html` use KaTeX (`$$...$$` syntax, CDN-loaded with
   auto-render in `<head>`).
 
