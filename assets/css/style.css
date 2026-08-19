@@ -158,7 +158,7 @@ p  { color: var(--text); }
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: rgba(var(--brand-navy-rgb), .82);
+  background: rgba(var(--brand-navy-rgb), .95);
   backdrop-filter: saturate(1.8) blur(20px);
   -webkit-backdrop-filter: saturate(1.8) blur(20px);
 }
@@ -174,13 +174,19 @@ p  { color: var(--text); }
   white-space: nowrap;
 }
 .nav-brand svg { width: 28px; height: 28px; flex-shrink: 0; }
-.nav-brand span.sub { font-weight: 400; font-size: .8rem; color: #93c5fd; margin-left: .2rem; }
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: .25rem;
   margin-left: auto;
 }
+/* Every item is its own flex row so the link text centers consistently
+   whether the <li> holds a plain <a> or (Theory) an <a> plus a chevron
+   button — without this, the chevron's fixed height inflates only the
+   Theory <li>'s line box, leaving its link text sitting visibly lower
+   than its siblings. */
+.nav-links li { display: flex; align-items: center; }
 .nav-links a {
   color: #cbd5e1;
   padding: .45rem .85rem;
@@ -709,7 +715,6 @@ p  { color: var(--text); }
    ============================================================ */
 @media (max-width: 768px) {
   .nav { padding: 0 1rem; gap: .5rem; }
-  .nav-brand .sub { display: none; }
   .theme-toggle { width: 34px; height: 34px; margin-left: 0; }
   .theme-toggle svg { width: 16px; height: 16px; }
   .nav-links { display: none; }

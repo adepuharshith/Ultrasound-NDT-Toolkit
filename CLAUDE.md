@@ -131,9 +131,14 @@ Where it was applied:
 - **`.nav`** (main nav, `style.css`) and **`.sec-nav`** (theory.html's/signal-processing.html's sticky
   quick-jump bar) use frosted glass instead of a flat fill: translucent background + `backdrop-filter:
   saturate(1.8) blur(20px)` (with a `-webkit-backdrop-filter` fallback for Safari). `.nav` tints
-  `rgba(var(--brand-navy-rgb), .82)` to keep the brand color; `.sec-nav` tints `rgba(var(--bg-card-rgb),
+  `rgba(var(--brand-navy-rgb), .95)` to keep the brand color; `.sec-nav` tints `rgba(var(--bg-card-rgb),
   .72)`. The `--bg-card-rgb`/`--brand-navy-rgb` tokens exist specifically so `rgba(var(--x-rgb), alpha)`
-  works — a hex custom property can't be split into components for that.
+  works — a hex custom property can't be split into components for that. `.nav`'s tint opacity was
+  originally `.82`, tuned up to `.95` after feedback that it rendered as a pale, desaturated blue-gray —
+  at low opacity over a near-neutral light page background, `saturate(1.8)` has little colored backdrop
+  content to boost, so the blend read as washed-out rather than a confident navy. `.95` reads as
+  essentially solid brand navy (matching the hero/page-header gradient's own starting color) while still
+  keeping a sliver of blur-through for scrolled content.
 - **Pill buttons**: `.btn`/`.btn-primary`/`.btn-outline` (hero CTAs, `style.css`), `.ctrl-btn`
   (signal-processing.html's Animate/Reset controls), `.wave-demo-btn` (theory.html's canvas play/pause
   overlays), and `.profile-link` (about.html's contact links) all moved from small rounded-rect radii
@@ -162,8 +167,26 @@ it on the element directly.**
   hand-authored per page.
 - Persistence: the toggle click handler sets `localStorage.theme` and flips `data-theme`; if the user has
   never toggled, the site follows `prefers-color-scheme` live via a media-query listener.
-- On mobile (≤768px), `.nav` padding/gap tighten and `.nav-brand .sub` ("Purdue NDT Lab") hides to keep
-  brand + toggle + hamburger from overflowing 375–390px viewports.
+- On mobile (≤768px), `.nav` padding/gap tighten to keep brand + toggle + hamburger from overflowing
+  375–390px viewports.
+- **`.nav-brand`** is hand-authored per page (`<a class="nav-brand">`, duplicated across all 7 HTML files
+  the same way the theme-detection `<script>` is) and reads just **"Ultrasound NDT Toolkit"** — it used to
+  be "US & NDT Toolkit" plus a `<span class="sub">Purdue NDT Lab</span>` subtitle; both the abbreviation
+  and the subtitle were dropped per feedback, and the now-dead `.nav-brand span.sub` CSS (including its
+  mobile `display:none` override) was removed along with it. Keep all 7 copies in sync if it changes again.
+- **Gotcha**: `.nav-links` items are `<li><a>…</a></li>`, except the Theory item, which is
+  `<li class="theory-menu"><a>…</a><button class="theory-menu-toggle">…</button><div class="theory-dropdown">…</div></li>`
+  (built by `main.js`). Because `.theory-menu` is itself `display:flex`, its child `<a>` gets block-ified
+  and its vertical padding counts toward line-box height; every other `<li>`'s `<a>` stays `display:inline`,
+  where padding paints outside the line box without adding to it. That made the Theory `<li>`'s natural
+  content height taller than its siblings, so `.nav-links`'s stretch made the *plain* `<a>`s sit higher
+  within their (now-taller) row than the fully-padded Theory `<a>`, and it rendered visibly lower than
+  "Home"/"Calculators"/etc. Fixed with `.nav-links { align-items: center }` plus `.nav-links li { display:
+  flex; align-items: center }`, so every item centers its own content regardless of what else shares its
+  `<li>`. **If a future nav item needs an inline sibling next to its link (icon, badge, chevron), give that
+  `<li>` the same `display:flex; align-items:center` treatment** — it's already covered by the generic
+  `.nav-links li` rule, so no special-casing needed, but keep this in mind if that generic rule ever gets
+  narrowed to target only specific `<li>`s.
 
 ## Section design pattern: blended, alternating-tone bands (no boxed cards)
 
