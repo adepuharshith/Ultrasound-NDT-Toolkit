@@ -10,8 +10,12 @@ framework, no bundler, no package manager.
 
 Remote: `https://github.com/adepuharshith/Ultrasound-NDT-Toolkit` (the repo was renamed from lowercase at
 some point; GitHub redirects the old URL, but the local `origin` remote was repointed to the canonical one),
-GitHub Pages at `https://adepuharshith.github.io/ultrasound-ndt-toolkit/` (not yet enabled in repo settings — Settings →
-Pages → main branch). Pushing over HTTPS works via credentials already cached in the macOS Keychain
+live at `https://ultrasoundndt.com/` (custom domain bought at Squarespace Domains, Nov 2026; renews at $22/yr
+in Oct 2028). Served by GitHub Pages from `main` / root; the `CNAME` file at the repo root holds the domain
+(don't delete it — Pages would drop the custom domain). DNS at Squarespace is 4 GitHub A records on `@` + a
+`www` CNAME to `adepuharshith.github.io`; the old `github.io` URL and `www` both redirect to the apex. Every
+HTML page has a `<link rel="canonical">` pointing at `https://ultrasoundndt.com/<page>` (index → `/`) — add
+one when creating a new page. Pushing over HTTPS works via credentials already cached in the macOS Keychain
 (`osxkeychain` credential helper) — `git push origin main` from the CLI just works, no PAT/SSH setup
 needed. Offer to commit + push after finishing a change, but only do it once the user confirms — they
 don't want automatic pushes on every change.
